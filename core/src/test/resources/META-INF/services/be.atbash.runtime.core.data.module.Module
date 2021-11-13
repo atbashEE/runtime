@@ -1,0 +1,4 @@
+be.atbash.runtime.core.modules.LoggingModule
+be.atbash.runtime.core.modules.ConfigModule
+be.atbash.runtime.core.modules.Module1
+be.atbash.runtime.core.modules.Module2

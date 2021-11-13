@@ -1,0 +1,10 @@
+{
+  "logging" : {
+    "logToConsole" : false,
+    "logToFile" : true
+  },
+  "endpoints" : [
+    { "name" : "http",
+      "port":  8080}
+  ]
+}

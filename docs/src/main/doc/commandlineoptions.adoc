@@ -1,0 +1,23 @@
+== Command line option
+
+=== Runtime
+
+java -jar atbash-runtime.jar <options>
+
+-r|--root: Location of 'domain' directory, by default current directory.
+
+-n|--configname: Configuration name within the domain, by default `default`.
+
+-v|--verbose: Are all log messages shown on the console.
+
+zero, one or more WAR files can be added to the command line that needs to be deployd. Also the applications that are already 'deployed' within the configuration are started.
+
+=== CLI
+
+java -jar atbash-runtime.jar <command> <options>
+
+==== create-config
+
+Create a configuration within the domain.
+
+xx To be documented xx

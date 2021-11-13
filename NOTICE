@@ -1,0 +1,16 @@
+Atbash Runtime - A small modular Jakarta EE Core profile runtime
+
+Copyright 2021 by Rudy De Busscher
+
+------------------------------------------------------------------------
+See the file LICENSE
+------------------------------------------------------------------------
+
+
+This codebase builds on top of EPL-2 or Apache licensed code.
+
+Jetty: https://github.com/eclipse/jetty.project
+Jersey: https://github.com/eclipse-ee4j/jersey
+Weld: https://github.com/weld/core
+
+and others

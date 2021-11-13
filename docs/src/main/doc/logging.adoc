@@ -1,0 +1,25 @@
+The runtime controls the entire logging subsystem.
+
+The configuration is performed through a properties file that configures the Java Util Logging system.  The file is expected at  `<instance>/logging.properties` and is created from a default when not found.
+
+Within the Runtime itself, the logging is performed through SLF4J API.  A bridge to Java Util Logging is included.  The `be.atbash.runtime.logging.handler.LogFileHandler` handles the logging to file.
+
+By default, no messages are written to the console and if needed, the `--logToConsole` is required to view logging entries also on the console.
+
+=== Early logging
+
+Since the logging module requires the Configuration module to be started (so that configuration is known) the logging cannot be configured immediately after the Java program starts. The initial logging is captured by an `EarlyLogHandler` that stores the LogRecords within memory until the logging module is ready.
+
+The Early Logging is configured through this call:
+
+[source]
+----
+LoggingManager.getInstance().initializeEarlyLogging(logToConsole);
+----
+
+Performed steps are
+
+- Define RuntimeLogManager as Log manager.
+- Set logToConsole value as System property (`LoggingUtil.SYSTEM_PROPERTY_LOGGING_CONSOLE = "runtime.logging.console"`)
+- Remove all handlers from th Root Logger.
+- Add the Early Logging Handler.

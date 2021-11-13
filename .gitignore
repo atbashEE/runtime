@@ -1,5 +1,9 @@
+# default configuration in the domain
+default
+
 # Compiled class file
 *.class
+target
 
 # Log file
 *.log
@@ -21,3 +25,29 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# File created by maven.
+dependency-reduced-pom.xml
+
+### JetBrains template
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
+
+*.iml
+
+## Directory-based project format:
+.idea/
+
+## File-based project format:
+*.ipr
+*.iws
+
+## Plugin-specific files:
+
+# IntelliJ
+out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# snyk
+.dcignore
