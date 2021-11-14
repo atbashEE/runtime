@@ -32,6 +32,9 @@
     <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <properties>
+        <docker.skip>false</docker.skip>
+    </properties>
     <dependencies>
 
         <dependency>
@@ -115,13 +118,20 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.31.0</version>
+                <version>0.38.0</version>
                 <configuration>
                     <images>
                         <image>
-                            <name></name>
+                            <build>
+                                <contextDir>${project.basedir}/src/main/docker</contextDir>
+                                <assembly>
+                                    <descriptorRef>artifact</descriptorRef>
+                                </assembly>
+                            </build>
+                            <name>%a:%v</name>
                         </image>
                     </images>
+                    <skip>${docker.skip}</skip>
                 </configuration>
                 <executions>
                     <execution>

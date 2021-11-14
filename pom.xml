@@ -134,7 +134,8 @@
                         <exclude>**/NOTICE.txt</exclude>
                         <exclude>**/NOTICE</exclude>
                         <exclude>**/config.yml</exclude>
-                        <exclude>**/Base64Codec.java</exclude>
+                        <exclude>**/*.sh</exclude>
+                        <exclude>**/Dockerfile</exclude>
                     </excludes>
                     <mapping>
                         <java>SLASHSTAR_STYLE</java>

@@ -83,6 +83,8 @@ public class RuntimeMain {
             LOGGER.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
 
             deployArchives(command);
+            // FIXME CLI-104 is used twice
+            // FIXME list number of applications.
             LOGGER.info("CLI-104: Applications ready");
         }
     }
