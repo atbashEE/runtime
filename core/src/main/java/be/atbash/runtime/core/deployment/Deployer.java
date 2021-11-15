@@ -69,7 +69,10 @@ public class Deployer implements ModuleEventListener {
             LOG.info(String.format("Loading application %s", deployment.getDeploymentName()));
             // FIXME
         } else {
-            deploy(deployment);
+            if (!deploy(deployment)) {
+                // Nothing is deployed,
+                return;
+            }
             determineSpecifications(deployment);
         }
 
@@ -111,9 +114,17 @@ public class Deployer implements ModuleEventListener {
         deployment.setSniffers(specificationChecker.getTriggeredSniffers());
     }
 
-    private void deploy(ArchiveDeployment deployment) {
+    /**
+     * Deployment is unpacking the WAR into the domain configuration directory.
+     * @param deployment
+     * @return
+     */
+    private boolean deploy(ArchiveDeployment deployment) {
         LOG.info(String.format("Deploying application %s", deployment.getArchiveFile()));
 
+        if (!checkDeployment(deployment)) {
+            return false;
+        }
         File targetLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getArchiveFile().getName());
         deployment.setDeploymentLocation(targetLocation);
         Unpack unpack = new Unpack(deployment.getArchiveFile(), targetLocation);
@@ -122,6 +133,15 @@ public class Deployer implements ModuleEventListener {
 
         WebAppClassLoader appClassLoader = new WebAppClassLoader(targetLocation, Deployer.class.getClassLoader());
         deployment.setClassLoader(appClassLoader);
-        
+        return true;
+    }
+
+    private boolean checkDeployment(ArchiveDeployment deployment) {
+        // FIXME We need more checks?
+        boolean result = deployment.getArchiveFile().exists();
+        if (!result) {
+            LOG.warn(String.format("DEPLOY-101: Deployment %s not found", deployment.getArchiveFile()));
+        }
+        return result;
     }
 }
