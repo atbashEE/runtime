@@ -1,4 +1,5 @@
 be.atbash.runtime.config.module.ConfigModule
 be.atbash.runtime.logging.LoggingModule
+be.atbash.runtime.core.data.DataModule
 be.atbash.runtime.jetty.JettyModule
 be.atbash.runtime.jersey.JerseyModule

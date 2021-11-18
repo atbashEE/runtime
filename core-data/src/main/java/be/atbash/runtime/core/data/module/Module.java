@@ -26,6 +26,7 @@ public interface Module<C> extends Runnable, ModuleEventListener {
 
     String LOGGING_MODULE_NAME = "Logging";
     String CONFIG_MODULE_NAME = "Config";
+    String DATA_MODULE_NAME = "Data";
 
     /**
      * The Name of the module

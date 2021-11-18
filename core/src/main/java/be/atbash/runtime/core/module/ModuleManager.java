@@ -60,6 +60,9 @@ public class ModuleManager {
         RuntimeConfiguration runtimeConfiguration = module1.getExposedObject(RuntimeConfiguration.class);
         startEssentialModule(module2, runtimeConfiguration);
 
+        Module<?> module3 = findModule(Module.DATA_MODULE_NAME);
+        startEssentialModule(module3, null);
+
         registerSniffers();
     }
 

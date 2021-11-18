@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.core.deployment;
 
+import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.WebAppClassLoader;
@@ -25,6 +26,7 @@ import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.event.ModuleEventListener;
 import be.atbash.runtime.core.deployment.monitor.ApplicationMon;
+import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import be.atbash.runtime.monitor.core.Monitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +83,9 @@ public class Deployer implements ModuleEventListener {
         deployment.getDeploymentModule().registerDeployment(deployment);
 
         //EventManager.getInstance().publishEvent(Events.REGISTER_DEPLOYMENT, deployment);
+        RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+        runData.deployed(deployment);
+
         applicationMon.registerApplication(deployment.getDeploymentName());
     }
 
