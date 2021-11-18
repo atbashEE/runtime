@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.jetty;
 
+import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.config.ConfigUtil;
@@ -22,15 +23,14 @@ import be.atbash.runtime.core.data.config.Endpoint;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
-import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -119,19 +119,14 @@ public class JettyModule implements Module<RuntimeConfiguration> {
 
         LOGGER.info("JETTY:101: Started Jetty");
 
-        /*
-        HashLoginService loginService = new HashLoginService();
-        loginService.setName("Test Realm");
-        loginService.setConfig("src/test/resources/realm.properties");
-        server.addBean(loginService);
-
-
-        and for Jersey https://eclipse-ee4j.github.io/jersey.github.io/documentation/latest/user-guide.html#deployment
-        https://mkyong.com/webservices/jax-rs/jersey-and-jetty-http-server-examples/
-        https://github.com/AlanHohn/jaxrs
-        https://github.com/eclipse-ee4j/jersey/blob/master/containers/jetty-http/src/main/java/org/glassfish/jersey/jetty/JettyHttpContainerFactory.java
-         */
-
+        if (Arrays.stream(configuration.getRequestedModules()).noneMatch("health"::equals)) {
+            // FIXME create a proper health module.
+            // But if health module is node active, this HealthHandler should give basics
+            // so that MicroShed testing is working.
+            // register health
+            RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+            handlers.addHandler(new HealthHandler(runData));
+        }
     }
 
     @Override

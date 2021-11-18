@@ -17,15 +17,16 @@ package be.atbash.runtime;
 
 import be.atbash.runtime.common.command.AbstractAtbashCommand;
 import be.atbash.runtime.common.command.RuntimeCommand;
+import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.version.VersionInfo;
+import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import be.atbash.runtime.logging.LoggingManager;
 import be.atbash.runtime.monitor.ServerMon;
 import be.atbash.runtime.monitor.core.Monitoring;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -82,10 +83,15 @@ public class RuntimeMain {
             LOGGER = LoggingManager.getInstance().getMainLogger(RuntimeMain.class, logToConsole);
             LOGGER.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
 
-            deployArchives(command);
+            int applications = deployAndRunArchives(command);
             // FIXME CLI-104 is used twice
-            // FIXME list number of applications.
-            LOGGER.info("CLI-104: Applications ready");
+            if (applications > 0) {
+                LOGGER.info(String.format("CLI-104: %s Applications running", applications));
+            } else {
+                // FIXME, if we do not run the domain mode (domain module is running) this
+                // doesn't make any sense and we should quit the process
+                LOGGER.warn("CLI-105: No Applications running");
+            }
         }
     }
 
@@ -104,11 +110,13 @@ public class RuntimeMain {
         return result;
     }
 
-    private static void deployArchives(RuntimeCommand command) {
+    private static int deployAndRunArchives(RuntimeCommand command) {
         File[] archives = command.getConfigurationParameters().getArchives();
         EventManager eventManager = EventManager.getInstance();
         if (archives != null && archives.length > 0) {
             Arrays.stream(archives).forEach(a -> eventManager.publishEvent(Events.DEPLOYMENT, new ArchiveDeployment(a)));
         }
+        RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+        return runData.getDeployments().size();
     }
 }
