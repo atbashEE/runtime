@@ -93,6 +93,7 @@ public class Unpack {
      * @throws IOException
      */
     private static void extractFile(JarInputStream jarInputStream, String filePath) throws IOException {
+        ensureDirectoryExists(filePath);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
         byte[] bytesIn = new byte[BUFFER_SIZE];
         int read = 0;
@@ -100,5 +101,12 @@ public class Unpack {
             bos.write(bytesIn, 0, read);
         }
         bos.close();
+    }
+
+    private static void ensureDirectoryExists(String filePath) {
+        File parentFile = new File(filePath).getParentFile();
+        if (!parentFile.exists()) {
+            parentFile.mkdirs();
+        }
     }
 }
