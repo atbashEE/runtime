@@ -5,12 +5,14 @@ EXPOSE 8080
 
 ENV HOME_DIR=/opt/atbash
 ENV SCRIPT_DIR=${HOME_DIR} \
+    DEPLOYMENT_DIR=${HOME_DIR}/deployment \
     JVM_ARGS="" \
     MEM_MAX_RAM_PERCENTAGE="70.0" \
     MEM_XSS="512k"
 
 RUN true \
     && mkdir -p "${HOME_DIR}" \
+    && mkdir -p "${DEPLOYMENT_DIR}" \
     && addgroup --gid 1000 atbash \
     && adduser --system --uid 1000 --no-create-home --shell /bin/bash --home "${HOME_DIR}" --gecos "" --ingroup atbash atbash \
     && echo atbash:atbash | chpasswd \

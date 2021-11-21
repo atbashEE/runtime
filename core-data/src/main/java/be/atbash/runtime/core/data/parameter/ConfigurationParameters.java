@@ -38,6 +38,9 @@ public class ConfigurationParameters {
     @CommandLine.Option(names = {"-r", "--root"}, description = "Location of the Atbash runtime installation, current directory by default")
     private String rootDirectory = ".";
 
+    @CommandLine.Option(names = {"--deploymentdirectory"}, description = "Deployment directory that is searched for WAR files which needs to be deployed.")
+    private File deploymentDirectory;
+
     @CommandLine.Option(names = {"-n", "--configName"}, description = "Configuration name")
     private String configName = "default";
 
@@ -93,6 +96,14 @@ public class ConfigurationParameters {
 
     public void setRootDirectory(String rootDirectory) {
         this.rootDirectory = rootDirectory;
+    }
+
+    public File getDeploymentDirectory() {
+        return deploymentDirectory;
+    }
+
+    public void setDeploymentDirectory(File deploymentDirectory) {
+        this.deploymentDirectory = deploymentDirectory;
     }
 
     public String getConfigName() {

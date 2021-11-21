@@ -30,10 +30,13 @@ import org.slf4j.Logger;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class RuntimeMain {
+
+    private static Logger LOGGER;
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
@@ -43,7 +46,7 @@ public class RuntimeMain {
         LoggingManager.getInstance().initializeEarlyLogging(logToConsole);
 
         // We can't create a logger before we have installed our EarlyLogHandler
-        Logger LOGGER = LoggingManager.getInstance().getMainLogger(RuntimeMain.class, logToConsole);
+        LOGGER = LoggingManager.getInstance().getMainLogger(RuntimeMain.class, logToConsole);
 
         LOGGER.info("CLI-101: Handling command line arguments");
         RuntimeCommand command = new RuntimeCommand();
@@ -111,12 +114,41 @@ public class RuntimeMain {
     }
 
     private static int deployAndRunArchives(RuntimeCommand command) {
-        File[] archives = command.getConfigurationParameters().getArchives();
+        List<File> archives = getAllArchives(command);
         EventManager eventManager = EventManager.getInstance();
-        if (archives != null && archives.length > 0) {
-            Arrays.stream(archives).forEach(a -> eventManager.publishEvent(Events.DEPLOYMENT, new ArchiveDeployment(a)));
+        if (!archives.isEmpty()) {
+            archives.forEach(a -> eventManager.publishEvent(Events.DEPLOYMENT, new ArchiveDeployment(a)));
         }
         RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
         return runData.getDeployments().size();
+    }
+
+    private static List<File> getAllArchives(RuntimeCommand command) {
+        List<File> result = new ArrayList<>();
+        File deploymentDirectory = command.getConfigurationParameters().getDeploymentDirectory();
+        if (deploymentDirectory != null) {
+
+            result.addAll(findArchivesInDeploymentDirectory(deploymentDirectory));
+        }
+
+        File[] archives = command.getConfigurationParameters().getArchives();
+        if (archives != null) {
+            result.addAll(Arrays.asList(archives));
+        }
+        return result;
+    }
+
+    private static List<File> findArchivesInDeploymentDirectory(File deploymentDirectory) {
+        List<File> result = new ArrayList<>();
+        if (deploymentDirectory.exists() && deploymentDirectory.isDirectory()) {
+
+            File[] files = deploymentDirectory.listFiles((dir, name) -> name.endsWith(".war"));
+            if (files != null) {
+                result.addAll(Arrays.asList(files));
+            }
+        } else {
+            LOGGER.warn(String.format( "CLI-105: %s is not a valid directory", deploymentDirectory));
+        }
+        return result;
     }
 }
