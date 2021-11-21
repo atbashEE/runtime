@@ -110,6 +110,19 @@
                                     </manifestEntries>
 
                                 </transformer>
+
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/services/org.glassfish.jersey.internal.spi.AutoDiscoverable
+                                    </resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>
+                                        META-INF/services/org.glassfish.jersey.internal.spi.ForcedAutoDiscoverable
+                                    </resource>
+                                </transformer>
+
                             </transformers>
                         </configuration>
                     </execution>
