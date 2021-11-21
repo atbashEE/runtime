@@ -35,6 +35,9 @@ public class HealthHandler extends AbstractHandler {
     }
 
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        if (!target.startsWith("/health")) {
+            return;
+        }
         response.setContentType("text/html;charset=utf-8");
 
         int status = runData.getDeployments().isEmpty() ? HttpServletResponse.SC_SERVICE_UNAVAILABLE : HttpServletResponse.SC_OK;
