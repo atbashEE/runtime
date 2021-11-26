@@ -16,12 +16,17 @@
 package be.atbash.runtime.core.module;
 
 import be.atbash.runtime.core.data.module.Module;
+import be.atbash.runtime.core.deployment.Deployer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 // FIXME naming should be different I guess.
 public class ExposedObjectsModuleManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExposedObjectsModuleManager.class);
 
     private static final ExposedObjectsModuleManager INSTANCE = new ExposedObjectsModuleManager();
 
@@ -35,7 +40,7 @@ public class ExposedObjectsModuleManager {
         if (exposedObjectMapping.containsKey(exposedObjectType)) {
             return exposedObjectMapping.get(exposedObjectType).getExposedObject(exposedObjectType);
         } else {
-            // FIXME Logging
+            LOGGER.error(String.format("DE-101: Object '%s' not exposed by any Module", exposedObjectType.getName()));
         }
         return null;
     }
