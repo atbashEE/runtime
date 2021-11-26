@@ -41,7 +41,7 @@
 
         <dependency>
             <groupId>be.atbash.runtime</groupId>
-            <artifactId>core-data</artifactId>
+            <artifactId>core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 

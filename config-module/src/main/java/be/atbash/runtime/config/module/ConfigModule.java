@@ -18,6 +18,8 @@ package be.atbash.runtime.config.module;
 import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.config.ConfigInstanceUtil;
 import be.atbash.runtime.config.module.profile.ProfileManager;
+import be.atbash.runtime.config.util.FileUtil;
+import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.config.Config;
@@ -25,7 +27,7 @@ import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
-import be.atbash.runtime.core.data.util.ResourceReader;
+import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import be.atbash.runtime.monitor.core.Monitoring;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,12 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 public class ConfigModule implements Module<ConfigurationParameters> {
@@ -130,6 +129,8 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         builder.setConfig(config);
         runtimeConfiguration = builder.build();
 
+        RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+        runData.registerDeploymentListener(new ArchiveDeploymentStorage(runtimeConfiguration));
         Monitoring.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Module ready");
     }
 
@@ -141,25 +142,14 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     }
 
     private void readConfiguration(ConfigInstance configInstance) {
-        String content = readConfigurationContent(configInstance);
+        String content = FileUtil.readConfigurationContent(configInstance);
         ObjectMapper mapper = new ObjectMapper();
         try {
-            config =  mapper.readValue(content, Config.class);
+            config = mapper.readValue(content, Config.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             // FIXME
         }
-    }
-
-    private String readConfigurationContent(ConfigInstance configInstance) {
-        File configFile = new File(configInstance.getConfigDirectory(), "config.json");
-        try {
-            return Files.readString(configFile.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-            // FIXME
-        }
-        return null;
     }
 
 

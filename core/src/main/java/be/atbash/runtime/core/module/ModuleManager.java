@@ -53,15 +53,17 @@ public class ModuleManager {
 
     private void init() {
         modules = findAllModules();
-        Module<?> module1 = findModule(Module.CONFIG_MODULE_NAME);
-        startEssentialModule(module1, configurationParameters);
 
-        Module<?> module2 = findModule(Module.LOGGING_MODULE_NAME);
-        RuntimeConfiguration runtimeConfiguration = module1.getExposedObject(RuntimeConfiguration.class);
-        startEssentialModule(module2, runtimeConfiguration);
+        // Data Module must be the first one as everything else can be dependent on it.
+        Module<?> module1 = findModule(Module.DATA_MODULE_NAME);
+        startEssentialModule(module1, null);
 
-        Module<?> module3 = findModule(Module.DATA_MODULE_NAME);
-        startEssentialModule(module3, null);
+        Module<?> module2 = findModule(Module.CONFIG_MODULE_NAME);
+        startEssentialModule(module2, configurationParameters);
+
+        Module<?> module3 = findModule(Module.LOGGING_MODULE_NAME);
+        RuntimeConfiguration runtimeConfiguration = module3.getExposedObject(RuntimeConfiguration.class);
+        startEssentialModule(module3, runtimeConfiguration);
 
         registerSniffers();
     }
