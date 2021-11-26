@@ -96,6 +96,11 @@ public class RuntimeMain {
                 LOGGER.warn("CLI-105: No Applications running");
             }
         }
+
+        if (command.getConfigurationParameters().isWarmup()) {
+            LOGGER.info("CLI-106: process stop due to warmup parameter");
+            System.exit(0);  // Normal status.
+        }
     }
 
     private static AbstractAtbashCommand handleCommandLine(String[] args, RuntimeCommand command, CommandLine commandLine) {

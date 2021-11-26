@@ -47,6 +47,9 @@ public class ConfigurationParameters {
     @CommandLine.Option(names = {"--logToConsole"}, description = "Does the runtime logs to the console")
     private boolean logToConsole = false;
 
+    @CommandLine.Option(names = {"--warmup"}, description = "In warmup mode, runtime exists when application(s) are ready.")
+    private boolean warmup = false;
+
     @CommandLine.Parameters(index = "0..*")
     private File[] archives;
 
@@ -120,6 +123,14 @@ public class ConfigurationParameters {
 
     public void setLogToConsole(boolean logToConsole) {
         this.logToConsole = logToConsole;
+    }
+
+    public boolean isWarmup() {
+        return warmup;
+    }
+
+    public void setWarmup(boolean warmup) {
+        this.warmup = warmup;
     }
 
     public File[] getArchives() {
