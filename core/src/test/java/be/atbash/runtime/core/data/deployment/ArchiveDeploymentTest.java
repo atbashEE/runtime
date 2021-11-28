@@ -78,7 +78,7 @@ class ArchiveDeploymentTest {
         File location = new File(strTmp, "junit.war");
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
         List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
-        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers);
+        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit");
         Assertions.assertThat(deployment.isDeployed()).isFalse();
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("customName");
         Assertions.assertThat(deployment.isVerified()).isFalse();
@@ -91,7 +91,7 @@ class ArchiveDeploymentTest {
         File location = new File(strTmp, "junit.war");
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
         List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
-        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers);
+        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit");
         Assertions.assertThat(deployment.isVerified()).isFalse();
         Assertions.assertThat(deployment.isPrepared()).isFalse();
         Assertions.assertThat(deployment.isDeployed()).isFalse();
@@ -108,7 +108,7 @@ class ArchiveDeploymentTest {
         File location = new File(strTmp, "junit.war");
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
         List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
-        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers);
+        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit");
         Assertions.assertThat(deployment.isVerified()).isFalse();
         Assertions.assertThat(deployment.isPrepared()).isFalse();
         Assertions.assertThat(deployment.isDeployed()).isFalse();
@@ -146,7 +146,7 @@ class ArchiveDeploymentTest {
         File location = new File(strTmp, "junit.war");
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
         List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
-        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers);
+        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit");
         Assertions.assertThat(deployment.isPrepared()).isFalse();
         Assertions.assertThat(deployment.isVerified()).isFalse();
         Assertions.assertThat(deployment.isDeployed()).isFalse();
@@ -162,6 +162,33 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.isPrepared()).isTrue();
         Assertions.assertThat(deployment.isDeployed()).isFalse();
 
+    }
+
+    @Test
+    public void testSetContextRoot() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File archive = new File(strTmp, "junit.war");
+        ArchiveDeployment deployment = new ArchiveDeployment(archive);
+        deployment.setContextRoot("/root");
+        Assertions.assertThat(deployment.getContextRoot()).isEqualTo("/root");
+    }
+
+    @Test
+    public void testSetContextRootCleanup() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File archive = new File(strTmp, "junit.war");
+        ArchiveDeployment deployment = new ArchiveDeployment(archive);
+        deployment.setContextRoot("  root   ");
+        Assertions.assertThat(deployment.getContextRoot()).isEqualTo("/root");
+    }
+
+    @Test
+    public void testSetContextRootNoEndSlash() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File archive = new File(strTmp, "junit.war");
+        ArchiveDeployment deployment = new ArchiveDeployment(archive);
+        deployment.setContextRoot("root/");
+        Assertions.assertThat(deployment.getContextRoot()).isEqualTo("/root");
     }
 
 }

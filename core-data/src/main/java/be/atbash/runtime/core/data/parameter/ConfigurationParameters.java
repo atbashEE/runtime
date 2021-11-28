@@ -50,6 +50,9 @@ public class ConfigurationParameters {
     @CommandLine.Option(names = {"--warmup"}, description = "In warmup mode, runtime exists when application(s) are ready.")
     private boolean warmup = false;
 
+    @CommandLine.Option(names = {"--contextroot"}, description = "The context root for the application. Comma separated list when multiple applications are deployed.")
+    private String contextRoot = "";
+
     @CommandLine.Parameters(index = "0..*")
     private File[] archives;
 
@@ -131,6 +134,14 @@ public class ConfigurationParameters {
 
     public void setWarmup(boolean warmup) {
         this.warmup = warmup;
+    }
+
+    public String getContextRoot() {
+        return contextRoot;
+    }
+
+    public void setContextRoot(String contextRoot) {
+        this.contextRoot = contextRoot;
     }
 
     public File[] getArchives() {

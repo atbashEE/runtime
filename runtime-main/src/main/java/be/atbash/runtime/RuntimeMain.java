@@ -25,6 +25,7 @@ import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.util.SpecificationUtil;
 import be.atbash.runtime.core.data.version.VersionInfo;
 import be.atbash.runtime.core.deployment.SnifferManager;
@@ -66,6 +67,10 @@ public class RuntimeMain {
             // FIXME
         }
 
+        if (!validateCommandLine(command)) {
+            LOGGER.error("CLI-111: Number of values for parameter --contextroot does not math number of application to be deployed.");
+        }
+
         if (actualCommand.getCommandType() == AbstractAtbashCommand.CommandType.CLI) {
             try {
                 LoggingManager.getInstance().restoreOriginalHandlers();
@@ -95,7 +100,7 @@ public class RuntimeMain {
             LOGGER.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
 
             int applications = deployAndRunArchives(command);
-            // FIXME CLI-104 is used twice
+
             if (applications > 0) {
                 LOGGER.info(String.format("CLI-104: %s Applications running", applications));
             } else {
@@ -110,6 +115,18 @@ public class RuntimeMain {
             LOGGER.info("CLI-106: process stop due to warmup parameter");
             System.exit(0);  // Normal status.
         }
+    }
+
+    private static boolean validateCommandLine(RuntimeCommand command) {
+        String contextRoot = command.getConfigurationParameters().getContextRoot();
+        if (contextRoot.isBlank()) {
+            // No contextroot value specified, nothing to check.
+            return true;
+        }
+
+        List<File> archivesSpecifiedOnCommandLine = getAllArchivesSpecifiedOnCommandLine(command);
+        String[] parts = contextRoot.split(",");
+        return archivesSpecifiedOnCommandLine.size() == parts.length;
     }
 
     private static AbstractAtbashCommand handleCommandLine(String[] args, RuntimeCommand command, CommandLine commandLine) {
@@ -148,6 +165,8 @@ public class RuntimeMain {
                 a -> eventManager.publishEvent(Events.DEPLOYMENT, a)
         );
 
+        assignContextRoots(archives, command.getConfigurationParameters().getContextRoot());
+
         if (!archives.isEmpty()) {
             archives.forEach(a -> eventManager.publishEvent(Events.DEPLOYMENT, a));
         }
@@ -155,10 +174,20 @@ public class RuntimeMain {
         return runData.getDeployments().size();
     }
 
+    private static void assignContextRoots(List<ArchiveDeployment> archives, String contextRoot) {
+        if (contextRoot.isBlank()) {
+            return;
+        }
+        String[] rootValues = contextRoot.split(",");
+        for (int i = 0; i < rootValues.length; i++) {
+            archives.get(i).setContextRoot(rootValues[i]);
+        }
+    }
+
     private static ArchiveDeployment createArchiveDeployment(DeploymentMetadata metadata, EventManager eventManager) {
         List<Sniffer> sniffers = SnifferManager.getInstance().retrieveSniffers(metadata.getSniffers());
         ArchiveDeployment deployment = new ArchiveDeployment(metadata.getDeploymentLocation(), metadata.getDeploymentName()
-                , SpecificationUtil.asEnum(metadata.getSpecifications()), sniffers);
+                , SpecificationUtil.asEnum(metadata.getSpecifications()), sniffers, metadata.getContextRoot());
         eventManager.publishEvent(Events.VERIFY_DEPLOYMENT, deployment);
         if (deployment.getDeploymentLocation() == null) {
             // The Deployment location is gone
@@ -194,6 +223,15 @@ public class RuntimeMain {
         } else {
             LOGGER.warn(String.format("CLI-105: %s is not a valid directory", deploymentDirectory));
         }
+        result.sort(new AlphabeticalComparator());
         return result;
+    }
+
+    private static class AlphabeticalComparator implements java.util.Comparator<File> {
+
+        @Override
+        public int compare(File f1, File f2) {
+            return f1.getName().compareTo(f2.getName());
+        }
     }
 }

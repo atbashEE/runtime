@@ -35,7 +35,9 @@ public class ArchiveDeployment {
     private boolean deployed;
     private File deploymentLocation;
 
-    // This is bout preparation.
+    private String contextRoot;
+
+    // This is about preparation.
     private ArchiveContent archiveContent;
     private WebAppClassLoader classLoader;
     private List<Specification> specifications;
@@ -61,11 +63,13 @@ public class ArchiveDeployment {
         this.verified = true;
     }
 
-    public ArchiveDeployment(String deploymentLocation, String deploymentName, List<Specification> specifications, List<Sniffer> sniffers) {
+    public ArchiveDeployment(String deploymentLocation, String deploymentName, List<Specification> specifications,
+                             List<Sniffer> sniffers, String contextRoot) {
         this.deploymentLocation = new File(deploymentLocation);
         this.deploymentName = deploymentName;
         this.specifications = specifications;
         this.sniffers = sniffers;
+        this.contextRoot = contextRoot;
         this.verified = false;
     }
 
@@ -149,7 +153,16 @@ public class ArchiveDeployment {
     }
 
     public String getContextRoot() {
-        // FIXME make this configurable.
-        return "/" + deploymentName;
+        return contextRoot == null ? "/" + deploymentName : contextRoot;
+    }
+
+    public void setContextRoot(String contextRoot) {
+        this.contextRoot = contextRoot.strip();
+        if (!this.contextRoot.startsWith("/")) {
+            this.contextRoot = "/" + this.contextRoot;
+        }
+        if (this.contextRoot.endsWith("/")) {
+            this.contextRoot = this.contextRoot.substring(0, this.contextRoot.length() - 1);
+        }
     }
 }

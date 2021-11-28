@@ -31,6 +31,7 @@ public class DeploymentMetadata {
     private String deploymentLocation;
     private List<String> specifications;
     private List<String> sniffers;
+    private String contextRoot;
 
     // required for Json Processing
     public DeploymentMetadata() {
@@ -47,8 +48,10 @@ public class DeploymentMetadata {
         sniffers = deployment.getSniffers().stream()
                 .map(s -> s.getClass().getSimpleName())
                 .collect(Collectors.toList());
+        contextRoot = deployment.getContextRoot();
     }
 
+    // setters are for the JSON handling
     public String getDeploymentName() {
         return deploymentName;
     }
@@ -79,5 +82,13 @@ public class DeploymentMetadata {
 
     public void setSniffers(List<String> sniffers) {
         this.sniffers = sniffers;
+    }
+
+    public String getContextRoot() {
+        return contextRoot;
+    }
+
+    public void setContextRoot(String contextRoot) {
+        this.contextRoot = contextRoot;
     }
 }

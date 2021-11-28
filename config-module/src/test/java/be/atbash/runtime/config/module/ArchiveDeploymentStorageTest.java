@@ -30,7 +30,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ArchiveDeploymentStorageTest {
 
-
     @Test
     public void testArchiveDeploymentDone() throws IOException {
         File configDirectory = new File("./target/testDirectory1");
@@ -51,7 +50,7 @@ class ArchiveDeploymentStorageTest {
         String content = Files.readString(new File(configDirectory, "applications.json").toPath());
 
         assertThat(content).contains("\"deploymentName\":\"test\"");
-        assertThat(content).contains("\"deploymentLocation\":\"/applications/test.war\"");
+        assertThat(content).contains("\"deploymentLocation\":\"/test.war\"");
         assertThat(content).contains("\"specifications\":[\"REST\",\"HTML\"]");
         assertThat(content).contains("\"sniffers\":[\"TestSniffer1\"]");
     }
@@ -61,7 +60,7 @@ class ArchiveDeploymentStorageTest {
         File configDirectory = new File("./target/testDirectory2");
         configDirectory.mkdirs();
 
-        String originalContent = "{\"deployments\":[{\"deploymentName\":\"test\",\"deploymentLocation\":\"/applications/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"]}]}";
+        String originalContent = "{\"deployments\":[{\"deploymentName\":\"test\",\"deploymentLocation\":\"/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"]}]}";
         Files.writeString(new File(configDirectory, "applications.json").toPath(), originalContent);
 
         RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
@@ -78,9 +77,9 @@ class ArchiveDeploymentStorageTest {
 
         String content = Files.readString(new File(configDirectory, "applications.json").toPath());
 
-        assertThat(content).contains("{\"deploymentName\":\"test\",\"deploymentLocation\":\"/applications/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"]}");
+        assertThat(content).contains("{\"deploymentName\":\"test\",\"deploymentLocation\":\"/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"],\"contextRoot\":null}");
         assertThat(content).contains("\"deploymentName\":\"test2\"");
-        assertThat(content).contains("\"deploymentLocation\":\"/applications/test2.war\"");
+        assertThat(content).contains("\"deploymentLocation\":\"/test2.war\"");
         assertThat(content).contains("\"specifications\":[\"SERVLET\"]");
         assertThat(content).contains("\"sniffers\":[\"TestSniffer2\"]");
     }
@@ -107,7 +106,7 @@ class ArchiveDeploymentStorageTest {
 
         String content = Files.readString(new File(configDirectory, "applications.json").toPath());
 
-        assertThat(content).contains("{\"deploymentName\":\"test\",\"deploymentLocation\":\"/applications/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"]}");
+        assertThat(content).contains("{\"deploymentName\":\"test\",\"deploymentLocation\":\"/applications/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"],\"contextRoot\":null}");
         assertThat(content).doesNotContain("\"deploymentName\":\"test2\"");
         assertThat(content).doesNotContain("\"deploymentLocation\":\"/applications/test2.war\"");
         assertThat(content).doesNotContain("\"specifications\":[\"SERVLET\"]");
