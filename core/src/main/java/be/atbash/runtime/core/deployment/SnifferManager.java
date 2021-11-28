@@ -21,6 +21,7 @@ import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class SnifferManager {
 
@@ -41,8 +42,15 @@ public final class SnifferManager {
         return new SpecificationChecker(archiveContent, classLoader, new ArrayList<>(sniffers));
     }
 
+
+    public List<Sniffer> retrieveSniffers(List<String> snifferNames) {
+        return sniffers.stream()
+                .filter(s -> snifferNames.contains(s.getClass().getSimpleName()))
+                .collect(Collectors.toList());
+
+    }
+
     public static SnifferManager getInstance() {
         return INSTANCE;
     }
-
 }

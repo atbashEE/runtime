@@ -15,17 +15,30 @@
  */
 package be.atbash.runtime.core.data;
 
-import java.util.Arrays;
-import java.util.Optional;
+import org.junit.jupiter.api.Test;
 
-public enum Specification {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    HTML, SERVLET, REST;
+class SpecificationTest {
 
-    public static Specification fromCode(String value) {
-        Optional<Specification> specification = Arrays.stream(Specification.values())
-                .filter(s -> s.name().equalsIgnoreCase(value))
-                .findAny();
-        return specification.orElse(null);
+    @Test
+    public void testFromCode() {
+        assertThat(Specification.fromCode("SERVLET")).isEqualTo(Specification.SERVLET);
     }
+
+    @Test
+    public void testFromCode_caseInsensitive() {
+        assertThat(Specification.fromCode("sErVlEt")).isEqualTo(Specification.SERVLET);
+    }
+
+    @Test
+    public void testFromCode_unknown() {
+        assertThat(Specification.fromCode("xxx")).isNull();
+    }
+
+    @Test
+    public void testFromCode_null() {
+        assertThat(Specification.fromCode(null)).isNull();
+    }
+
 }

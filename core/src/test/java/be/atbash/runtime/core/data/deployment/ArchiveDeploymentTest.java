@@ -15,10 +15,18 @@
  */
 package be.atbash.runtime.core.data.deployment;
 
+import be.atbash.runtime.core.data.Specification;
+import be.atbash.runtime.core.data.WebAppClassLoader;
+import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.deployment.sniffer.SingleTriggeredSniffer;
+import be.atbash.runtime.core.modules.Module1;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 class ArchiveDeploymentTest {
 
@@ -29,8 +37,9 @@ class ArchiveDeploymentTest {
         ArchiveDeployment deployment = new ArchiveDeployment(archive);
         Assertions.assertThat(deployment.isDeployed()).isFalse();
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("junit");
+        Assertions.assertThat(deployment.isVerified()).isTrue();
+        Assertions.assertThat(deployment.isPrepared()).isFalse();
     }
-
 
     @Test
     public void testDeploymentMutlipleDots() {
@@ -46,8 +55,113 @@ class ArchiveDeploymentTest {
         String strTmp = System.getProperty("java.io.tmpdir");
         File archive = new File(strTmp, "junit.war");
         ArchiveDeployment deployment = new ArchiveDeployment(archive, "customName");
-        Assertions.assertThat(deployment.isDeployed()).isTrue();
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("customName");
+        Assertions.assertThat(deployment.isVerified()).isTrue();
+        Assertions.assertThat(deployment.isPrepared()).isFalse();
+    }
+
+
+    @Test
+    public void testDeploymentContextRoot() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File archive = new File(strTmp, "junit.war");
+        ArchiveDeployment deployment = new ArchiveDeployment(archive);
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("junit");
+        Assertions.assertThat(deployment.getContextRoot()).isEqualTo("/junit");
+    }
+
+    @Test
+    public void testDeploymentWithLocation() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File location = new File(strTmp, "junit.war");
+        List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
+        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers);
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("customName");
+        Assertions.assertThat(deployment.isVerified()).isFalse();
+        Assertions.assertThat(deployment.isPrepared()).isFalse();
+    }
+
+    @Test
+    public void testDeploymentVerification() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File location = new File(strTmp, "junit.war");
+        List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
+        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers);
+        Assertions.assertThat(deployment.isVerified()).isFalse();
+        Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
+
+        deployment.setDeploymentLocation(location);
+        Assertions.assertThat(deployment.isVerified()).isTrue();
+        Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
+    }
+
+    @Test
+    public void testDeploymentVerificationFailed() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File location = new File(strTmp, "junit.war");
+        List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
+        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers);
+        Assertions.assertThat(deployment.isVerified()).isFalse();
+        Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
+
+        deployment.setDeploymentLocation(null);
+        Assertions.assertThat(deployment.isVerified()).isFalse();
+        Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
+    }
+
+    @Test
+    public void testDeploymentPrepared() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File archive = new File(strTmp, "junit.war");
+        ArchiveDeployment deployment = new ArchiveDeployment(archive);
+        Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("junit");
+        Assertions.assertThat(deployment.isVerified()).isTrue();
+        Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
+
+        deployment.setArchiveContent(new ArchiveContent(new ArrayList<>()));
+        deployment.setClassLoader(new WebAppClassLoader(archive, this.getClass().getClassLoader()));
+        deployment.setSpecifications(Collections.singletonList(Specification.HTML));
+        deployment.setSniffers(Collections.singletonList(new SingleTriggeredSniffer()));
+        deployment.setDeploymentModule(new Module1());
+
+        Assertions.assertThat(deployment.isVerified()).isTrue();
+        Assertions.assertThat(deployment.isPrepared()).isTrue();
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
+    }
+
+    @Test
+    public void testDeploymentLocationAndPrepared() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File location = new File(strTmp, "junit.war");
+        List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
+        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers);
+        Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.isVerified()).isFalse();
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
+
+        // Verification
+        deployment.setDeploymentLocation(location);
+
+        deployment.setArchiveContent(new ArchiveContent(new ArrayList<>()));
+        deployment.setClassLoader(new WebAppClassLoader(location, this.getClass().getClassLoader()));
+        deployment.setDeploymentModule(new Module1());
+
+        Assertions.assertThat(deployment.isVerified()).isTrue();
+        Assertions.assertThat(deployment.isPrepared()).isTrue();
+        Assertions.assertThat(deployment.isDeployed()).isFalse();
+
     }
 
 }

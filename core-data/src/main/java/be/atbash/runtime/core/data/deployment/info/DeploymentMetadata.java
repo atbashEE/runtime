@@ -40,7 +40,7 @@ public class DeploymentMetadata {
         deploymentName = deployment.getDeploymentName();
         String absolutePath = deployment.getDeploymentLocation().getAbsolutePath();
         // Remove config directory location from the path.
-        deploymentLocation = absolutePath.substring(runtimeConfiguration.getConfigDirectory().getAbsolutePath().length());
+        deploymentLocation = absolutePath.substring(runtimeConfiguration.getApplicationDirectory().getAbsolutePath().length());
         specifications = deployment.getSpecifications().stream()
                 .map(Specification::name)
                 .collect(Collectors.toList());

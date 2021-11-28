@@ -20,6 +20,7 @@ import be.atbash.runtime.core.data.deployment.ArchiveContent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -41,13 +42,17 @@ public class Unpack {
 
     }
 
+    public Unpack(File targetLocation) {
+        this.targetLocation = targetLocation;
+    }
+
     public ArchiveContent handleArchiveFile() {
         try {
             unpackArchive();
 
         } catch (IOException e) {
             // FIXME
-            e.printStackTrace();
+             e.printStackTrace();
         }
         return new ArchiveContent(archiveFiles);
     }
@@ -108,5 +113,36 @@ public class Unpack {
         if (!parentFile.exists()) {
             parentFile.mkdirs();
         }
+    }
+
+    public ArchiveContent processExpandedArchive() {
+
+        defineArchiveContent(targetLocation);
+        return new ArchiveContent(archiveFiles);
+
+    }
+
+    private void defineArchiveContent(File directory) {
+        // Get all files from a directory.
+        File[] fList = directory.listFiles();
+        if (fList != null) {
+            for (File file : fList) {
+                if (file.isFile()) {
+                    Optional<String> content = stripLocation(file.getAbsolutePath());
+                    content.ifPresent(archiveFiles::add);
+                } else if (file.isDirectory()) {
+                    defineArchiveContent(file);
+                }
+            }
+        }
+    }
+
+    private Optional<String> stripLocation(String filePath) {
+        Optional<String> result = Optional.empty();
+        int index = filePath.indexOf(Unpack.WEB_INF_CLASSES);
+        if (index > 0) {
+            result = Optional.of(filePath.substring(index + Unpack.WEB_INF_CLASSES.length() + 1));
+        }
+        return result;
     }
 }

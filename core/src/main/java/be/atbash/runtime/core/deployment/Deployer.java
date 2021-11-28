@@ -25,6 +25,7 @@ import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.event.ModuleEventListener;
+import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.deployment.monitor.ApplicationMon;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import be.atbash.runtime.monitor.core.Monitoring;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Deployer implements ModuleEventListener {
 
@@ -62,16 +64,33 @@ public class Deployer implements ModuleEventListener {
 
             // FIXME Marker Rudy
         }
+        if (Events.VERIFY_DEPLOYMENT.equals(eventPayload.getEventCode())) {
+            verifyArchive(eventPayload.getPayload());
+        }
+    }
+
+    private void verifyArchive(ArchiveDeployment deployment) {
+        File realApplicationDeploymentLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getDeploymentLocation().getAbsolutePath() + "/WEB-INF");
+        if (!realApplicationDeploymentLocation.exists()) {
+            // Does no longer exists.
+            deployment.setDeploymentLocation(null);
+        } else {
+            // realApplicationDeploymentLocation points to /WEB-INF, we need to go 1 up.
+            deployment.setDeploymentLocation(realApplicationDeploymentLocation.getParentFile());
+        }
+
     }
 
     private void deployArchive(ArchiveDeployment deployment) {
         currentArchiveDeployment = deployment;
 
-        if (deployment.isDeployed()) {
-            LOG.info(String.format("Loading application %s", deployment.getDeploymentName()));
-            // FIXME
+        if (deployment.getArchiveFile() == null) {
+            if (!loadArchive(deployment)) {
+                return;
+            }
+            feedSniffers(deployment);
         } else {
-            if (!deploy(deployment)) {
+            if (!unpackArchive(deployment)) {
                 // Nothing is deployed,
                 return;
             }
@@ -82,11 +101,52 @@ public class Deployer implements ModuleEventListener {
 
         deployment.getDeploymentModule().registerDeployment(deployment);
 
+        deployment.setDeployed();
         //EventManager.getInstance().publishEvent(Events.REGISTER_DEPLOYMENT, deployment);
         RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
         runData.deployed(deployment);
 
         applicationMon.registerApplication(deployment.getDeploymentName());
+    }
+
+    private void feedSniffers(ArchiveDeployment deployment) {
+        List<Sniffer> sniffers = new ArrayList<>(deployment.getSniffers());
+        WebAppClassLoader classLoader = deployment.getClassLoader();
+
+        try {
+            for (String archiveClass : deployment.getArchiveContent().getArchiveClasses()) {
+                Class<?> aClass = classLoader.loadClass(archiveClass);
+
+                List<Sniffer> triggeredSniffers = sniffers.stream()
+                        .filter(s -> s.triggered(aClass))
+                        .collect(Collectors.toList());
+
+                triggeredSniffers.stream()
+                        .filter(Sniffer::isFastDetection)
+                        .forEach(sniffers::remove);
+
+                if (sniffers.isEmpty()) {
+                    break;
+                    // No need to check the rest as all Sniffers are selected
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            // FXIME
+            e.printStackTrace();
+        }
+    }
+
+    private boolean loadArchive(ArchiveDeployment deployment) {
+        LOG.info(String.format("Loading application %s", deployment.getDeploymentName()));
+
+        Unpack unpack = new Unpack(deployment.getDeploymentLocation());
+        ArchiveContent archiveContent = unpack.processExpandedArchive();
+        deployment.setArchiveContent(archiveContent);
+
+        extractedsetClassloader(deployment);
+
+        return true;
+
     }
 
     private void determineDeploymentModule(ArchiveDeployment deployment) {
@@ -120,11 +180,12 @@ public class Deployer implements ModuleEventListener {
     }
 
     /**
-     * Deployment is unpacking the WAR into the domain configuration directory.
+     * Unpacking the WAR into the domain configuration directory.
+     *
      * @param deployment
      * @return
      */
-    private boolean deploy(ArchiveDeployment deployment) {
+    private boolean unpackArchive(ArchiveDeployment deployment) {
         LOG.info(String.format("Deploying application %s", deployment.getArchiveFile()));
 
         if (!checkDeployment(deployment)) {
@@ -136,9 +197,14 @@ public class Deployer implements ModuleEventListener {
         ArchiveContent archiveContent = unpack.handleArchiveFile();
         deployment.setArchiveContent(archiveContent);
 
-        WebAppClassLoader appClassLoader = new WebAppClassLoader(targetLocation, Deployer.class.getClassLoader());
-        deployment.setClassLoader(appClassLoader);
+        extractedsetClassloader(deployment);
+
         return true;
+    }
+
+    private void extractedsetClassloader(ArchiveDeployment deployment) {
+        WebAppClassLoader appClassLoader = new WebAppClassLoader(deployment.getDeploymentLocation(), Deployer.class.getClassLoader());
+        deployment.setClassLoader(appClassLoader);
     }
 
     private boolean checkDeployment(ArchiveDeployment deployment) {

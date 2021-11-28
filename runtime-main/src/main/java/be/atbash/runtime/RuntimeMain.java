@@ -17,11 +17,17 @@ package be.atbash.runtime;
 
 import be.atbash.runtime.common.command.AbstractAtbashCommand;
 import be.atbash.runtime.common.command.RuntimeCommand;
+import be.atbash.runtime.core.data.CriticalThreadCount;
 import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
+import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
+import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.data.util.SpecificationUtil;
 import be.atbash.runtime.core.data.version.VersionInfo;
+import be.atbash.runtime.core.deployment.SnifferManager;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import be.atbash.runtime.logging.LoggingManager;
 import be.atbash.runtime.monitor.ServerMon;
@@ -33,6 +39,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class RuntimeMain {
 
@@ -98,6 +106,7 @@ public class RuntimeMain {
         }
 
         if (command.getConfigurationParameters().isWarmup()) {
+            CriticalThreadCount.getInstance().waitForCriticalThreadsToFinish();
             LOGGER.info("CLI-106: process stop due to warmup parameter");
             System.exit(0);  // Normal status.
         }
@@ -119,16 +128,47 @@ public class RuntimeMain {
     }
 
     private static int deployAndRunArchives(RuntimeCommand command) {
-        List<File> archives = getAllArchives(command);
+
+        List<ArchiveDeployment> archives = getAllArchivesSpecifiedOnCommandLine(command)
+                .stream()
+                .map(ArchiveDeployment::new)
+                .collect(Collectors.toList());
+
         EventManager eventManager = EventManager.getInstance();
+
+        List<ArchiveDeployment> persistedDeployments = ExposedObjectsModuleManager.getInstance()
+                .getExposedObject(PersistedDeployments.class)
+                .getDeployments()
+                .stream()
+                .map(md -> createArchiveDeployment(md, eventManager))
+                .filter(Objects::nonNull)  // null means the deployment directory with application binaries is gone.
+                .collect(Collectors.toList());
+
+        persistedDeployments.forEach(
+                a -> eventManager.publishEvent(Events.DEPLOYMENT, a)
+        );
+
         if (!archives.isEmpty()) {
-            archives.forEach(a -> eventManager.publishEvent(Events.DEPLOYMENT, new ArchiveDeployment(a)));
+            archives.forEach(a -> eventManager.publishEvent(Events.DEPLOYMENT, a));
         }
         RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
         return runData.getDeployments().size();
     }
 
-    private static List<File> getAllArchives(RuntimeCommand command) {
+    private static ArchiveDeployment createArchiveDeployment(DeploymentMetadata metadata, EventManager eventManager) {
+        List<Sniffer> sniffers = SnifferManager.getInstance().retrieveSniffers(metadata.getSniffers());
+        ArchiveDeployment deployment = new ArchiveDeployment(metadata.getDeploymentLocation(), metadata.getDeploymentName()
+                , SpecificationUtil.asEnum(metadata.getSpecifications()), sniffers);
+        eventManager.publishEvent(Events.VERIFY_DEPLOYMENT, deployment);
+        if (deployment.getDeploymentLocation() == null) {
+            // The Deployment location is gone
+            // FIXME remove from persistedDeployments.
+            deployment = null;
+        }
+        return deployment;
+    }
+
+    private static List<File> getAllArchivesSpecifiedOnCommandLine(RuntimeCommand command) {
         List<File> result = new ArrayList<>();
         File deploymentDirectory = command.getConfigurationParameters().getDeploymentDirectory();
         if (deploymentDirectory != null) {
@@ -152,7 +192,7 @@ public class RuntimeMain {
                 result.addAll(Arrays.asList(files));
             }
         } else {
-            LOGGER.warn(String.format( "CLI-105: %s is not a valid directory", deploymentDirectory));
+            LOGGER.warn(String.format("CLI-105: %s is not a valid directory", deploymentDirectory));
         }
         return result;
     }

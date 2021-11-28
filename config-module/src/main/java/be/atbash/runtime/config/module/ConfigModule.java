@@ -23,6 +23,7 @@ import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.config.Config;
+import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
@@ -80,13 +81,17 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
     @Override
     public List<Class<?>> getExposedTypes() {
-        return List.of(RuntimeConfiguration.class);
+        return List.of(RuntimeConfiguration.class, PersistedDeployments.class);
     }
 
     @Override
     public <T> T getExposedObject(Class<T> exposedObjectType) {
         if (exposedObjectType.equals(RuntimeConfiguration.class)) {
             return (T) runtimeConfiguration;
+        }
+        if (exposedObjectType.equals(PersistedDeployments.class)) {
+
+            return (T)ConfigUtil.readApplicationDeploymentsData(runtimeConfiguration);
         }
         return null;
     }

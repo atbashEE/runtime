@@ -25,11 +25,17 @@ import java.util.List;
 
 public class ArchiveDeployment {
 
-    private final File archiveFile;
+    private File archiveFile;
     private final String deploymentName;
+    // verified means the deploymentLocation points to a valid expanded war
+    // or archiveFile is specified
+    private boolean verified;
+    // There is also isPrepared. Prepared means that ALL preparation is done
+    // Deployed means that the application is responding to user requests.
     private boolean deployed;
     private File deploymentLocation;
 
+    // This is bout preparation.
     private ArchiveContent archiveContent;
     private WebAppClassLoader classLoader;
     private List<Specification> specifications;
@@ -38,11 +44,11 @@ public class ArchiveDeployment {
 
     public ArchiveDeployment(File archiveFile) {
         this(archiveFile, determineDeploymentName(archiveFile));
-        deployed = false;
     }
 
     private static String determineDeploymentName(File archiveFile) {
         String filename = archiveFile.getName();
+        // FIXME we need to block anything that doesn't has the suffix .war?
         if (filename.endsWith(".war")) {
             filename = filename.substring(0, filename.length() - 4);
         }
@@ -52,7 +58,15 @@ public class ArchiveDeployment {
     public ArchiveDeployment(File archiveFile, String deploymentName) {
         this.archiveFile = archiveFile;
         this.deploymentName = deploymentName;
-        this.deployed = true;
+        this.verified = true;
+    }
+
+    public ArchiveDeployment(String deploymentLocation, String deploymentName, List<Specification> specifications, List<Sniffer> sniffers) {
+        this.deploymentLocation = new File(deploymentLocation);
+        this.deploymentName = deploymentName;
+        this.specifications = specifications;
+        this.sniffers = sniffers;
+        this.verified = false;
     }
 
     public File getArchiveFile() {
@@ -61,6 +75,22 @@ public class ArchiveDeployment {
 
     public boolean isDeployed() {
         return deployed;
+    }
+
+    public void setDeployed() {
+        deployed = true;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public boolean isPrepared() {
+        return verified && archiveContent != null &&
+                classLoader != null &&
+                specifications != null &&
+                deploymentModule != null &&
+                sniffers != null;
     }
 
     public String getDeploymentName() {
@@ -73,6 +103,9 @@ public class ArchiveDeployment {
 
     public void setDeploymentLocation(File deploymentLocation) {
         this.deploymentLocation = deploymentLocation;
+        this.verified = deploymentLocation != null;
+        // When setting DeploymentLocation it is assumed that it is a verified
+        // it is a valid, expanded WAR
     }
 
     public void setArchiveContent(ArchiveContent archiveContent) {

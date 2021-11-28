@@ -28,11 +28,12 @@ public class RunData {
 
     public void deployed(ArchiveDeployment deployment) {
         deployments.add(deployment);
-        listeners.forEach(listener ->
-                new Thread(
-                        () -> listener.archiveDeploymentDone(deployment)
-                ).start()
-        );
+        listeners.forEach(listener -> {
+            CriticalThreadCount.getInstance().newCriticalThreadStarted();
+            new Thread(
+                    () -> listener.archiveDeploymentDone(deployment)
+            ).start();
+        });
     }
 
     public List<ArchiveDeployment> getDeployments() {
