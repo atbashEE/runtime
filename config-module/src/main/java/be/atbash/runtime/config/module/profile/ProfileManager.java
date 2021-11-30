@@ -17,6 +17,7 @@ package be.atbash.runtime.config.module.profile;
 
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
+import be.atbash.runtime.core.data.profile.Profile;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,19 +28,23 @@ public class ProfileManager {
     public static final List<String> REQUIRED_MODULES = List.of(Module.LOGGING_MODULE_NAME, Module.CONFIG_MODULE_NAME);
 
     private ConfigurationParameters parameters;
+    private Profile profile;
 
-    public ProfileManager(ConfigurationParameters parameters) {
+    public ProfileManager(ConfigurationParameters parameters, Profile profile) {
 
         this.parameters = parameters;
+        this.profile = profile;
     }
 
     public String[] getRequestedModules() {
         List<String> result = new ArrayList<>(defineModules());
+        // We add the Required modules (like config and logging here) so that they
+        // appear in the monitoring part. But they are started separately by the ModuleManager
         result.addAll(REQUIRED_MODULES);
-        result.add("jetty");
-        result.add("jersey");  // FIXME
+        result.addAll(profile.getModules());
 
         // Define Other modules;
+        // FIXME based on parameters.getModules().
         return result.toArray(new String[]{});
     }
 

@@ -1,5 +1,17 @@
 [
-  {"name": "default", "modules": [""]}
-,{"name": "minimal", "modules": [""]}
-,{"name": "standby", "modules": [""]}
+  {
+    "name": "default",
+    "modules": [
+      "jersey",
+      "jetty"
+    ]
+  },
+  {
+    "name": "domain",
+    "modules": [
+      "jersey",
+      "jetty",
+      "domain"
+    ]
+  }
 ]

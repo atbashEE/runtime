@@ -25,12 +25,12 @@ import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
-import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.util.SpecificationUtil;
 import be.atbash.runtime.core.data.version.VersionInfo;
 import be.atbash.runtime.core.deployment.SnifferManager;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import be.atbash.runtime.logging.LoggingManager;
+import be.atbash.runtime.logging.earlylog.EarlyLogRecords;
 import be.atbash.runtime.monitor.ServerMon;
 import be.atbash.runtime.monitor.core.Monitoring;
 import org.slf4j.Logger;
@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class RuntimeMain {
@@ -91,7 +92,17 @@ public class RuntimeMain {
             try {
                 actualCommand.call();
             } catch (Exception e) {
-                e.printStackTrace();
+                // If a problem during Config Module start -> we need to write out the problem
+                // If Logging Module is started, we have a log with the issue.
+                EarlyLogRecords.getEarlyMessages()
+                        .stream()
+                        .filter(lr -> lr.getLevel() == Level.SEVERE)
+                        .forEach(lr -> LOGGER.error(lr.getMessage().substring(1)));
+                // Why do we loose the handler on our Logger?
+                LOGGER = LoggingManager.getInstance().getMainLogger(RuntimeMain.class, logToConsole);
+
+                LOGGER.info("CLI-107: Atbash Runtime startup aborted due to previous errors. (See log if created for the reason of the abort)");
+                return;
             }
 
             long end = System.currentTimeMillis();

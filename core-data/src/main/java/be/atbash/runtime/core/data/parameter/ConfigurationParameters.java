@@ -24,7 +24,7 @@ public class ConfigurationParameters {
     private boolean daemon = false;
 
     @CommandLine.Option(names = {"-p", "--profile"}, description = "Profile name")
-    private String profile;
+    private String profile = "default";
 
     @CommandLine.Option(names = {"-m", "--modules"}, description = "Comma separated list of modules that needs to be started.")
     private String modules;

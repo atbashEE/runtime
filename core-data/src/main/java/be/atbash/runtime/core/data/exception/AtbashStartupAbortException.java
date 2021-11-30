@@ -15,16 +15,5 @@
  */
 package be.atbash.runtime.core.data.exception;
 
-// FIXME Multiple UnexpectedException
-public class UnexpectedException extends AtbashRuntimeException {
-
-    public UnexpectedException(UnexpectedExceptionCode code, Throwable exception) {
-        super(String.format("%s: Unexpected Exception happened - message '%s'", code.name(), exception.getMessage()), exception);
-    }
-
-    public enum UnexpectedExceptionCode {
-        UE001  // IOException that should not happen
-        , UE002 // Exception due to corrupt configuration
-    }
-
+public class AtbashStartupAbortException extends RuntimeException {
 }

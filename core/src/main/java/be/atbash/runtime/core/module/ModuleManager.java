@@ -16,12 +16,15 @@
 package be.atbash.runtime.core.module;
 
 import be.atbash.runtime.core.data.RuntimeConfiguration;
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.IncorrectUsageException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
+import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.deployment.Deployer;
 import be.atbash.runtime.core.deployment.SnifferManager;
-import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -30,6 +33,7 @@ import java.util.stream.Collectors;
 public class ModuleManager {
 
     private static ModuleManager INSTANCE;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModuleManager.class);
 
     private static final Object MODULE_START_LOCK = new Object();
     private ConfigurationParameters configurationParameters;
@@ -43,7 +47,9 @@ public class ModuleManager {
     private ModuleManager(ConfigurationParameters configurationParameters) {
         this.configurationParameters = configurationParameters;
 
-        init();
+        if (!init()) {
+            throw new AtbashStartupAbortException();
+        }
 
         // Register deployer as Event Listener.
         RuntimeConfiguration runtimeConfiguration = ExposedObjectsModuleManager.getInstance().getExposedObject(RuntimeConfiguration.class);
@@ -51,7 +57,7 @@ public class ModuleManager {
         EventManager.getInstance().registerListener(new Deployer(runtimeConfiguration, modulesCopy));
     }
 
-    private void init() {
+    private boolean init() {
         modules = findAllModules();
 
         // Data Module must be the first one as everything else can be dependent on it.
@@ -59,13 +65,18 @@ public class ModuleManager {
         startEssentialModule(module1, null);
 
         Module<?> module2 = findModule(Module.CONFIG_MODULE_NAME);
-        startEssentialModule(module2, configurationParameters);
+        if (!startEssentialModule(module2, configurationParameters)) {
+            return false;
+        }
 
         Module<?> module3 = findModule(Module.LOGGING_MODULE_NAME);
         RuntimeConfiguration runtimeConfiguration = module2.getExposedObject(RuntimeConfiguration.class);
-        startEssentialModule(module3, runtimeConfiguration);
+        if (!startEssentialModule(module3, runtimeConfiguration)) {
+            return false;
+        }
 
         registerSniffers();
+        return true;
     }
 
     private void registerSniffers() {
@@ -80,8 +91,26 @@ public class ModuleManager {
         }
         modulesStarted = true;
         RuntimeConfiguration runtimeConfiguration = ExposedObjectsModuleManager.getInstance().getExposedObject(RuntimeConfiguration.class);
-        findAndStartModules(runtimeConfiguration.getRequestedModules());
-        return true;  // For future reference when a certain module fails to start.
+        String[] requestedModules = runtimeConfiguration.getRequestedModules();
+        if (validateRequestedModules(requestedModules)) {
+            findAndStartModules(requestedModules);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean validateRequestedModules(String[] requestedModules) {
+        List<String> moduleNames = modules.stream()
+                .map(Module::name)
+                .collect(Collectors.toList());
+        List<String> unknownModules = Arrays.stream(requestedModules)
+                .filter(n -> !moduleNames.contains(n))
+                .collect(Collectors.toList());
+        if (!unknownModules.isEmpty()) {
+            LOGGER.error(String.format("CONFIG-012: Incorrect Module name(s) specified '%s' (abort startup)", String.join(",", unknownModules)));
+        }
+        return unknownModules.isEmpty();
     }
 
     private void findAndStartModules(String[] requestedModules) {
@@ -140,9 +169,10 @@ public class ModuleManager {
         }
     }
 
-    private <T> void startEssentialModule(Module<T> module, Object configValue) {
-        Thread moduleStarterThread = new Thread(new ModuleStarter(module));
-        module.setConfig((T)configValue);
+    private <T> boolean startEssentialModule(Module<T> module, Object configValue) {
+        ModuleStarter starter = new ModuleStarter(module);
+        Thread moduleStarterThread = new Thread(starter);
+        module.setConfig((T) configValue);
         moduleStarterThread.start();
         Thread.yield();  // So that other modules can start in parallel
         try {
@@ -157,6 +187,7 @@ public class ModuleManager {
         }
         ExposedObjectsModuleManager.getInstance().register(module);
 
+        return starter.isSuccess();
     }
 
     private boolean canStart(String moduleName, List<String> startedModules, List<String> currentStarted) {

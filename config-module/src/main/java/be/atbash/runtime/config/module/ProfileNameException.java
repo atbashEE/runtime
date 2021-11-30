@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.data.exception;
+package be.atbash.runtime.config.module;
 
-// FIXME Multiple UnexpectedException
-public class UnexpectedException extends AtbashRuntimeException {
+import be.atbash.runtime.core.exception.UnexpectedException;
 
-    public UnexpectedException(UnexpectedExceptionCode code, Throwable exception) {
-        super(String.format("%s: Unexpected Exception happened - message '%s'", code.name(), exception.getMessage()), exception);
+public class ProfileNameException extends UnexpectedException {
+    public ProfileNameException(String message) {
+        super(message);
     }
-
-    public enum UnexpectedExceptionCode {
-        UE001  // IOException that should not happen
-        , UE002 // Exception due to corrupt configuration
-    }
-
 }

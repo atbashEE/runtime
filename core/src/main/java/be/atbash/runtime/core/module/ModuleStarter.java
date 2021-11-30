@@ -16,10 +16,15 @@
 package be.atbash.runtime.core.module;
 
 import be.atbash.runtime.core.data.module.Module;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ModuleStarter implements Runnable {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModuleStarter.class);
+
     private Module module;
+    private boolean success;
 
     public ModuleStarter(Module module) {
         this.module = module;
@@ -27,6 +32,16 @@ public class ModuleStarter implements Runnable {
 
     @Override
     public void run() {
-        module.run();
+        try {
+            module.run();
+            success = true;
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage());
+            success = false;
+        }
+    }
+
+    public boolean isSuccess() {
+        return success;
     }
 }

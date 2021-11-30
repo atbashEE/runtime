@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.common.command;
 
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.module.ModuleManager;
 import picocli.CommandLine;
@@ -35,7 +36,9 @@ public class RuntimeCommand extends AbstractAtbashCommand {
     public Integer call() throws Exception {
 
         ModuleManager manager = ModuleManager.initModuleManager(configurationParameters);
-        manager.startModules();
+        if (!manager.startModules()) {
+            throw new AtbashStartupAbortException();
+        }
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 

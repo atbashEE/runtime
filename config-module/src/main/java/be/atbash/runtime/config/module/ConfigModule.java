@@ -24,10 +24,12 @@ import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.config.Config;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
+import be.atbash.runtime.core.data.profile.Profile;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import be.atbash.runtime.monitor.core.Monitoring;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -39,7 +41,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class ConfigModule implements Module<ConfigurationParameters> {
 
@@ -53,6 +57,8 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     private boolean statelessConfigRun;
 
     private Config config;
+
+    private List<Profile> profiles;
 
     @Override
     public String name() {
@@ -91,7 +97,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         }
         if (exposedObjectType.equals(PersistedDeployments.class)) {
 
-            return (T)ConfigUtil.readApplicationDeploymentsData(runtimeConfiguration);
+            return (T) ConfigUtil.readApplicationDeploymentsData(runtimeConfiguration);
         }
         return null;
     }
@@ -108,7 +114,10 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
     @Override
     public void run() {
-        Monitoring.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Module startup");
+        Monitoring.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Config Module startup");
+
+        readProfiles();
+        Profile profile = findProfile();
 
         configurationInformation = new ConfigurationInformation();
 
@@ -125,7 +134,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         }
 
 
-        ProfileManager profileManager = new ProfileManager(parameters);
+        ProfileManager profileManager = new ProfileManager(parameters, profile);
         readConfiguration(configInstance);
         overruleConfiguration();
 
@@ -136,7 +145,18 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
         RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
         runData.registerDeploymentListener(new ArchiveDeploymentStorage(runtimeConfiguration));
-        Monitoring.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Module ready");
+        Monitoring.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Config Module ready");
+    }
+
+    private Profile findProfile() {
+
+        Optional<Profile> profile = profiles.stream()
+                .filter(p -> p.getName().equals(parameters.getProfile()))
+                .findAny();
+        if (profile.isEmpty()) {
+            throw new ProfileNameException(String.format("CONFIG-011: Incorrect Profile name '%s'", parameters.getProfile()));
+        }
+        return profile.get();
     }
 
     private void overruleConfiguration() {
@@ -157,6 +177,22 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         }
     }
 
+    private void readProfiles() {
+        String content;
+        try {
+            content = readProfileJson();
+        } catch (IOException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            profiles = Arrays.asList(mapper.readValue(content, Profile[].class));
+        } catch (JsonProcessingException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE002, e);
+        }
+
+    }
 
     private String readProfileJson() throws IOException {
         InputStream profilesJSONStream = ConfigModule.class.getResourceAsStream("/profiles.json");
