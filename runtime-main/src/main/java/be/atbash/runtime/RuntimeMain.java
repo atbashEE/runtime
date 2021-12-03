@@ -110,14 +110,20 @@ public class RuntimeMain {
             LOGGER = LoggingManager.getInstance().getMainLogger(RuntimeMain.class, logToConsole);
             LOGGER.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
 
-            int applications = deployAndRunArchives(command);
+             deployAndRunArchives(command);
+
+             RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+            int applications = runData.getDeployments().size();
 
             if (applications > 0) {
                 LOGGER.info(String.format("CLI-104: %s Applications running", applications));
             } else {
-                // FIXME, if we do not run the domain mode (domain module is running) this
-                // doesn't make any sense and we should quit the process
+
                 LOGGER.warn("CLI-105: No Applications running");
+                if (!runData.isDomainMode()) {
+                    LOGGER.info("CLI-108: Atbash Runtime stopped as there are no applications deployed and Runtime is not in domain mode.");
+                    System.exit(0);  // Normal status.
+                }
             }
         }
 
@@ -155,7 +161,7 @@ public class RuntimeMain {
         return result;
     }
 
-    private static int deployAndRunArchives(RuntimeCommand command) {
+    private static void deployAndRunArchives(RuntimeCommand command) {
 
         List<ArchiveDeployment> archives = getAllArchivesSpecifiedOnCommandLine(command)
                 .stream()
@@ -181,8 +187,6 @@ public class RuntimeMain {
         if (!archives.isEmpty()) {
             archives.forEach(a -> eventManager.publishEvent(Events.DEPLOYMENT, a));
         }
-        RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
-        return runData.getDeployments().size();
     }
 
     private static void assignContextRoots(List<ArchiveDeployment> archives, String contextRoot) {

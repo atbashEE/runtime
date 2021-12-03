@@ -99,6 +99,7 @@
         <module>jersey</module>
         <module>weld</module>
         <module>jersey-weld</module>
+        <module>remote-cli</module>
         <module>runtime-common</module>
         <module>runtime-main</module>
         <module>runtime-cli</module>

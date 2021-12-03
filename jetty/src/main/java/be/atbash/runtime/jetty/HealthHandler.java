@@ -38,13 +38,18 @@ public class HealthHandler extends AbstractHandler {
         if (!target.startsWith("/health")) {
             return;
         }
+        baseRequest.setHandled(true);
         response.setContentType("text/html;charset=utf-8");
 
-        int status = runData.getDeployments().isEmpty() ? HttpServletResponse.SC_SERVICE_UNAVAILABLE : HttpServletResponse.SC_OK;
-
+        int status;
+        if (runData.isDomainMode()) {
+            status = HttpServletResponse.SC_OK;
+        } else {
+            status = runData.getDeployments().isEmpty() ? HttpServletResponse.SC_SERVICE_UNAVAILABLE : HttpServletResponse.SC_OK;
+        }
         response.setStatus(status);
-        baseRequest.setHandled(true);
-        if (runData.getDeployments().isEmpty()) {
+
+        if (!runData.isDomainMode() && runData.getDeployments().isEmpty()) {
             downWithNoApplications(response);
         } else {
             upWithApplications(response, runData);

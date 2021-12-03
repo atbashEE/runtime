@@ -25,6 +25,7 @@ public class RunData {
 
     private final List<ArchiveDeployment> deployments = new ArrayList<>();
     private final List<ArchiveDeploymentListener> listeners = new ArrayList<>();
+    private boolean domainMode;
 
     public void deployed(ArchiveDeployment deployment) {
         deployments.add(deployment);
@@ -41,9 +42,17 @@ public class RunData {
     }
 
     public void registerDeploymentListener(ArchiveDeploymentListener listener) {
-        // TODO I don't think there is a need for the
+        // TODO I don't think there is a need for the unregister
         if (!listeners.contains(listeners)) {
             listeners.add(listener);
         }
+    }
+
+    public void setDomainMode() {
+        domainMode = true;
+    }
+
+    public boolean isDomainMode() {
+        return domainMode;
     }
 }
