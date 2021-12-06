@@ -20,6 +20,9 @@ import be.atbash.runtime.core.data.exception.IncorrectUsageException;
 import be.atbash.runtime.core.module.ModuleManager;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.modules.ModulesLogger;
+import be.atbash.runtime.monitor.core.MonitorBean;
+import be.atbash.runtime.monitor.core.MonitoringService;
+import be.atbash.runtime.monitor.data.ServerMon;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 
@@ -45,6 +48,9 @@ class ModuleManagerTest {
     @Test
     @Order(3)
     public void startModules() {
+
+        MonitoringService.registerBean(MonitorBean.RuntimeMonitorBean, new ServerMon(System.currentTimeMillis()));
+
         ConfigurationParameters parameters = new ConfigurationParameters();
         parameters.setModules("module1,module2");
         ModuleManager manager = ModuleManager.initModuleManager(parameters);
@@ -66,6 +72,9 @@ class ModuleManagerTest {
     @Test
     @Order(4)
     public void stopModules() {
+
+        MonitoringService.registerBean(MonitorBean.RuntimeMonitorBean, new ServerMon(System.currentTimeMillis()));
+
         ConfigurationParameters parameters = new ConfigurationParameters();
         parameters.setModules("module1,module2");
         ModuleManager manager = ModuleManager.initModuleManager(parameters);

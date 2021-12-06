@@ -1,0 +1,12 @@
+== Remote CLI domain API
+
+Overview of the endpoints when the domain mode is active and can be used to interact with the runtime remotely.
+
+This API is also used by the `runtime-cli` tool.
+
+Each API returns a JSON result.
+
+=== GET - domain/status
+
+Returns the status and information of the runtime.
+

@@ -36,8 +36,26 @@
 
         <dependency>
             <groupId>be.atbash.runtime</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>runtime-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>monitor-data</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>jetty-module</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

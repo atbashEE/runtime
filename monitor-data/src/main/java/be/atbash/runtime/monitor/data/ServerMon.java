@@ -15,10 +15,13 @@
  */
 package be.atbash.runtime.monitor.data;
 
+import java.util.List;
+
 public class ServerMon implements ServerMonMBean {
 
     private String version;
     private long startOfServer;
+    private List<String> startedModules;
 
     public ServerMon(long startOfServer) {
         this.startOfServer = startOfServer;
@@ -34,7 +37,16 @@ public class ServerMon implements ServerMonMBean {
     }
 
     @Override
-    public Integer uptime() {
-        return Math.toIntExact((System.currentTimeMillis() - startOfServer) / 1000);
+    public List<String> getStartedModules() {
+        return startedModules;
+    }
+
+    public void setStartedModules(List<String> startedModules) {
+        this.startedModules = startedModules;
+    }
+
+    @Override
+    public Long uptime() {
+        return (System.currentTimeMillis() - startOfServer) / 1000;
     }
 }

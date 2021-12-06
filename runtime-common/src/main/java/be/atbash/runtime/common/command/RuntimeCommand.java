@@ -20,7 +20,9 @@ import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.module.ModuleManager;
 import picocli.CommandLine;
 
-@CommandLine.Command(subcommands = {CreateConfigCommand.class}
+@CommandLine.Command(subcommands =
+        {CreateConfigCommand.class,
+                StatusCommand.class}
         , name = "")
 public class RuntimeCommand extends AbstractAtbashCommand {
 

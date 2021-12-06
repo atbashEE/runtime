@@ -13,11 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.monitor;
+package be.atbash.runtime.monitor.core;
 
-public interface ServerMonMBean {
+public enum MonitorBean {
+    RuntimeMonitorBean("Atbash.Runtime", "Info"),
+    ApplicationMonitorBean("Atbash.Server.Applications", "data");
 
-    String getVersion();
+    private String hierarchyName;
+    private String name;
 
-    Integer uptime();
+    MonitorBean(String hierarchyName, String name) {
+        this.hierarchyName = hierarchyName;
+        this.name = name;
+    }
+
+    public String getHierarchyName() {
+        return hierarchyName;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

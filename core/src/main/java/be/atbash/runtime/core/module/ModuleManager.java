@@ -23,6 +23,9 @@ import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.deployment.Deployer;
 import be.atbash.runtime.core.deployment.SnifferManager;
+import be.atbash.runtime.monitor.core.MonitorBean;
+import be.atbash.runtime.monitor.core.MonitoringService;
+import be.atbash.runtime.monitor.data.ServerMon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +97,10 @@ public class ModuleManager {
         String[] requestedModules = runtimeConfiguration.getRequestedModules();
         if (validateRequestedModules(requestedModules)) {
             findAndStartModules(requestedModules);
+
+            ServerMon serverMon = MonitoringService.retrieveBean(MonitorBean.RuntimeMonitorBean);
+            serverMon.setStartedModules(startedModuleNames);
+
             return true;
         } else {
             return false;

@@ -21,6 +21,7 @@ import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,5 +66,8 @@ public class RemoteCLIModule implements Module<Void> {
     public void run() {
         RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
         runData.setDomainMode();
+
+        HandlerCollection handlers = ExposedObjectsModuleManager.getInstance().getExposedObject(HandlerCollection.class);
+        handlers.addHandler(new DomainHandler());
     }
 }

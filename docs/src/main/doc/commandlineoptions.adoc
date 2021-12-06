@@ -21,3 +21,20 @@ java -jar atbash-runtime.jar <command> <options>
 Create a configuration within the domain.
 
 xx To be documented xx
+
+==== Options for all remote commands
+
+-h | --host (default - localhost): Host name or IP address of the machine running the Atbash runtime in Domain mode.
+
+-p | --port (default - 8080): Port number assigned the process running the Atbash runtime in Domain mode
+
+
+-f | --format (default - TEXT): Format output of the Remote CLI commands.  Support values are TEXT and JSON.
+
+==== status (remote)
+
+Returns the status and information of the runtime with as output.
+
+version - version number of the runtime.
+modules - the active modules of the runtime.
+uptime - The time the runtime is already running.

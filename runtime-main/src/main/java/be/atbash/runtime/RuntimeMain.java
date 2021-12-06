@@ -31,8 +31,9 @@ import be.atbash.runtime.core.deployment.SnifferManager;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import be.atbash.runtime.logging.LoggingManager;
 import be.atbash.runtime.logging.earlylog.EarlyLogRecords;
-import be.atbash.runtime.monitor.ServerMon;
-import be.atbash.runtime.monitor.core.Monitoring;
+import be.atbash.runtime.monitor.core.MonitorBean;
+import be.atbash.runtime.monitor.data.ServerMon;
+import be.atbash.runtime.monitor.core.MonitoringService;
 import org.slf4j.Logger;
 import picocli.CommandLine;
 
@@ -81,13 +82,13 @@ public class RuntimeMain {
             }
         } else {
 
-            Monitoring.setActive(command.getConfigurationParameters().isWatcher());
+            MonitoringService.setActive(command.getConfigurationParameters().isWatcher());
 
             VersionInfo versionInfo = VersionInfo.getInstance();
-            Monitoring.logMonitorEvent("Main", String.format("CLI-102: Starting Atbash Runtime version %s", versionInfo.getReleaseVersion()));
+            MonitoringService.logMonitorEvent("Main", String.format("CLI-102: Starting Atbash Runtime version %s", versionInfo.getReleaseVersion()));
             serverMon.setVersion(versionInfo.getReleaseVersion());
 
-            Monitoring.registerMBean("Atbash.Server", "Info", serverMon);
+            MonitoringService.registerBean(MonitorBean.RuntimeMonitorBean, serverMon);
 
             try {
                 actualCommand.call();

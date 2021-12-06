@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.monitor.data;
+package be.atbash.runtime.core.data.parameter;
 
-import java.util.List;
+public enum RemoteCLIOutputFormat {
 
-public interface ServerMonMBean {
-
-    String getVersion();
-
-    Long uptime();
-
-    List<String> getStartedModules();
+    TEXT, JSON
 }

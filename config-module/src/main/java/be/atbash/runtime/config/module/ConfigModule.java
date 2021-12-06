@@ -31,7 +31,7 @@ import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.profile.Profile;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
-import be.atbash.runtime.monitor.core.Monitoring;
+import be.atbash.runtime.monitor.core.MonitoringService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -114,7 +114,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
     @Override
     public void run() {
-        Monitoring.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Config Module startup");
+        MonitoringService.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Config Module startup");
 
         readProfiles();
         Profile profile = findProfile();
@@ -145,7 +145,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
         RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
         runData.registerDeploymentListener(new ArchiveDeploymentStorage(runtimeConfiguration));
-        Monitoring.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Config Module ready");
+        MonitoringService.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Config Module ready");
     }
 
     private Profile findProfile() {

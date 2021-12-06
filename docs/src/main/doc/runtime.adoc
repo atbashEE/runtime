@@ -19,3 +19,5 @@ jersey
 include::logging.adoc[]
 
 include::commandlineoptions.adoc[]
+
+include::domain-api.adoc[]

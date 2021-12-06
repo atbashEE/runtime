@@ -17,6 +17,7 @@ package be.atbash.runtime.cli;
 
 import be.atbash.runtime.common.command.AbstractAtbashCommand;
 import be.atbash.runtime.common.command.RuntimeCommand;
+import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -43,17 +44,16 @@ public class Main_CLI {
         if (actualCommand.getCommandType() == AbstractAtbashCommand.CommandType.CLI) {
             try {
                 actualCommand.call();
+            } catch (AtbashRuntimeException e) {
+                // actually, this was just a way to jump to here :)
+                return;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
+            // FIXME
+            System.out.println("TODO: Implement runtime command ");
 
-
-            try {
-                actualCommand.call();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
     }

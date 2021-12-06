@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.monitor;
+package be.atbash.runtime.remotecli.command;
 
-public class ServerMon implements ServerMonMBean {
+import be.atbash.runtime.common.command.data.CommandResponse;
+import be.atbash.runtime.remotecli.DomainHandler;
 
-    private String version;
-    private long startOfServer;
+import java.util.Map;
 
-    public ServerMon(long startOfServer) {
-        this.startOfServer = startOfServer;
-    }
+/**
+ * All implementations of the remote CLI commands must implement this interface.
+ * And instances must be registered in the {@link DomainHandler}.
+ */
+public interface ServerRemoteCommand {
 
-    @Override
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    @Override
-    public Integer uptime() {
-        return Math.toIntExact((System.currentTimeMillis() - startOfServer) / 1000);
-    }
+    CommandResponse handleCommand(Map<String,String> options);
 }

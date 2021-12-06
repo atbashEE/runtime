@@ -28,7 +28,8 @@ import be.atbash.runtime.core.data.module.event.ModuleEventListener;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.deployment.monitor.ApplicationMon;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
-import be.atbash.runtime.monitor.core.Monitoring;
+import be.atbash.runtime.monitor.core.MonitorBean;
+import be.atbash.runtime.monitor.core.MonitoringService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class Deployer implements ModuleEventListener {
     public Deployer(RuntimeConfiguration runtimeConfiguration, List<Module> modules) {
         this.runtimeConfiguration = runtimeConfiguration;
         this.modules = modules;
-        Monitoring.registerMBean("Atbash.Server.Applications", "data", applicationMon);
+        MonitoringService.registerBean(MonitorBean.ApplicationMonitorBean, applicationMon);
     }
 
     @Override

@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.monitor.data;
+package be.atbash.runtime.common.command.exception;
 
-import java.util.List;
+import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
 
-public interface ServerMonMBean {
+public class DomainConnectException extends AtbashRuntimeException {
 
-    String getVersion();
-
-    Long uptime();
-
-    List<String> getStartedModules();
+    public DomainConnectException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

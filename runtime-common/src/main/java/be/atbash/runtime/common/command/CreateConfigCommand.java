@@ -40,13 +40,13 @@ public class CreateConfigCommand extends AbstractAtbashCommand {
         }
 
         if (configInstance.isExistingConfigDirectory()) {
-            System.out.printf("CI-010: The specified root directory '%s' already exist and can't be used.%n", configInstance.getConfigDirectory());
+            System.out.printf("CLI-010: The specified root directory '%s' already exist and can't be used.%n", configInstance.getConfigDirectory());
             return -1;
         }
 
         ConfigInstanceUtil.storeRuntimeConfig(configInstance);
         ConfigInstanceUtil.storeLoggingConfig(configInstance);
-        System.out.println("CLI-104: Command create-config executed successfully.");
+        System.out.println("CLI-201: Command create-config executed successfully.");
         return 0;
     }
 }

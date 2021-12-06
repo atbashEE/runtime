@@ -21,14 +21,17 @@ import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;
+import java.util.HashMap;
+import java.util.Map;
 
-public final class Monitoring {
+public final class MonitoringService {
 
-    private static boolean flightRecorderActive = true;  // The default
+    private static boolean flightRecorderActive = true;  // FIXME The default but config needed
 
     private static boolean active;
+    private static Map<ObjectName, Object> monitoringBeans = new HashMap<>();
 
-    private Monitoring() {
+    private MonitoringService() {
     }
 
     public static void logMonitorEvent(String module, String message) {
@@ -52,15 +55,32 @@ public final class Monitoring {
         return active;
     }
 
-    public static void registerMBean(String hierarchyName, String property, Object mbean) {
+    public static void registerBean(MonitorBean monitorBean, Object mbean) {
+        //  TODO should/can this be a singleton?
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName objectName;
         try {
-            objectName = new ObjectName(hierarchyName + ":name=" + property);
-            server.registerMBean(mbean, objectName);
+            objectName = constructName(monitorBean);
+            server.registerMBean(mbean, objectName);  // FIXME configuration to activate JMX
+            monitoringBeans.put(objectName, mbean);
         } catch (MalformedObjectNameException | NotCompliantMBeanException | InstanceAlreadyExistsException | MBeanRegistrationException e) {
             e.printStackTrace();
         }
 
+    }
+
+    private static ObjectName constructName(MonitorBean monitorBean) throws MalformedObjectNameException {
+        return new ObjectName(monitorBean.getHierarchyName() + ":name=" + monitorBean.getName());
+    }
+
+    public static <T> T retrieveBean(MonitorBean monitorBean) {
+        ObjectName objectName;
+        try {
+            objectName = constructName(monitorBean);
+            return (T) monitoringBeans.get(objectName);
+        } catch (MalformedObjectNameException e) {
+            e.printStackTrace();
+        }
+        return null; //FIXME
     }
 }
