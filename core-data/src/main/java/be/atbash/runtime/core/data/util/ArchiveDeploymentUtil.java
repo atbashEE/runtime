@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.common.command;
+package be.atbash.runtime.core.data.util;
 
-import picocli.CommandLine;
+import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-@CommandLine.Command(name = "status")
-public class StatusCommand extends AbstractRemoteAtbashCommand {
+public final class ArchiveDeploymentUtil {
 
-    @Override
-    public Integer call() throws Exception {
-        Map<String, String> options = new HashMap<>();
+    private ArchiveDeploymentUtil() {
+    }
 
-        callRemoteCLI("GET", "status", basicRemoteCLIParameters, options);
-        return 0;
+    public static void assignContextRoots(List<ArchiveDeployment> archives, String contextRoot) {
+        if (contextRoot.isBlank()) {
+            return;
+        }
+        String[] rootValues = contextRoot.split(",");
+        for (int i = 0; i < rootValues.length; i++) {
+            archives.get(i).setContextRoot(rootValues[i]);
+        }
     }
 }

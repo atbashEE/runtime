@@ -38,3 +38,13 @@ Returns the status and information of the runtime with as output.
 version - version number of the runtime.
 modules - the active modules of the runtime.
 uptime - The time the runtime is already running.
+
+=== deploy (remote)
+
+Deploys the application on the runtime, and optionally define the context root.
+
+deploy <file>
+
+deploy --contextroot <root> <file>
+
+deploy --contextroot <root1,root2> <file1> <file2>

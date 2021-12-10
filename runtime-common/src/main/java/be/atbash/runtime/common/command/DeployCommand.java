@@ -17,17 +17,41 @@ package be.atbash.runtime.common.command;
 
 import picocli.CommandLine;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-@CommandLine.Command(name = "status")
-public class StatusCommand extends AbstractRemoteAtbashCommand {
+@CommandLine.Command(name = "deploy")
+public class DeployCommand extends AbstractRemoteAtbashCommand {
+
+    @CommandLine.Option(names = {"--contextroot"}, description = "The context root for the application. Comma separated list when multiple applications are deployed.")
+    private String contextRoot = "";
+
+    @CommandLine.Parameters(index = "0..*")
+    private File[] archives;
 
     @Override
     public Integer call() throws Exception {
         Map<String, String> options = new HashMap<>();
+        options.put("contextroot", contextRoot);
 
-        callRemoteCLI("GET", "status", basicRemoteCLIParameters, options);
+        callRemoteCLI("deploy", basicRemoteCLIParameters, options, archives);
         return 0;
+    }
+
+    public String getContextRoot() {
+        return contextRoot;
+    }
+
+    public void setContextRoot(String contextRoot) {
+        this.contextRoot = contextRoot;
+    }
+
+    public File[] getArchives() {
+        return archives;
+    }
+
+    public void setArchives(File[] archives) {
+        this.archives = archives;
     }
 }

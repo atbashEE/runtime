@@ -19,18 +19,27 @@ import be.atbash.runtime.common.command.data.CommandResponse;
 import be.atbash.runtime.common.command.exception.DomainConnectException;
 import be.atbash.runtime.core.data.parameter.BasicRemoteCLIParameters;
 import be.atbash.runtime.core.data.parameter.RemoteCLIOutputFormat;
+import be.atbash.runtime.core.exception.UnexpectedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import picocli.CommandLine;
 
 import java.io.*;
 import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
  * Abstract class for all Remote CLI commands as it contains the code to call the Runtime endpoint.
  */
 public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand {
+
+    @CommandLine.Mixin
+    protected BasicRemoteCLIParameters basicRemoteCLIParameters;
 
     @Override
     public CommandType getCommandType() {
@@ -39,6 +48,7 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
 
     void callRemoteCLI(String method, String command, BasicRemoteCLIParameters remoteCLIParameters, Map<String, String> options) {
 
+        // FIXME rewrite using the JDK 9 HttpClient.
         URL url = null;
         try {
             if ("POST".equals(method)) {
@@ -95,11 +105,24 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
         } else {
             ObjectMapper mapper = new ObjectMapper();
             CommandResponse commandResponse = mapper.readValue(data, CommandResponse.class);
-            for (Map.Entry<String, String> entry : commandResponse.getData().entrySet()) {
-                System.out.println(entry.getKey() + ": " + entry.getValue());
+            if (commandResponse.isSuccess()) {
+                writeCommandOutput(commandResponse);
+            } else {
+                writeErrorMessage(commandResponse);
             }
         }
 
+    }
+
+    private void writeErrorMessage(CommandResponse commandResponse) {
+        System.out.println("Command execution failed with the following message");
+        System.out.println(commandResponse.getErrorMessage());
+    }
+
+    private void writeCommandOutput(CommandResponse commandResponse) {
+        for (Map.Entry<String, String> entry : commandResponse.getData().entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
     }
 
     private URL assembleURL(String command, BasicRemoteCLIParameters remoteCLIParameters) throws MalformedURLException {
@@ -118,6 +141,41 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
                 remoteCLIParameters.getPort() +
                 "/domain/" +  // FIXME domain must be configurable.
                 command;
+    }
+
+    void callRemoteCLI(String command, BasicRemoteCLIParameters remoteCLIParameters, Map<String, String> options, File[] archives) {
+
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+
+            URI uri = assembleURL(command, remoteCLIParameters, options).toURI();
+
+            MultipartBodyPublisher publisher = new MultipartBodyPublisher();
+
+            Arrays.stream(archives).forEach(
+                    archive -> {
+                        String name = archive.getName();
+                        publisher.addPart(name, archive.toPath());
+                    }
+            );
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(uri)
+                    .header("Content-Type", "multipart/form-data; boundary=" + MultipartBodyPublisher.BOUNDARY)
+                    .POST(publisher.build())
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            int status = response.statusCode();
+            // FIXME check on status
+
+            String data = response.body();
+            writeCommandResult(remoteCLIParameters, data);
+
+        } catch (IOException | InterruptedException | URISyntaxException e) {
+            throw new UnexpectedException(e);
+        }
     }
 
     private static class ParameterStringBuilder {

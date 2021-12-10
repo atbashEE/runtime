@@ -192,7 +192,7 @@ public class Deployer implements ModuleEventListener {
         if (!checkDeployment(deployment)) {
             return false;
         }
-        File targetLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getArchiveFile().getName());
+        File targetLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getDeploymentName() + ".war");
         deployment.setDeploymentLocation(targetLocation);
         Unpack unpack = new Unpack(deployment.getArchiveFile(), targetLocation);
         ArchiveContent archiveContent = unpack.handleArchiveFile();

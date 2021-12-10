@@ -183,22 +183,13 @@ public class RuntimeMain {
                 a -> eventManager.publishEvent(Events.DEPLOYMENT, a)
         );
 
-        assignContextRoots(archives, command.getConfigurationParameters().getContextRoot());
+        ArchiveDeploymentUtil.assignContextRoots(archives, command.getConfigurationParameters().getContextRoot());
 
         if (!archives.isEmpty()) {
             archives.forEach(a -> eventManager.publishEvent(Events.DEPLOYMENT, a));
         }
     }
 
-    private static void assignContextRoots(List<ArchiveDeployment> archives, String contextRoot) {
-        if (contextRoot.isBlank()) {
-            return;
-        }
-        String[] rootValues = contextRoot.split(",");
-        for (int i = 0; i < rootValues.length; i++) {
-            archives.get(i).setContextRoot(rootValues[i]);
-        }
-    }
 
     private static ArchiveDeployment createArchiveDeployment(DeploymentMetadata metadata, EventManager eventManager) {
         List<Sniffer> sniffers = SnifferManager.getInstance().retrieveSniffers(metadata.getSniffers());

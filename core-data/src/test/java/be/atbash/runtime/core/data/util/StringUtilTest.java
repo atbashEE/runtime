@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.common.command;
+package be.atbash.runtime.core.data.util;
 
-import picocli.CommandLine;
+import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@CommandLine.Command(name = "status")
-public class StatusCommand extends AbstractRemoteAtbashCommand {
+class StringUtilTest {
 
-    @Override
-    public Integer call() throws Exception {
-        Map<String, String> options = new HashMap<>();
+    @Test
+    void determineDeploymentName() {
+        assertThat(StringUtil.determineDeploymentName("test.war")).isEqualTo("test");
+    }
 
-        callRemoteCLI("GET", "status", basicRemoteCLIParameters, options);
-        return 0;
+    @Test
+    void determineDeploymentNameMultipleDots() {
+        assertThat(StringUtil.determineDeploymentName("my.test.archive.war")).isEqualTo("my.test.archive");
     }
 }

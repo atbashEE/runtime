@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.common.command;
+package be.atbash.runtime.remotecli.command;
 
-import picocli.CommandLine;
+import java.io.InputStream;
 
-import java.util.HashMap;
-import java.util.Map;
+@FunctionalInterface
+public interface HandleFileUpload {
 
-@CommandLine.Command(name = "status")
-public class StatusCommand extends AbstractRemoteAtbashCommand {
-
-    @Override
-    public Integer call() throws Exception {
-        Map<String, String> options = new HashMap<>();
-
-        callRemoteCLI("GET", "status", basicRemoteCLIParameters, options);
-        return 0;
-    }
+    void uploadedFile(String name, InputStream inputStream);
 }

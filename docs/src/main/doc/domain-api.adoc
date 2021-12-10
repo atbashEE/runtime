@@ -10,3 +10,6 @@ Each API returns a JSON result.
 
 Returns the status and information of the runtime.
 
+=== POST - domain/deploy
+
+Deploy application.

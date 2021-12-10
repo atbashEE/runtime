@@ -16,71 +16,105 @@
 package be.atbash.runtime.remotecli;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
+import be.atbash.runtime.core.exception.UnexpectedException;
+import be.atbash.runtime.remotecli.command.DeployRemoteCommand;
+import be.atbash.runtime.remotecli.command.HandleFileUpload;
 import be.atbash.runtime.remotecli.command.ServerRemoteCommand;
 import be.atbash.runtime.remotecli.command.StatusRemoteCommand;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class DomainHandler extends AbstractHandler {
 
-    public static final String DOMAIN_URL = "/domain/";
-    private Map<String, ServerRemoteCommand> commands;
+    public static final String DOMAIN_URL = "/domain/";  // FIXME Configurable?
+    private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement("temp/upload");
+
+    private final Map<String, ServerRemoteCommand> commands;
 
     public DomainHandler() {
         commands = new HashMap<>();
         commands.put("status", new StatusRemoteCommand());
+        commands.put("deploy", new DeployRemoteCommand());
     }
 
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        if (!target.startsWith(DOMAIN_URL)) {  // FIXME Configurable?
+        if (!target.startsWith(DOMAIN_URL)) {
             return;
         }
         baseRequest.setHandled(true);
         response.setContentType("application/json");
 
         String command = determineCommand(request.getRequestURI());
-        // FIXME retrieve command options
-        Map<String, String> options = new HashMap<>();
-
-        if ("GET".equals(request.getMethod())) {
-            for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
-                String key = URLDecoder.decode(entry.getKey(), StandardCharsets.UTF_8);
-                String value = "";
-                if (entry.getValue().length > 0) {
-                    value = URLDecoder.decode(entry.getValue()[0], StandardCharsets.UTF_8);
-                }
-                options.put(key, value);
-            }
-        } else {
-            String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-
-            Pattern.compile("&")
-                    .splitAsStream(body)
-                    .map(s -> Arrays.copyOf(s.split("=", 2), 2))
-                    .map(o -> Map.entry(decode(o[0]), decode(o[1])))
-                    .forEach(e -> options.put(e.getKey(), e.getValue()));
-
-        }
-        CommandResponse result = null;
+        ServerRemoteCommand remoteCommand;
         if (commands.containsKey(command)) {
-            result = commands.get(command).handleCommand(options);
+            remoteCommand = commands.get(command);
         } else {
             // FIXME
+            throw new UnexpectedException("Unknown command " + command);
         }
+
+        Map<String, String> options;
+
+        if ("GET".equals(request.getMethod())) {
+            options = retrieveOptionsFromURL(request);
+        } else {
+            String contentType = request.getContentType();
+
+            if (contentType != null && contentType.startsWith("multipart/")) {
+                if (!(remoteCommand instanceof HandleFileUpload)) {
+                    // FIXME should this be a warning and just ignore the uploaded files.?
+                    throw new UnexpectedException("Not able to handle uploaded files with command " + command);
+                }
+
+                options = retrieveOptionsFromURL(request);
+                request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+                for (Part part : request.getParts()) {
+                    ((HandleFileUpload) remoteCommand).uploadedFile(part.getName(), part.getInputStream());
+                }
+            } else {
+                String body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+                options = new HashMap<>();
+
+                Pattern.compile("&")
+                        .splitAsStream(body)
+                        .map(s -> Arrays.copyOf(s.split("=", 2), 2))
+                        .map(o -> Map.entry(decode(o[0]), decode(o[1])))
+                        .forEach(e -> options.put(e.getKey(), e.getValue()));
+            }
+        }
+        CommandResponse result = remoteCommand.handleCommand(options);
 
         ObjectMapper mapper = new ObjectMapper();
         response.getOutputStream().println(mapper.writeValueAsString(result));
+    }
+
+    private Map<String, String> retrieveOptionsFromURL(HttpServletRequest request) {
+        Map<String, String> options = new HashMap<>();
+        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+            String key = URLDecoder.decode(entry.getKey(), StandardCharsets.UTF_8);
+            String value = "";
+            if (entry.getValue().length > 0) {
+                value = URLDecoder.decode(entry.getValue()[0], StandardCharsets.UTF_8);
+            }
+            options.put(key, value);
+        }
+        return options;
     }
 
     private String determineCommand(String requestURI) {

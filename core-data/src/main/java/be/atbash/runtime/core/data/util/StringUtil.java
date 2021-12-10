@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.common.command;
+package be.atbash.runtime.core.data.util;
 
-import picocli.CommandLine;
+import java.io.File;
 
-import java.util.HashMap;
-import java.util.Map;
+public final class StringUtil {
 
-@CommandLine.Command(name = "status")
-public class StatusCommand extends AbstractRemoteAtbashCommand {
-
-    @Override
-    public Integer call() throws Exception {
-        Map<String, String> options = new HashMap<>();
-
-        callRemoteCLI("GET", "status", basicRemoteCLIParameters, options);
-        return 0;
+    private StringUtil() {
     }
+
+    public static String determineDeploymentName(File archiveFile) {
+        String filename = archiveFile.getName();
+        return determineDeploymentName(filename);
+    }
+
+    public static String determineDeploymentName(String filename) {
+        // FIXME we need to block anything that doesn't has the suffix .war?
+        if (filename.endsWith(".war")) {
+            filename = filename.substring(0, filename.length() - 4);
+        }
+        return filename;
+    }
+
 }
