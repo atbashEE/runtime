@@ -17,10 +17,7 @@ package be.atbash.runtime.remotecli;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
 import be.atbash.runtime.core.exception.UnexpectedException;
-import be.atbash.runtime.remotecli.command.DeployRemoteCommand;
-import be.atbash.runtime.remotecli.command.HandleFileUpload;
-import be.atbash.runtime.remotecli.command.ServerRemoteCommand;
-import be.atbash.runtime.remotecli.command.StatusRemoteCommand;
+import be.atbash.runtime.remotecli.command.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
@@ -51,6 +48,7 @@ public class DomainHandler extends AbstractHandler {
         commands = new HashMap<>();
         commands.put("status", new StatusRemoteCommand());
         commands.put("deploy", new DeployRemoteCommand());
+        commands.put("list-applications", new ListApplicationsRemoteCommand());
     }
 
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

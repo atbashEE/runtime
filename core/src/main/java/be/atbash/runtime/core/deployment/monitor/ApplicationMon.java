@@ -15,20 +15,23 @@
  */
 package be.atbash.runtime.core.deployment.monitor;
 
+import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class ApplicationMon implements ApplicationMonMBean{
+public class ApplicationMon implements ApplicationMonMBean {
 
-    private List<String> applications = new ArrayList<>();
+    // FIXME This does not expose correctly in JMX (like with JConsole)
+    private List<ApplicationInfo> applications = new ArrayList<>();
 
     @Override
-    public List<String> getApplications() {
+    public List<ApplicationInfo> getApplications() {
         return applications;
     }
 
-    public void registerApplication(String name) {
-        applications.add(name);
+    public void registerApplication(ArchiveDeployment deployment) {
+        applications.add(new ApplicationInfo(deployment));
     }
 
     public void unregisterApplication(String name) {

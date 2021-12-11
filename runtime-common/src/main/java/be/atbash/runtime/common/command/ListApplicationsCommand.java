@@ -13,11 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.deployment.monitor;
+package be.atbash.runtime.common.command;
 
-import java.util.List;
+import picocli.CommandLine;
 
-public interface ApplicationMonMBean {
+import java.util.HashMap;
+import java.util.Map;
 
-    List<ApplicationInfo> getApplications();
+@CommandLine.Command(name = "list-applications")
+public class ListApplicationsCommand extends AbstractRemoteAtbashCommand {
+
+    @Override
+    public Integer call() throws Exception {
+        Map<String, String> options = new HashMap<>();
+
+        callRemoteCLI("GET", "list-applications", basicRemoteCLIParameters, options);
+        return 0;
+    }
 }

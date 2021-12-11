@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.deployment.monitor;
+package be.atbash.runtime.common.command;
 
-import java.util.List;
+public final class RuntimeCommonConstant {
 
-public interface ApplicationMonMBean {
-
-    List<ApplicationInfo> getApplications();
+    public static final String CLASS_INFO_MARKER = "$$Class";
+    private RuntimeCommonConstant() {
+    }
 }

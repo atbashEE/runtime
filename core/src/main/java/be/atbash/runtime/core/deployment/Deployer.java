@@ -107,7 +107,7 @@ public class Deployer implements ModuleEventListener {
         RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
         runData.deployed(deployment);
 
-        applicationMon.registerApplication(deployment.getDeploymentName());
+        applicationMon.registerApplication(deployment);
     }
 
     private void feedSniffers(ArchiveDeployment deployment) {

@@ -23,7 +23,8 @@ import picocli.CommandLine;
 @CommandLine.Command(subcommands =
         {CreateConfigCommand.class,
                 StatusCommand.class,
-                DeployCommand.class}
+                DeployCommand.class,
+                ListApplicationsCommand.class}
         , name = "")
 public class RuntimeCommand extends AbstractAtbashCommand {
 

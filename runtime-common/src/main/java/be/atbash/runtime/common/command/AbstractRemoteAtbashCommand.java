@@ -17,6 +17,7 @@ package be.atbash.runtime.common.command;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
 import be.atbash.runtime.common.command.exception.DomainConnectException;
+import be.atbash.runtime.common.command.util.MultipartBodyPublisher;
 import be.atbash.runtime.core.data.parameter.BasicRemoteCLIParameters;
 import be.atbash.runtime.core.data.parameter.RemoteCLIOutputFormat;
 import be.atbash.runtime.core.exception.UnexpectedException;
@@ -32,6 +33,8 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
+
+import static be.atbash.runtime.common.command.RuntimeCommonConstant.CLASS_INFO_MARKER;
 
 /**
  * Abstract class for all Remote CLI commands as it contains the code to call the Runtime endpoint.
@@ -115,13 +118,36 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
     }
 
     private void writeErrorMessage(CommandResponse commandResponse) {
+        // FIXME System.out of Logger?
         System.out.println("Command execution failed with the following message");
         System.out.println(commandResponse.getErrorMessage());
     }
 
     private void writeCommandOutput(CommandResponse commandResponse) {
-        for (Map.Entry<String, String> entry : commandResponse.getData().entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
+        if (commandResponse.getData().containsKey(CLASS_INFO_MARKER)) {
+            writeOutputCommandWithComplexData(commandResponse);
+        } else {
+            for (Map.Entry<String, String> entry : commandResponse.getData().entrySet()) {
+                // FIXME System.out of Logger?
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+        }
+    }
+
+    private void writeOutputCommandWithComplexData(CommandResponse commandResponse) {
+        try {
+            Class<?> infoClass = Class.forName(commandResponse.getData().get(CLASS_INFO_MARKER));
+            ObjectMapper mapper = new ObjectMapper();
+            for (Map.Entry<String, String> entry : commandResponse.getData().entrySet()) {
+                if (entry.getKey().equals(CLASS_INFO_MARKER)) {
+                    continue;
+                }
+                Object value = mapper.readValue(entry.getValue(), infoClass);
+                // FIXME System.out of Logger?
+                System.out.println(entry.getKey() + ": " + value.toString());
+            }
+        } catch (ClassNotFoundException | JsonProcessingException e) {
+            e.printStackTrace();  // FIXME
         }
     }
 
