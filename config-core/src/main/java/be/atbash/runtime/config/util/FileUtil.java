@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import static be.atbash.runtime.config.RuntimeConfigConstants.APPLICATIONS_FILE;
+
 public final class FileUtil {
 
     private FileUtil() {
@@ -39,7 +41,7 @@ public final class FileUtil {
     }
 
     public static String readDeployedApplicationsContent(RuntimeConfiguration runtimeConfiguration) {
-        File applicationFile = new File(runtimeConfiguration.getConfigDirectory(), "applications.json");
+        File applicationFile = new File(runtimeConfiguration.getConfigDirectory(), APPLICATIONS_FILE);
         if (!applicationFile.exists()) {
             return "{}"; // empty object
         }
@@ -53,7 +55,7 @@ public final class FileUtil {
     }
 
     public static void writeDeployedApplicationsContent(RuntimeConfiguration runtimeConfiguration, String content) {
-        File applicationFile = new File(runtimeConfiguration.getConfigDirectory(), "applications.json");
+        File applicationFile = new File(runtimeConfiguration.getConfigDirectory(), APPLICATIONS_FILE);
         try {
             if (!applicationFile.exists()) {
                 applicationFile.createNewFile();

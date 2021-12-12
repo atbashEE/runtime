@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.config.module;
+package be.atbash.runtime.remotecli.exception;
 
 import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
 
-public class ProfileNameException extends AtbashRuntimeException {
-    public ProfileNameException(String profileName) {
-        super("CONFIG-011", String.format("Incorrect Profile name '%s'", profileName));
+public class IncorrectContentTypeWithCommandException extends AtbashRuntimeException {
+    public IncorrectContentTypeWithCommandException(String commandName) {
+        super("RC-105", String.format("Multipart Content Type found with command '%s' which is not supported", commandName));
     }
 }

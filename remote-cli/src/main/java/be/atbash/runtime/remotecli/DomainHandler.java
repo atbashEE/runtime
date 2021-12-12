@@ -16,8 +16,9 @@
 package be.atbash.runtime.remotecli;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
-import be.atbash.runtime.core.exception.UnexpectedException;
 import be.atbash.runtime.remotecli.command.*;
+import be.atbash.runtime.remotecli.exception.IncorrectContentTypeWithCommandException;
+import be.atbash.runtime.remotecli.exception.UnknownCommandException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
@@ -64,8 +65,7 @@ public class DomainHandler extends AbstractHandler {
         if (commands.containsKey(command)) {
             remoteCommand = commands.get(command);
         } else {
-            // FIXME
-            throw new UnexpectedException("Unknown command " + command);
+            throw new UnknownCommandException(command);
         }
 
         Map<String, String> options;
@@ -77,8 +77,7 @@ public class DomainHandler extends AbstractHandler {
 
             if (contentType != null && contentType.startsWith("multipart/")) {
                 if (!(remoteCommand instanceof HandleFileUpload)) {
-                    // FIXME should this be a warning and just ignore the uploaded files.?
-                    throw new UnexpectedException("Not able to handle uploaded files with command " + command);
+                    throw new IncorrectContentTypeWithCommandException(command);
                 }
 
                 options = retrieveOptionsFromURL(request);

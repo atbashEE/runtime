@@ -18,9 +18,9 @@ package be.atbash.runtime.common.command;
 import be.atbash.runtime.common.command.data.CommandResponse;
 import be.atbash.runtime.common.command.exception.DomainConnectException;
 import be.atbash.runtime.common.command.util.MultipartBodyPublisher;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.parameter.BasicRemoteCLIParameters;
 import be.atbash.runtime.core.data.parameter.RemoteCLIOutputFormat;
-import be.atbash.runtime.core.exception.UnexpectedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import picocli.CommandLine;
@@ -208,7 +208,7 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             writeCommandResult(remoteCLIParameters, data);
 
         } catch (IOException | InterruptedException e) {
-            throw new UnexpectedException(e);
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001 ,e);
         }
     }
 

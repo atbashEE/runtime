@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.config.module;
+package be.atbash.runtime.config.module.exception;
 
 import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
 
-public class ProfileNameException extends AtbashRuntimeException {
-    public ProfileNameException(String profileName) {
-        super("CONFIG-011", String.format("Incorrect Profile name '%s'", profileName));
+public class IncorrectFileContentException extends AtbashRuntimeException {
+    public IncorrectFileContentException(String fileName) {
+        super("CONFIG-013", "Unable to parse the content of " + fileName);
     }
 }

@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.exception;
+package be.atbash.runtime.config;
 
-/**
- * Is used to convert a checked exception to a runtime one or indicate that a certain situation should not occur (but it did)
- */
-public class UnexpectedException extends AtbashRuntimeException {
-    public UnexpectedException(String message) {
-        super(message);
-    }
+public final class RuntimeConfigConstants {
 
-    public UnexpectedException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    public static final String APPLICATIONS_FILE = "applications.json";
 
-    public UnexpectedException(Throwable cause) {
-        super(cause);
+    private RuntimeConfigConstants() {
     }
 }

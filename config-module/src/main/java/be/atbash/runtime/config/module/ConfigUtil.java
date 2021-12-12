@@ -15,12 +15,14 @@
  */
 package be.atbash.runtime.config.module;
 
+import be.atbash.runtime.config.module.exception.IncorrectFileContentException;
 import be.atbash.runtime.config.util.FileUtil;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
-import be.atbash.runtime.core.exception.UnexpectedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static be.atbash.runtime.config.RuntimeConfigConstants.APPLICATIONS_FILE;
 
 final class ConfigUtil {
 
@@ -34,8 +36,7 @@ final class ConfigUtil {
         try {
             return mapper.readValue(content, PersistedDeployments.class);
         } catch (JsonProcessingException e) {
-            // FIXME, this should be a specific exception because user has tampered with file and made a mistake.
-            throw new UnexpectedException(e);
+            throw new IncorrectFileContentException(APPLICATIONS_FILE);
         }
     }
 

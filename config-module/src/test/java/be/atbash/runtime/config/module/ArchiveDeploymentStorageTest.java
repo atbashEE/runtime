@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static be.atbash.runtime.config.RuntimeConfigConstants.APPLICATIONS_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ArchiveDeploymentStorageTest {
@@ -47,7 +48,7 @@ class ArchiveDeploymentStorageTest {
         deployment.setSniffers(Collections.singletonList(new TestSniffer1()));
         archiveDeploymentStorage.archiveDeploymentDone(deployment);
 
-        String content = Files.readString(new File(configDirectory, "applications.json").toPath());
+        String content = Files.readString(new File(configDirectory, APPLICATIONS_FILE).toPath());
 
         assertThat(content).contains("\"deploymentName\":\"test\"");
         assertThat(content).contains("\"deploymentLocation\":\"/test.war\"");
@@ -62,7 +63,7 @@ class ArchiveDeploymentStorageTest {
         configDirectory.mkdirs();
 
         String originalContent = "{\"deployments\":[{\"deploymentName\":\"test\",\"deploymentLocation\":\"/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"]}]}";
-        Files.writeString(new File(configDirectory, "applications.json").toPath(), originalContent);
+        Files.writeString(new File(configDirectory, APPLICATIONS_FILE).toPath(), originalContent);
 
         RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
                 configDirectory, "JUnitTest")
@@ -76,7 +77,7 @@ class ArchiveDeploymentStorageTest {
         deployment.setSniffers(Collections.singletonList(new TestSniffer2()));
         archiveDeploymentStorage.archiveDeploymentDone(deployment);
 
-        String content = Files.readString(new File(configDirectory, "applications.json").toPath());
+        String content = Files.readString(new File(configDirectory, APPLICATIONS_FILE).toPath());
 
         assertThat(content).contains("{\"deploymentName\":\"test\",\"deploymentLocation\":\"/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"],\"contextRoot\":null}");
         assertThat(content).contains("\"deploymentName\":\"test2\"");
@@ -91,7 +92,7 @@ class ArchiveDeploymentStorageTest {
         configDirectory.mkdirs();
 
         String originalContent = "{\"deployments\":[{\"deploymentName\":\"test\",\"deploymentLocation\":\"/applications/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"]}]}";
-        Files.writeString(new File(configDirectory, "applications.json").toPath(), originalContent);
+        Files.writeString(new File(configDirectory, APPLICATIONS_FILE).toPath(), originalContent);
 
         RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
                 configDirectory, "JUnitTest")
@@ -105,7 +106,7 @@ class ArchiveDeploymentStorageTest {
         deployment.setSniffers(Collections.singletonList(new TestSniffer2()));
         archiveDeploymentStorage.archiveDeploymentDone(deployment);
 
-        String content = Files.readString(new File(configDirectory, "applications.json").toPath());
+        String content = Files.readString(new File(configDirectory, APPLICATIONS_FILE).toPath());
 
         assertThat(content).contains("{\"deploymentName\":\"test\",\"deploymentLocation\":\"/applications/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"],\"contextRoot\":null}");
         assertThat(content).doesNotContain("\"deploymentName\":\"test2\"");
@@ -120,7 +121,7 @@ class ArchiveDeploymentStorageTest {
         configDirectory.mkdirs();
 
         String originalContent = "{\"deployments\":[{\"deploymentName\":\"test\",\"deploymentLocation\":\"/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"],\"contextRoot\":\"/test\"}]}";
-        Files.writeString(new File(configDirectory, "applications.json").toPath(), originalContent);
+        Files.writeString(new File(configDirectory, APPLICATIONS_FILE).toPath(), originalContent);
 
         RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
                 configDirectory, "JUnitTest")
@@ -136,7 +137,7 @@ class ArchiveDeploymentStorageTest {
 
         archiveDeploymentStorage.archiveDeploymentRemoved(deployment);
 
-        String content = Files.readString(new File(configDirectory, "applications.json").toPath());
+        String content = Files.readString(new File(configDirectory, APPLICATIONS_FILE).toPath());
 
         assertThat(content).contains("{\"deployments\":[]}");
     }

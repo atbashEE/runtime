@@ -154,7 +154,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
                 .filter(p -> p.getName().equals(parameters.getProfile()))
                 .findAny();
         if (profile.isEmpty()) {
-            throw new ProfileNameException(String.format("CONFIG-011: Incorrect Profile name '%s'", parameters.getProfile()));
+            throw new ProfileNameException(parameters.getProfile());
         }
         return profile.get();
     }

@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.exception;
+package be.atbash.runtime.remotecli.exception;
 
-/**
- * Top level exception grouping all runtime exceptions thrown by the Atbash Runtime code.
- */
-public class AtbashRuntimeException extends RuntimeException {
+import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
 
-    public AtbashRuntimeException(String message) {
-        super(message);
-    }
-
-    public AtbashRuntimeException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AtbashRuntimeException(Throwable cause) {
-        super(cause);
+public class UnknownCommandException extends AtbashRuntimeException {
+    public UnknownCommandException(String commandName) {
+        super("RC-104", String.format("Unknown command '%s'", commandName));
     }
 }
