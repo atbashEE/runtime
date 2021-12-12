@@ -45,4 +45,8 @@ public class PersistedDeployments {
                 .findAny();
 
     }
+
+    public void removeDeployment(DeploymentMetadata metadata) {
+        deployments.remove(metadata);
+    }
 }

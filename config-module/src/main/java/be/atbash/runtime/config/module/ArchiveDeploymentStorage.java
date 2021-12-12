@@ -45,6 +45,15 @@ public class ArchiveDeploymentStorage implements ArchiveDeploymentListener {
         CriticalThreadCount.getInstance().criticalThreadFinished();
     }
 
+    @Override
+    public void archiveDeploymentRemoved(ArchiveDeployment deployment) {
+        synchronized (LOCK) {
+            PersistedDeployments deployments = ConfigUtil.readApplicationDeploymentsData(runtimeConfiguration);
+            deployments.removeDeployment(new DeploymentMetadata(deployment, runtimeConfiguration));
+            writeApplicationDeploymentsData(deployments);
+        }
+        CriticalThreadCount.getInstance().criticalThreadFinished();
+    }
 
     private void writeApplicationDeploymentsData(PersistedDeployments deployments) {
         ObjectMapper mapper = new ObjectMapper();

@@ -157,4 +157,24 @@ public class ArchiveDeployment {
             this.contextRoot = this.contextRoot.substring(0, this.contextRoot.length() - 1);
         }
     }
+
+    // archiveDeployments are identified by context root.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ArchiveDeployment)) {
+            return false;
+        }
+
+        ArchiveDeployment that = (ArchiveDeployment) o;
+
+        return contextRoot.equals(that.contextRoot);
+    }
+
+    @Override
+    public int hashCode() {
+        return contextRoot.hashCode();
+    }
 }

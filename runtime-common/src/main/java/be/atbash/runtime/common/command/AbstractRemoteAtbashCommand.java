@@ -62,6 +62,9 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
 
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod(method);
+            if ("POST".equals(method)) {
+                con.setDoOutput(true);
+            }
             try {
                 con.connect();
             } catch (ConnectException e) {
@@ -71,7 +74,6 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             }
 
             if ("POST".equals(method)) {
-                con.setDoOutput(true);
                 DataOutputStream out = new DataOutputStream(con.getOutputStream());
                 out.writeBytes(ParameterStringBuilder.getParamsString(options));
                 out.flush();

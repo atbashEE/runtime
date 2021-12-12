@@ -55,4 +55,14 @@ public class RunData {
     public boolean isDomainMode() {
         return domainMode;
     }
+
+    public void undeployed(ArchiveDeployment deployment) {
+        deployments.remove(deployment);
+        listeners.forEach(listener -> {
+            CriticalThreadCount.getInstance().newCriticalThreadStarted();
+            new Thread(
+                    () -> listener.archiveDeploymentRemoved(deployment)
+            ).start();
+        });
+    }
 }

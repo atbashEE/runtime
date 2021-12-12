@@ -42,7 +42,7 @@ class ArchiveDeploymentTest {
     }
 
     @Test
-    public void testDeploymentMutlipleDots() {
+    public void testDeploymentMultipleDots() {
         String strTmp = System.getProperty("java.io.tmpdir");
         File archive = new File(strTmp, "my.test.application.war");
         ArchiveDeployment deployment = new ArchiveDeployment(archive);
@@ -191,4 +191,18 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.getContextRoot()).isEqualTo("/root");
     }
 
+    @Test
+    public void testEquals() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File archive1 = new File(strTmp, "junit.war");
+        ArchiveDeployment deployment1 = new ArchiveDeployment(archive1);
+        deployment1.setContextRoot("root/");
+
+        File archive2 = new File(strTmp, "junit2.war");
+        ArchiveDeployment deployment2 = new ArchiveDeployment(archive2);
+        deployment2.setContextRoot("root/");
+
+        Assertions.assertThat(deployment1).isEqualTo(deployment2);
+
+    }
 }

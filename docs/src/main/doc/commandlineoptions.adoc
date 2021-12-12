@@ -43,8 +43,18 @@ uptime - The time the runtime is already running.
 
 Deploys the application on the runtime, and optionally define the context root.
 
-deploy <file>
+`deploy <file>`
 
-deploy --contextroot <root> <file>
+`deploy --contextroot <root> <file>`
 
-deploy --contextroot <root1,root2> <file1> <file2>
+`deploy --contextroot <root1,root2> <file1> <file2>`
+
+=== list-applications (remote)
+
+List all applications running on the runtime.
+
+=== undeploy (remote)
+
+Undeploy an application
+
+`undeploy <name>`

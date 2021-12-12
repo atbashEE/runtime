@@ -16,15 +16,17 @@
 package be.atbash.runtime.core.data.deployment;
 
 /**
- * This is different from the Deployment Event. The Event says that an archive needs to be deployed.
+ * This is different from the Deployment/Undeployment Event. The Event says that an archive needs to be deployed/undeployed.
  *
- * This listener is called when the deployment is actually performed and successful.
+ * This listener is called when the deployment/undeployment is actually performed and successful.
  *
  * Listeners are called in another thread, not the thread that performed the registration (so that handling can be done in
  * parallel)
  */
-@FunctionalInterface
+
 public interface ArchiveDeploymentListener {
 
     void archiveDeploymentDone(ArchiveDeployment deployment);
+
+    void archiveDeploymentRemoved(ArchiveDeployment deployment);
 }

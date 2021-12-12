@@ -13,3 +13,11 @@ Returns the status and information of the runtime.
 === POST - domain/deploy
 
 Deploy application.
+
+=== GET - domain/list-applications
+
+List all applications running on the runtime.
+
+=== POST - domain/undeploy
+
+Undeploy an application

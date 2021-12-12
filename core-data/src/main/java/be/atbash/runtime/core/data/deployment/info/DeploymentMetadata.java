@@ -91,4 +91,26 @@ public class DeploymentMetadata {
     public void setContextRoot(String contextRoot) {
         this.contextRoot = contextRoot;
     }
+
+    // context root is the unique identifier in the system.
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DeploymentMetadata)) {
+            return false;
+        }
+
+        DeploymentMetadata that = (DeploymentMetadata) o;
+
+        return contextRoot.equals(that.contextRoot);
+    }
+
+    @Override
+    public int hashCode() {
+        return contextRoot.hashCode();
+    }
+
 }

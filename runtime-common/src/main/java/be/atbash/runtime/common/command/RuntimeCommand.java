@@ -24,7 +24,8 @@ import picocli.CommandLine;
         {CreateConfigCommand.class,
                 StatusCommand.class,
                 DeployCommand.class,
-                ListApplicationsCommand.class}
+                ListApplicationsCommand.class,
+                UndeployCommand.class}
         , name = "")
 public class RuntimeCommand extends AbstractAtbashCommand {
 

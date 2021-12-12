@@ -49,6 +49,7 @@ public class DomainHandler extends AbstractHandler {
         commands.put("status", new StatusRemoteCommand());
         commands.put("deploy", new DeployRemoteCommand());
         commands.put("list-applications", new ListApplicationsRemoteCommand());
+        commands.put("undeploy", new UndeployRemoteCommand());
     }
 
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

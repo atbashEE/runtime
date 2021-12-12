@@ -68,6 +68,28 @@ public class Deployer implements ModuleEventListener {
         if (Events.VERIFY_DEPLOYMENT.equals(eventPayload.getEventCode())) {
             verifyArchive(eventPayload.getPayload());
         }
+
+        if (Events.UNDEPLOYMENT.equals(eventPayload.getEventCode())) {
+            undeploy(eventPayload.getPayload());
+        }
+    }
+
+    private void undeploy(String deploymentName) {
+        RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+        Optional<ArchiveDeployment> archiveDeployment = runData.getDeployments()
+                .stream()
+                .filter(ad -> ad.getDeploymentName().equals(deploymentName))
+                .findAny();
+        if (archiveDeployment.isEmpty()) {
+            // FIXME this should never happen as it is already tested
+        }
+        ArchiveDeployment deployment = archiveDeployment.get();
+        deployment.getDeploymentModule().unregisterDeployment(deployment);
+
+        runData.undeployed(deployment);
+
+        applicationMon.unregisterApplication(deployment);
+
     }
 
     private void verifyArchive(ArchiveDeployment deployment) {

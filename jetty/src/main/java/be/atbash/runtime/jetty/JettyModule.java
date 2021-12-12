@@ -25,6 +25,7 @@ import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class JettyModule implements Module<RuntimeConfiguration> {
 
@@ -103,6 +105,22 @@ public class JettyModule implements Module<RuntimeConfiguration> {
         // System.out.println(handler.getServletHandler()._servletPathMap);
         // FIXME So we need to get this from the ServletSniffer, including parsing the web.xml
         LOGGER.info("JETTY-104: End of registration of WebApp " + deployment.getDeploymentName());
+    }
+
+    public void unregisterDeployment(ArchiveDeployment deployment) {
+        // TODO Duplicated between Jetty and Jersey module but we need to keep them independent
+        Optional<Handler> handler = Arrays.stream(handlers.getHandlers())
+                .filter(h -> h instanceof WebAppContext)
+                .filter(wac -> ((WebAppContext) wac).getContextPath().equals(deployment.getContextRoot()))
+                .findAny();
+        if (handler.isPresent()) {
+            try {
+                handler.get().stop();
+            } catch (Exception e) {
+                e.printStackTrace();  // FIXME
+            }
+        }
+        LOGGER.info("JETTY-105: Unregistration of WebApp " + deployment.getDeploymentName() + " done");
     }
 
     @Override

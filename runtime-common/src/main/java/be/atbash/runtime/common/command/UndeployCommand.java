@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.data.module.event;
+package be.atbash.runtime.common.command;
 
-public final class Events {
+import picocli.CommandLine;
 
-    public static final String DEPLOYMENT = "Deployment";  // For the core to start deployment
-    public static final String VERIFY_DEPLOYMENT = "VerifyDeployment";  // For the core to verify if PersistedDeployment is still valid.
-    public static final String UNDEPLOYMENT = "Undeployment";  // For the core to remove the deployment
+import java.util.HashMap;
+import java.util.Map;
 
+@CommandLine.Command(name = "undeploy")
+public class UndeployCommand extends AbstractRemoteAtbashCommand {
 
-    private Events() {
+    @CommandLine.Parameters(index = "0")
+    private String deploymentName;
+
+    @Override
+    public Integer call() throws Exception {
+        Map<String, String> options = new HashMap<>();
+        options.put("name", deploymentName);
+
+        callRemoteCLI("POST", "undeploy", basicRemoteCLIParameters, options);
+        return 0;
     }
 }

@@ -53,6 +53,7 @@ class ArchiveDeploymentStorageTest {
         assertThat(content).contains("\"deploymentLocation\":\"/test.war\"");
         assertThat(content).contains("\"specifications\":[\"REST\",\"HTML\"]");
         assertThat(content).contains("\"sniffers\":[\"TestSniffer1\"]");
+        assertThat(content).contains("\"contextRoot\":\"/test\"");
     }
 
     @Test
@@ -85,7 +86,7 @@ class ArchiveDeploymentStorageTest {
     }
 
     @Test
-    public void testArchiveDeploymentDone_donooverwrite() throws IOException {
+    public void testArchiveDeploymentDone_doNotOverwrite() throws IOException {
         File configDirectory = new File("./target/testDirectory3");
         configDirectory.mkdirs();
 
@@ -111,5 +112,32 @@ class ArchiveDeploymentStorageTest {
         assertThat(content).doesNotContain("\"deploymentLocation\":\"/applications/test2.war\"");
         assertThat(content).doesNotContain("\"specifications\":[\"SERVLET\"]");
         assertThat(content).doesNotContain("\"sniffers\":[\"TestSniffer2\"]");
+    }
+
+    @Test
+    public void testArchiveDeploymentRemove() throws IOException {
+        File configDirectory = new File("./target/testDirectory4");
+        configDirectory.mkdirs();
+
+        String originalContent = "{\"deployments\":[{\"deploymentName\":\"test\",\"deploymentLocation\":\"/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"],\"contextRoot\":\"/test\"}]}";
+        Files.writeString(new File(configDirectory, "applications.json").toPath(), originalContent);
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
+        ArchiveDeploymentStorage archiveDeploymentStorage = new ArchiveDeploymentStorage(runtimeConfiguration);
+
+        ArchiveDeployment deployment = new ArchiveDeployment(new File("./applications/test.war"));
+        File targetLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getArchiveFile().getName());
+        deployment.setDeploymentLocation(targetLocation);
+        deployment.setSpecifications(Arrays.asList(Specification.SERVLET));
+        deployment.setSniffers(Collections.singletonList(new TestSniffer2()));
+        deployment.setContextRoot("/test");  // Important for test, internally identity is determined based on contextroot
+
+        archiveDeploymentStorage.archiveDeploymentRemoved(deployment);
+
+        String content = Files.readString(new File(configDirectory, "applications.json").toPath());
+
+        assertThat(content).contains("{\"deployments\":[]}");
     }
 }

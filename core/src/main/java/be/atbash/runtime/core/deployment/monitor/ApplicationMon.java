@@ -34,7 +34,7 @@ public class ApplicationMon implements ApplicationMonMBean {
         applications.add(new ApplicationInfo(deployment));
     }
 
-    public void unregisterApplication(String name) {
-        applications.remove(name);
+    public void unregisterApplication(ArchiveDeployment deployment) {
+        applications.remove(new ApplicationInfo(deployment));
     }
 }

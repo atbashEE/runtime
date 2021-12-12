@@ -85,4 +85,6 @@ public interface Module<C> extends Runnable, ModuleEventListener {
     default void stop() {}
 
     default void registerDeployment(ArchiveDeployment archiveDeployment) {}
+
+    default void unregisterDeployment(ArchiveDeployment archiveDeployment) {}
 }

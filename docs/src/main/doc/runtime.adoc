@@ -2,6 +2,17 @@
 
 A Jakarta EE 10 Core profile runtime.
 
+== General
+
+The product has several ways of operation
+
+- standalone; Start up the runtime with one or more applications.
+- domain; Start up the runtime and remotely administer the environment.
+- clustered; Remote administration of several instances all running the same applications(s)
+- embedded; Start the runtime as part of your application or test.
+
+Applications are internally identified by the contextroot they are available (must be unique on the runtime) and when performing remote administration, applications are indicated by their deployment name.
+
 == Modules
 
 config
