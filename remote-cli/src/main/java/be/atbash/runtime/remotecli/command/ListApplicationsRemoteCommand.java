@@ -16,12 +16,9 @@
 package be.atbash.runtime.remotecli.command;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
+import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.deployment.monitor.ApplicationInfo;
-import be.atbash.runtime.core.deployment.monitor.ApplicationMon;
-import be.atbash.runtime.monitor.core.MonitorBean;
-import be.atbash.runtime.monitor.core.MonitoringService;
-import be.atbash.runtime.monitor.data.ServerMonMBean;
-import be.atbash.runtime.remotecli.util.TimeUtil;
+import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -35,16 +32,17 @@ public class ListApplicationsRemoteCommand implements ServerRemoteCommand {
         CommandResponse result = new CommandResponse();
         result.setSuccess(true);
 
-        ApplicationMon applicationMonitorBean =  MonitoringService.retrieveBean(MonitorBean.ApplicationMonitorBean);
+        RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
 
         ObjectMapper mapper = new ObjectMapper();
-        if (applicationMonitorBean.getApplications().isEmpty()) {
+        if (runData.getDeployments().isEmpty()) {
             result.addData(" RC-102 ", "No applications deployed");  // FIXME not really an error/info message but it is helpful I guess
         } else {
-            applicationMonitorBean.getApplications()
-                    .forEach(info -> {
+            runData.getDeployments()
+                    .forEach(ad -> {
                         try {
-                            result.addData(info.getName(), mapper.writeValueAsString(info));
+                            ApplicationInfo info = new ApplicationInfo(ad);
+                            result.addData(ad.getDeploymentName(), mapper.writeValueAsString(info));
                         } catch (JsonProcessingException e) {
                             e.printStackTrace();
                         }
