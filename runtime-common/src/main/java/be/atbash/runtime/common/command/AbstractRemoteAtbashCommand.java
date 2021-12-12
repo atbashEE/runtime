@@ -25,8 +25,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import picocli.CommandLine;
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -51,57 +56,58 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
 
     void callRemoteCLI(String method, String command, BasicRemoteCLIParameters remoteCLIParameters, Map<String, String> options) {
 
-        // FIXME rewrite using the JDK 9 HttpClient.
-        URL url = null;
+        HttpClient client = HttpClient.newHttpClient();
+
         try {
+            HttpRequest request;
+            URI uri;
             if ("POST".equals(method)) {
-                url = assembleURL(command, remoteCLIParameters);
+                uri = assembleURI(command, remoteCLIParameters);
+
+                String body = ParameterStringBuilder.getParamsString(options);
+
+                request = HttpRequest.newBuilder()
+                        .uri(uri)
+                        .POST(HttpRequest.BodyPublishers.ofString(body))
+                        .build();
             } else {
-                url = assembleURL(command, remoteCLIParameters, options);
+                uri = assembleURI(command, remoteCLIParameters, options);
+
+                request = HttpRequest.newBuilder()
+                        .uri(uri)
+                        .GET()
+                        .build();
             }
 
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod(method);
-            if ("POST".equals(method)) {
-                con.setDoOutput(true);
-            }
+            HttpResponse<String> response;
             try {
-                con.connect();
+                response = client.send(request, HttpResponse.BodyHandlers.ofString());
             } catch (ConnectException e) {
                 // FIXME  is System.out the best
+
                 System.out.println("CLI-210: Unable to contact Runtime domain endpoint.");
                 throw new DomainConnectException("Unable to contact Runtime domain endpoint.", e);
             }
 
-            if ("POST".equals(method)) {
-                DataOutputStream out = new DataOutputStream(con.getOutputStream());
-                out.writeBytes(ParameterStringBuilder.getParamsString(options));
-                out.flush();
-                out.close();
+            String data = response.body();
+            int statusCode = response.statusCode();
+            if (statusCode != 200) {
+                System.out.printf("CLI-211: Calling Runtime domain endpoint resulted in status %s (message '%s')%n", statusCode, data);
+                throw new DomainConnectException("Call to Runtime domain endpoint resulted in a failure.", null);
             }
-
-            int status = con.getResponseCode();
-            // FIXME check for status 200
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuilder content = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
-
-            con.disconnect();
-
-            String data = content.toString();
-
             writeCommandResult(remoteCLIParameters, data);
 
-        } catch (IOException e) {
+        } catch (MalformedURLException e) {
             e.printStackTrace();
+            // FIXME
+        } catch (UnsupportedEncodingException e) {
+            // FIXME
+            e.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
         }
-
     }
 
     private void writeCommandResult(BasicRemoteCLIParameters remoteCLIParameters, String data) throws JsonProcessingException {
@@ -153,14 +159,14 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
         }
     }
 
-    private URL assembleURL(String command, BasicRemoteCLIParameters remoteCLIParameters) throws MalformedURLException {
+    private URI assembleURI(String command, BasicRemoteCLIParameters remoteCLIParameters) throws MalformedURLException {
         String result = determineBaseURLForCommand(command, remoteCLIParameters);
-        return new URL(result);
+        return URI.create(result);
     }
 
-    private URL assembleURL(String command, BasicRemoteCLIParameters remoteCLIParameters, Map<String, String> options) throws MalformedURLException, UnsupportedEncodingException {
+    private URI assembleURI(String command, BasicRemoteCLIParameters remoteCLIParameters, Map<String, String> options) throws MalformedURLException, UnsupportedEncodingException {
         String result = determineBaseURLForCommand(command, remoteCLIParameters) + "?" + ParameterStringBuilder.getParamsString(options);
-        return new URL(result);
+        return URI.create(result);
     }
 
     private String determineBaseURLForCommand(String command, BasicRemoteCLIParameters remoteCLIParameters) {
@@ -176,7 +182,7 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
         try {
             HttpClient client = HttpClient.newHttpClient();
 
-            URI uri = assembleURL(command, remoteCLIParameters, options).toURI();
+            URI uri = assembleURI(command, remoteCLIParameters, options);
 
             MultipartBodyPublisher publisher = new MultipartBodyPublisher();
 
@@ -201,7 +207,7 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             String data = response.body();
             writeCommandResult(remoteCLIParameters, data);
 
-        } catch (IOException | InterruptedException | URISyntaxException e) {
+        } catch (IOException | InterruptedException e) {
             throw new UnexpectedException(e);
         }
     }
