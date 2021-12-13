@@ -17,6 +17,7 @@ package be.atbash.runtime.remotecli.command;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
 import be.atbash.runtime.core.data.RunData;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.deployment.monitor.ApplicationInfo;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,7 +45,7 @@ public class ListApplicationsRemoteCommand implements ServerRemoteCommand {
                             ApplicationInfo info = new ApplicationInfo(ad);
                             result.addData(ad.getDeploymentName(), mapper.writeValueAsString(info));
                         } catch (JsonProcessingException e) {
-                            e.printStackTrace();
+                            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
                         }
                     });
             result.addData(CLASS_INFO_MARKER, ApplicationInfo.class.getName());

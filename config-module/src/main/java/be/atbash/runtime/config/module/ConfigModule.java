@@ -17,6 +17,7 @@ package be.atbash.runtime.config.module;
 
 import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.config.ConfigInstanceUtil;
+import be.atbash.runtime.config.module.exception.ProfileNameException;
 import be.atbash.runtime.config.module.profile.ProfileManager;
 import be.atbash.runtime.config.util.FileUtil;
 import be.atbash.runtime.core.data.RunData;
@@ -172,8 +173,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         try {
             config = mapper.readValue(content, Config.class);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            // FIXME
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE002, e);
         }
     }
 

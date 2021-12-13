@@ -18,6 +18,7 @@ package be.atbash.runtime.cli;
 import be.atbash.runtime.common.command.AbstractAtbashCommand;
 import be.atbash.runtime.common.command.RuntimeCommand;
 import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -48,7 +49,7 @@ public class Main_CLI {
                 // actually, this was just a way to jump to here :)
                 return;
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
         } else {
             // FIXME

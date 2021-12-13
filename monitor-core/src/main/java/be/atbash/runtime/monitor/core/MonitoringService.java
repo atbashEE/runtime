@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.monitor.core;
 
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.monitor.core.util.FlightRecorderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public final class MonitoringService {
             server.registerMBean(mbean, objectName);  // FIXME configuration to activate JMX
             monitoringBeans.put(objectName, mbean);
         } catch (MalformedObjectNameException | NotCompliantMBeanException | InstanceAlreadyExistsException | MBeanRegistrationException e) {
-            e.printStackTrace();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
     }
@@ -79,8 +80,7 @@ public final class MonitoringService {
             objectName = constructName(monitorBean);
             return (T) monitoringBeans.get(objectName);
         } catch (MalformedObjectNameException e) {
-            e.printStackTrace();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
-        return null; //FIXME
     }
 }

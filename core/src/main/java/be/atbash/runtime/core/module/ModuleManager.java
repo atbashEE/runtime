@@ -18,6 +18,7 @@ package be.atbash.runtime.core.module;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.IncorrectUsageException;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
@@ -162,7 +163,7 @@ public class ModuleManager {
         try {
             moduleStarterThread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();  // FIXME
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
         synchronized (MODULE_START_LOCK) {
             installingModules.remove(module.name());
@@ -185,7 +186,7 @@ public class ModuleManager {
         try {
             moduleStarterThread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();  // FIXME
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
         synchronized (MODULE_START_LOCK) {
             installingModules.remove(module.name());

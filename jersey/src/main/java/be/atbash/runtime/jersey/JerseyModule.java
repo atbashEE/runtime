@@ -18,6 +18,7 @@ package be.atbash.runtime.jersey;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
@@ -109,8 +110,7 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
         try {
             handler.start();
         } catch (Exception e) {
-            e.printStackTrace();
-            // FIXME
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
         LOGGER.info("JERSEY-104: End of registration of WebApp " + deployment.getDeploymentName());
@@ -126,7 +126,7 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
             try {
                 handler.get().stop();
             } catch (Exception e) {
-                e.printStackTrace();  // FIXME
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
         }
         LOGGER.info("JERSEY-105: Unregistration of WebApp " + deployment.getDeploymentName() + " done");

@@ -16,6 +16,7 @@
 package be.atbash.runtime.core.deployment;
 
 import be.atbash.runtime.core.data.deployment.ArchiveContent;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -51,8 +52,7 @@ public class Unpack {
             unpackArchive();
 
         } catch (IOException e) {
-            // FIXME
-             e.printStackTrace();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
         return new ArchiveContent(archiveFiles);
     }

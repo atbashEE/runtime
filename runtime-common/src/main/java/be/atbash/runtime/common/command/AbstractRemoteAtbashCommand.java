@@ -97,16 +97,8 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             }
             writeCommandResult(remoteCLIParameters, data);
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            // FIXME
-        } catch (UnsupportedEncodingException e) {
-            // FIXME
-            e.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
+        } catch (InterruptedException | IOException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }
 
@@ -155,7 +147,7 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
                 System.out.println(entry.getKey() + ": " + value.toString());
             }
         } catch (ClassNotFoundException | JsonProcessingException e) {
-            e.printStackTrace();  // FIXME
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }
 
@@ -208,7 +200,7 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             writeCommandResult(remoteCLIParameters, data);
 
         } catch (IOException | InterruptedException e) {
-            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001 ,e);
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }
 

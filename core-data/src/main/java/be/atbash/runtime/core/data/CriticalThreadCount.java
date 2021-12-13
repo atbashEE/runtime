@@ -15,6 +15,8 @@
  */
 package be.atbash.runtime.core.data;
 
+import be.atbash.runtime.core.data.exception.UnexpectedException;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class CriticalThreadCount {
@@ -39,7 +41,7 @@ public final class CriticalThreadCount {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
         }
     }

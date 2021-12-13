@@ -17,12 +17,14 @@ package be.atbash.runtime.config.util;
 
 import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
 import static be.atbash.runtime.config.RuntimeConfigConstants.APPLICATIONS_FILE;
+import static be.atbash.runtime.config.RuntimeConfigConstants.CONFIG_FILE;
 
 public final class FileUtil {
 
@@ -30,14 +32,12 @@ public final class FileUtil {
     }
 
     public static String readConfigurationContent(ConfigInstance configInstance) {
-        File configFile = new File(configInstance.getConfigDirectory(), "config.json");
+        File configFile = new File(configInstance.getConfigDirectory(), CONFIG_FILE);
         try {
             return Files.readString(configFile.toPath());
         } catch (IOException e) {
-            e.printStackTrace();
-            // FIXME
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
-        return null;
     }
 
     public static String readDeployedApplicationsContent(RuntimeConfiguration runtimeConfiguration) {
@@ -48,10 +48,8 @@ public final class FileUtil {
         try {
             return Files.readString(applicationFile.toPath());
         } catch (IOException e) {
-            e.printStackTrace();
-            // FIXME
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
-        return null;
     }
 
     public static void writeDeployedApplicationsContent(RuntimeConfiguration runtimeConfiguration, String content) {
@@ -61,10 +59,11 @@ public final class FileUtil {
                 applicationFile.createNewFile();
             }
 
+            // FIXME Test out what happens if file is read-only and we can capture this upstream of this method
+            // (At start of runtime)
             Files.writeString(applicationFile.toPath(), content);
         } catch (IOException e) {
-            e.printStackTrace();
-            // FIXME
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }
 }

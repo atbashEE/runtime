@@ -21,6 +21,7 @@ import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.config.ConfigUtil;
 import be.atbash.runtime.core.data.config.Endpoint;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
@@ -97,8 +98,7 @@ public class JettyModule implements Module<RuntimeConfiguration> {
         try {
             handler.start();
         } catch (Exception e) {
-            e.printStackTrace();
-            // FIXME
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
         // FIXME Print out a list of Servlets. This is not by default possible with Jetty.
         // It is stored here, but not accessible
@@ -117,7 +117,7 @@ public class JettyModule implements Module<RuntimeConfiguration> {
             try {
                 handler.get().stop();
             } catch (Exception e) {
-                e.printStackTrace();  // FIXME
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
         }
         LOGGER.info("JETTY-105: Unregistration of WebApp " + deployment.getDeploymentName() + " done");
@@ -132,7 +132,7 @@ public class JettyModule implements Module<RuntimeConfiguration> {
         try {
             server.start();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
         LOGGER.info("JETTY:101: Started Jetty");
@@ -164,7 +164,7 @@ public class JettyModule implements Module<RuntimeConfiguration> {
             server.stop();
         } catch (Exception e) {
             //Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, e);
-            e.printStackTrace(); // FIXME
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
 

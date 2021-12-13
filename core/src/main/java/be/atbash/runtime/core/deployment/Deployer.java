@@ -166,7 +166,7 @@ public class Deployer implements ModuleEventListener {
                 }
             }
         } catch (ClassNotFoundException e) {
-            // FXIME
+            // FIXME
             e.printStackTrace();
         }
     }

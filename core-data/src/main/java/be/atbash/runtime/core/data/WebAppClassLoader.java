@@ -15,6 +15,8 @@
  */
 package be.atbash.runtime.core.data;
 
+import be.atbash.runtime.core.data.exception.UnexpectedException;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -31,10 +33,10 @@ public class WebAppClassLoader extends ClassLoader {
         URL url = null;
         try {
             URI uri = new File(rootDirectory, "WEB-INF/classes/").toURI();
-            url = uri.toURL();
+            url = uri.toURL();  // FIXME
             url = URI.create(uri.toString() + "/").toURL();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
         classesClassLoader = new DelegatingURLClassLoader(new URL[]{url}, parent);
     }
@@ -61,7 +63,7 @@ public class WebAppClassLoader extends ClassLoader {
                 aClass = super.loadClass(name, resolve);
 
             } catch (Exception e) {
-                ///
+                // Intentional empty, try also the parent.
             }
             if (aClass == null) {
 

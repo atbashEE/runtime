@@ -15,9 +15,10 @@
  */
 package be.atbash.runtime.common.command.util;
 
+import be.atbash.runtime.core.data.exception.UnexpectedException;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -93,7 +94,7 @@ public class MultipartBodyPublisher {
             try {
                 next = computeNext();
             } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE002, e);
             }
             if (next == null) {
                 done = true;

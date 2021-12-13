@@ -17,15 +17,14 @@ package be.atbash.runtime.core;
 
 
 import be.atbash.runtime.core.data.exception.IncorrectUsageException;
-import be.atbash.runtime.core.module.ModuleManager;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
+import be.atbash.runtime.core.module.ModuleManager;
 import be.atbash.runtime.core.modules.ModulesLogger;
 import be.atbash.runtime.monitor.core.MonitorBean;
 import be.atbash.runtime.monitor.core.MonitoringService;
 import be.atbash.runtime.monitor.data.ServerMon;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
-
 
 import java.util.List;
 
@@ -40,38 +39,15 @@ class ModuleManagerTest {
     @Test()
     @Order(1)
     public void getInstanceWithoutConfig() {
-        Assertions.assertThatThrownBy(() ->  {
+        Assertions.assertThatThrownBy(() -> {
             ModuleManager.getInstance();
         }).isInstanceOf(IncorrectUsageException.class);
     }
 
     @Test
     @Order(3)
-    public void startModules() {
+    public void startAndStopModules() {
 
-        MonitoringService.registerBean(MonitorBean.RuntimeMonitorBean, new ServerMon(System.currentTimeMillis()));
-
-        ConfigurationParameters parameters = new ConfigurationParameters();
-        parameters.setModules("module1,module2");
-        ModuleManager manager = ModuleManager.initModuleManager(parameters);
-        manager.startModules();
-
-        List<String> events = ModulesLogger.getEvents();
-
-        Assertions.assertThat(events).hasSize(8);
-        Assertions.assertThat(events.get(0)).isEqualTo("Start Config Module");
-        Assertions.assertThat(events.get(1)).isEqualTo("End Config Module");
-        Assertions.assertThat(events.get(2)).isEqualTo("Start Logging Module");
-        Assertions.assertThat(events.get(3)).isEqualTo("End Logging Module");
-        Assertions.assertThat(events.get(4)).isEqualTo("Start Module 1");
-        Assertions.assertThat(events.get(5)).isEqualTo("End Module 1");
-        Assertions.assertThat(events.get(6)).isEqualTo("Start Module 2");
-        Assertions.assertThat(events.get(7)).isEqualTo("End Module 2");
-    }
-
-    @Test
-    @Order(4)
-    public void stopModules() {
 
         MonitoringService.registerBean(MonitorBean.RuntimeMonitorBean, new ServerMon(System.currentTimeMillis()));
 
@@ -82,7 +58,16 @@ class ModuleManagerTest {
         manager.stopModules();
 
         List<String> events = ModulesLogger.getEvents();
+
         Assertions.assertThat(events).hasSize(12);
+        Assertions.assertThat(events.get(0)).isEqualTo("Start Config Module");
+        Assertions.assertThat(events.get(1)).isEqualTo("End Config Module");
+        Assertions.assertThat(events.get(2)).isEqualTo("Start Logging Module");
+        Assertions.assertThat(events.get(3)).isEqualTo("End Logging Module");
+        Assertions.assertThat(events.get(4)).isEqualTo("Start Module 1");
+        Assertions.assertThat(events.get(5)).isEqualTo("End Module 1");
+        Assertions.assertThat(events.get(6)).isEqualTo("Start Module 2");
+        Assertions.assertThat(events.get(7)).isEqualTo("End Module 2");
 
         Assertions.assertThat(events.get(8)).isEqualTo("Stop Module2");
         Assertions.assertThat(events.get(9)).isEqualTo("Stop Module1");

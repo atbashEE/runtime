@@ -18,6 +18,7 @@ package be.atbash.runtime.config;
 public final class RuntimeConfigConstants {
 
     public static final String APPLICATIONS_FILE = "applications.json";
+    public static final String CONFIG_FILE = "config.json";
 
     private RuntimeConfigConstants() {
     }

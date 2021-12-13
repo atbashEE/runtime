@@ -22,9 +22,11 @@ import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.data.util.ArchiveDeploymentUtil;
 import be.atbash.runtime.core.data.util.SpecificationUtil;
 import be.atbash.runtime.core.data.version.VersionInfo;
 import be.atbash.runtime.core.deployment.SnifferManager;
@@ -32,8 +34,8 @@ import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import be.atbash.runtime.logging.LoggingManager;
 import be.atbash.runtime.logging.earlylog.EarlyLogRecords;
 import be.atbash.runtime.monitor.core.MonitorBean;
-import be.atbash.runtime.monitor.data.ServerMon;
 import be.atbash.runtime.monitor.core.MonitoringService;
+import be.atbash.runtime.monitor.data.ServerMon;
 import org.slf4j.Logger;
 import picocli.CommandLine;
 
@@ -78,7 +80,7 @@ public class RuntimeMain {
                 LoggingManager.getInstance().restoreOriginalHandlers();
                 actualCommand.call();
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
         } else {
 
@@ -111,9 +113,9 @@ public class RuntimeMain {
             LOGGER = LoggingManager.getInstance().getMainLogger(RuntimeMain.class, logToConsole);
             LOGGER.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
 
-             deployAndRunArchives(command);
+            deployAndRunArchives(command);
 
-             RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+            RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
             int applications = runData.getDeployments().size();
 
             if (applications > 0) {

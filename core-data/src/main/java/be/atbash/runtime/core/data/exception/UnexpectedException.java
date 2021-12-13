@@ -15,7 +15,6 @@
  */
 package be.atbash.runtime.core.data.exception;
 
-// FIXME Multiple UnexpectedException
 public class UnexpectedException extends AtbashRuntimeException {
 
     public UnexpectedException(UnexpectedExceptionCode code, Throwable exception) {

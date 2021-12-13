@@ -17,6 +17,7 @@ package be.atbash.runtime.logging.handler;
 
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.IncorrectConfigurationException;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
 import be.atbash.runtime.logging.EnhancedLogRecord;
 import be.atbash.runtime.logging.LoggingManager;
@@ -543,7 +544,7 @@ public class LogFileHandler extends StreamHandler {
                 stderrOutputStream.close();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, ex);
         }
 
         synchronizer.raiseSignal(1, TimeUnit.SECONDS);  // Wait at max 1 sec

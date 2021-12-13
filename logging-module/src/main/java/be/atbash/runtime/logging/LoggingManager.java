@@ -23,10 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 
@@ -110,6 +108,7 @@ public final class LoggingManager {
             logMgr.readConfiguration();
 
         } catch (IOException e) {
+            // FIXME
             LOGGER.error("Cannot read logging configuration file.", e);
         }
 

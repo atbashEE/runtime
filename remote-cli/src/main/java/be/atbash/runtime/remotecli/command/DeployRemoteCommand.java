@@ -17,6 +17,7 @@ package be.atbash.runtime.remotecli.command;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.util.ArchiveDeploymentUtil;
@@ -81,7 +82,7 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
         try {
             uploadedFiles.add(new UploadData(name, storeStreamToTempFile(inputStream)));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }
 

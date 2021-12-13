@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.config.module;
+package be.atbash.runtime.config.module.exception;
 
 import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
 
