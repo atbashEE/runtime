@@ -88,8 +88,20 @@ public class Deployer implements ModuleEventListener {
 
         runData.undeployed(deployment);
 
+        deleteDirectory(deployment.getDeploymentLocation());
+
         applicationMon.unregisterApplication(deployment);
 
+    }
+
+    private boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
     }
 
     private void verifyArchive(ArchiveDeployment deployment) {
