@@ -68,16 +68,20 @@ public class VersionReader {
     }
 
     private URL findManifestFile(String module) throws IOException {
-        URL result = null;
+        URL moduleResult = null;
+        URL firstResult = null;
         ClassLoader classLoader = this.getClass().getClassLoader();
         Enumeration<URL> systemResources = classLoader.getResources("META-INF/MANIFEST.MF");
-        while (systemResources.hasMoreElements() && result == null) {
+        while (systemResources.hasMoreElements() && moduleResult == null) {
             URL url = systemResources.nextElement();
+            if (firstResult == null) {
+                firstResult = url;
+            }
             if (url.toExternalForm().contains("/" + module)) {
-                result = url;
+                moduleResult = url;
             }
         }
-        return result;
+        return moduleResult == null ? firstResult : moduleResult;
     }
 
     /**
