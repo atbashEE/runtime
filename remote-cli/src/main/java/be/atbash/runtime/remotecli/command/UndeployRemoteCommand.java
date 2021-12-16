@@ -18,10 +18,11 @@ package be.atbash.runtime.remotecli.command;
 import be.atbash.runtime.common.command.data.CommandResponse;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
+import be.atbash.runtime.core.data.watcher.WatcherBean;
+import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.deployment.monitor.ApplicationInfo;
 import be.atbash.runtime.core.deployment.monitor.ApplicationMon;
-import be.atbash.runtime.monitor.core.MonitorBean;
-import be.atbash.runtime.monitor.core.MonitoringService;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +33,9 @@ public class UndeployRemoteCommand implements ServerRemoteCommand {
         CommandResponse result = new CommandResponse();
 
         String name = options.get("name");
-        ApplicationMon applicationMonitorBean = MonitoringService.retrieveBean(MonitorBean.ApplicationMonitorBean);
+
+        WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
+        ApplicationMon applicationMonitorBean = watcherService.retrieveBean(WatcherBean.ApplicationWatcherBean);
         Optional<ApplicationInfo> applicationInfo = applicationMonitorBean.getApplications()
                 .stream().filter(ai -> ai.getName().equals(name))
                 .findAny();

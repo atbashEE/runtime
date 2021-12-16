@@ -18,7 +18,7 @@ package be.atbash.runtime.logging.handler;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.IncorrectConfigurationException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
-import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.EnhancedLogRecord;
 import be.atbash.runtime.logging.LoggingManager;
 import be.atbash.runtime.logging.handler.formatter.JSONLogFormatter;
@@ -136,7 +136,7 @@ public class LogFileHandler extends StreamHandler {
 
     public LogFileHandler() {
 
-        this.configuration = ExposedObjectsModuleManager.getInstance().getExposedObject(RuntimeConfiguration.class);
+        this.configuration = RuntimeObjectsManager.getInstance().getExposedObject(RuntimeConfiguration.class);
         postConstruct();
     }
 

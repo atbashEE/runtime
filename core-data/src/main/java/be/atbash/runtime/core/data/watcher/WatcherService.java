@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.monitor.core;
+package be.atbash.runtime.core.data.watcher;
 
+import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
-import be.atbash.runtime.monitor.core.util.FlightRecorderUtil;
+import be.atbash.runtime.core.data.module.Module;
+import be.atbash.runtime.core.data.parameter.WatcherType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,18 +27,36 @@ import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class MonitoringService {
+public class WatcherService {
 
-    private static boolean flightRecorderActive = true;  // FIXME The default but config needed
+    private boolean jmxActive;
+    private boolean flightRecorderActive;
+    private boolean minimal;
 
-    private static boolean active;
-    private static Map<ObjectName, Object> monitoringBeans = new HashMap<>();
+    private Map<ObjectName, Object> monitoringBeans = new HashMap<>();
 
-    private MonitoringService() {
+    public WatcherService(WatcherType watcherType) {
+        minimal = watcherType == WatcherType.MINIMAL;
+        if (watcherType == WatcherType.JFR || watcherType == WatcherType.ALL) {
+            minimal = false;
+            flightRecorderActive = true;
+        }
+        if (watcherType == WatcherType.JMX || watcherType == WatcherType.ALL) {
+            minimal = false;
+            jmxActive = true;
+        }
     }
 
-    public static void logMonitorEvent(String module, String message) {
-        if (flightRecorderActive) {
+    public void reconfigure(RuntimeConfiguration configuration) {
+        jmxActive = configuration.getConfig().getMonitoring().isJmx();
+        flightRecorderActive = configuration.getConfig().getMonitoring().isFlightRecorder();
+        if (minimal) {
+            minimal = !jmxActive && !flightRecorderActive;
+        }
+    }
+
+    public void logWatcherEvent(String module, String message) {
+        if (flightRecorderActive || (minimal && Module.CORE_MODULE_NAME.equals(module))) {
             FlightRecorderUtil.getInstance().emitEvent(module, message);
 
         }
@@ -48,21 +68,15 @@ public final class MonitoringService {
 
     }
 
-    public static void setActive(boolean flag) {
-        active = flag;
-    }
-
-    public static boolean isActive() {
-        return active;
-    }
-
-    public static void registerBean(MonitorBean monitorBean, Object mbean) {
+    public void registerBean(WatcherBean watcherBean, Object mbean) {
         //  TODO should/can this be a singleton?
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName objectName;
         try {
-            objectName = constructName(monitorBean);
-            server.registerMBean(mbean, objectName);  // FIXME configuration to activate JMX
+            objectName = constructName(watcherBean);
+            if (jmxActive) {
+                server.registerMBean(mbean, objectName);
+            }
             monitoringBeans.put(objectName, mbean);
         } catch (MalformedObjectNameException | NotCompliantMBeanException | InstanceAlreadyExistsException | MBeanRegistrationException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
@@ -70,14 +84,14 @@ public final class MonitoringService {
 
     }
 
-    private static ObjectName constructName(MonitorBean monitorBean) throws MalformedObjectNameException {
-        return new ObjectName(monitorBean.getHierarchyName() + ":name=" + monitorBean.getName());
+    private ObjectName constructName(WatcherBean watcherBean) throws MalformedObjectNameException {
+        return new ObjectName(watcherBean.getHierarchyName() + ":name=" + watcherBean.getName());
     }
 
-    public static <T> T retrieveBean(MonitorBean monitorBean) {
+    public <T> T retrieveBean(WatcherBean watcherBean) {
         ObjectName objectName;
         try {
-            objectName = constructName(monitorBean);
+            objectName = constructName(watcherBean);
             return (T) monitoringBeans.get(objectName);
         } catch (MalformedObjectNameException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);

@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.data.module.event;
+package be.atbash.runtime.core.data.watcher;
 
-public final class Events {
+public enum WatcherBean {
+    RuntimeWatcherBean("Atbash.Runtime", "Info"),
+    ApplicationWatcherBean("Atbash.Server.Applications", "data");
 
-    public static final String DEPLOYMENT = "Deployment";  // For the core to start deployment
-    public static final String VERIFY_DEPLOYMENT = "VerifyDeployment";  // For the core to verify if PersistedDeployment is still valid.
-    public static final String UNDEPLOYMENT = "Undeployment";  // For the core to remove the deployment
+    private String hierarchyName;
+    private String name;
 
-    public static final String CONFIGURATION_UPDATE = "ConfigurationUpdate";  // Update of the RuntimeConfiguration
+    WatcherBean(String hierarchyName, String name) {
+        this.hierarchyName = hierarchyName;
+        this.name = name;
+    }
 
-    private Events() {
+    public String getHierarchyName() {
+        return hierarchyName;
+    }
+
+    public String getName() {
+        return name;
     }
 }

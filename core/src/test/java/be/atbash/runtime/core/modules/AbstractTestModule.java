@@ -26,12 +26,12 @@ import java.util.List;
 public abstract class AbstractTestModule<T> implements Module<T> {
 
     @Override
-    public List<Class<?>> getExposedTypes() {
+    public List<Class<?>> getRuntimeObjectTypes() {
         return new ArrayList<>();
     }
 
     @Override
-    public <T> T getExposedObject(Class<T> exposedObjectType) {
+    public <T> T getRuntimeObject(Class<T> exposedObjectType) {
         return null;
     }
 

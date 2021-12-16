@@ -16,9 +16,10 @@
 package be.atbash.runtime.remotecli.command;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
-import be.atbash.runtime.monitor.core.MonitorBean;
-import be.atbash.runtime.monitor.core.MonitoringService;
-import be.atbash.runtime.monitor.data.ServerMonMBean;
+import be.atbash.runtime.core.data.watcher.WatcherBean;
+import be.atbash.runtime.core.data.watcher.WatcherService;
+import be.atbash.runtime.core.data.watcher.model.ServerMonMBean;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.remotecli.util.TimeUtil;
 
 import java.util.Map;
@@ -29,7 +30,8 @@ public class StatusRemoteCommand implements ServerRemoteCommand {
         CommandResponse result = new CommandResponse();
         result.setSuccess(true);
 
-        ServerMonMBean serverMon = MonitoringService.retrieveBean(MonitorBean.RuntimeMonitorBean);
+        WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
+        ServerMonMBean serverMon = watcherService.retrieveBean(WatcherBean.RuntimeWatcherBean);
         result.addData("version", serverMon.getVersion());
         result.addData("uptime", TimeUtil.getTimeDescription(serverMon.uptime()));
         result.addData("modules", String.join(",", serverMon.getStartedModules()));

@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.core.module;
 
+import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.IncorrectUsageException;
@@ -22,11 +23,9 @@ import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
+import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.deployment.Deployer;
 import be.atbash.runtime.core.deployment.SnifferManager;
-import be.atbash.runtime.monitor.core.MonitorBean;
-import be.atbash.runtime.monitor.core.MonitoringService;
-import be.atbash.runtime.monitor.data.ServerMon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,34 +46,39 @@ public class ModuleManager {
     private List<Module> modules;  // Only read, no need for synchronization.
 
     private boolean modulesStarted = false;
+    private RunData runData;
+    private WatcherService watcherService;
 
     private ModuleManager(ConfigurationParameters configurationParameters) {
         this.configurationParameters = configurationParameters;
 
-        if (!init()) {
+        if (!init(configurationParameters)) {
             throw new AtbashStartupAbortException();
         }
 
         // Register deployer as Event Listener.
-        RuntimeConfiguration runtimeConfiguration = ExposedObjectsModuleManager.getInstance().getExposedObject(RuntimeConfiguration.class);
+        RuntimeConfiguration runtimeConfiguration = RuntimeObjectsManager.getInstance().getExposedObject(RuntimeConfiguration.class);
         List<Module> modulesCopy = new ArrayList<>(this.modules);
-        EventManager.getInstance().registerListener(new Deployer(runtimeConfiguration, modulesCopy));
+        EventManager.getInstance().registerListener(new Deployer(watcherService, runtimeConfiguration, modulesCopy));
     }
 
-    private boolean init() {
+    private boolean init(ConfigurationParameters configurationParameters) {
         modules = findAllModules();
 
         // Data Module must be the first one as everything else can be dependent on it.
-        Module<?> module1 = findModule(Module.DATA_MODULE_NAME);
-        startEssentialModule(module1, null);
+        Module<?> coreModule = findModule(Module.CORE_MODULE_NAME);
+        startEssentialModule(coreModule, configurationParameters.getWatcher());
+        runData = coreModule.getRuntimeObject(RunData.class);
+        watcherService = coreModule.getRuntimeObject(WatcherService.class);
+        EventManager.getInstance().registerListener(coreModule);
 
         Module<?> module2 = findModule(Module.CONFIG_MODULE_NAME);
-        if (!startEssentialModule(module2, configurationParameters)) {
+        if (!startEssentialModule(module2, this.configurationParameters)) {
             return false;
         }
 
         Module<?> module3 = findModule(Module.LOGGING_MODULE_NAME);
-        RuntimeConfiguration runtimeConfiguration = module2.getExposedObject(RuntimeConfiguration.class);
+        RuntimeConfiguration runtimeConfiguration = module2.getRuntimeObject(RuntimeConfiguration.class);
         if (!startEssentialModule(module3, runtimeConfiguration)) {
             return false;
         }
@@ -94,13 +98,12 @@ public class ModuleManager {
             return true;
         }
         modulesStarted = true;
-        RuntimeConfiguration runtimeConfiguration = ExposedObjectsModuleManager.getInstance().getExposedObject(RuntimeConfiguration.class);
+        RuntimeConfiguration runtimeConfiguration = RuntimeObjectsManager.getInstance().getExposedObject(RuntimeConfiguration.class);
         String[] requestedModules = runtimeConfiguration.getRequestedModules();
         if (validateRequestedModules(requestedModules)) {
             findAndStartModules(requestedModules);
 
-            ServerMon serverMon = MonitoringService.retrieveBean(MonitorBean.RuntimeMonitorBean);
-            serverMon.setStartedModules(startedModuleNames);
+            runData.setStartedModules(startedModuleNames);
 
             return true;
         } else {
@@ -151,7 +154,7 @@ public class ModuleManager {
         Thread moduleStarterThread = new Thread(new ModuleStarter(module));
         Class<?> moduleConfigClass = module.getModuleConfigClass();
         if (moduleConfigClass != null) {
-            Object exposedObject = ExposedObjectsModuleManager.getInstance().getExposedObject(moduleConfigClass);
+            Object exposedObject = RuntimeObjectsManager.getInstance().getExposedObject(moduleConfigClass);
             if (exposedObject == null) {
                 // FIXME Logging/Exception??
             }
@@ -170,7 +173,7 @@ public class ModuleManager {
             startedModules.add(module);
             startedModuleNames.add(module.name());
         }
-        ExposedObjectsModuleManager.getInstance().register(module);
+        RuntimeObjectsManager.getInstance().register(module);
         EventManager.getInstance().registerListener(module);
         if (requestedModules != null) {
             findAndStartModules(requestedModules);
@@ -193,7 +196,7 @@ public class ModuleManager {
             startedModuleNames.add(module.name());
             startedModules.add(module);
         }
-        ExposedObjectsModuleManager.getInstance().register(module);
+        RuntimeObjectsManager.getInstance().register(module);
 
         return starter.isSuccess();
     }

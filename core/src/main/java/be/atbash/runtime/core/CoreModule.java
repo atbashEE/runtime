@@ -13,28 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.remotecli;
+package be.atbash.runtime.core;
 
 import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
+import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
-import be.atbash.runtime.core.module.RuntimeObjectsManager;
-import org.eclipse.jetty.server.handler.HandlerCollection;
+import be.atbash.runtime.core.data.parameter.WatcherType;
+import be.atbash.runtime.core.data.watcher.WatcherService;
 
-import java.util.Collections;
 import java.util.List;
 
-public class RemoteCLIModule implements Module<Void> {
+import static be.atbash.runtime.core.data.module.event.Events.CONFIGURATION_UPDATE;
+
+/**
+ * This is a 'pseudo module' so that every other part of the runtime can access some basic information
+ * on what is running at the moment.
+ */
+public class CoreModule implements Module<WatcherType> {
+
+    private RunData runData;
+    private WatcherType watcherType;
+    private WatcherService watcherService;
+
     @Override
     public String name() {
-        return "remote-cli";
+        return Module.CORE_MODULE_NAME;
     }
 
     @Override
     public String[] dependencies() {
-        return new String[]{"jersey"};
+        return new String[0];
     }
 
     @Override
@@ -47,27 +58,38 @@ public class RemoteCLIModule implements Module<Void> {
         return null;
     }
 
+    public void setConfig(WatcherType watcherType) {
+        this.watcherType = watcherType;
+    }
+
     @Override
     public List<Class<?>> getRuntimeObjectTypes() {
-        return Collections.emptyList();
+        return List.of(RunData.class, WatcherService.class);
     }
 
     @Override
     public <T> T getRuntimeObject(Class<T> exposedObjectType) {
+        if (exposedObjectType.equals(RunData.class)) {
+            return (T) runData;
+        }
+        if (exposedObjectType.equals(WatcherService.class)) {
+            return (T) watcherService;
+        }
         return null;
     }
 
     @Override
     public void onEvent(EventPayload eventPayload) {
-
+        if (CONFIGURATION_UPDATE.equals(eventPayload.getEventCode())) {
+            watcherService.reconfigure(eventPayload.getPayload());
+        }
     }
 
     @Override
     public void run() {
-        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
-        runData.setDomainMode();
-
-        HandlerCollection handlers = RuntimeObjectsManager.getInstance().getExposedObject(HandlerCollection.class);
-        handlers.addHandler(new DomainHandler());
+        // The run of the module only requires that we have an empty instance
+        // of this instance that can be retrieved.
+        runData = new RunData();
+        watcherService = new WatcherService(watcherType);
     }
 }

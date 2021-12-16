@@ -27,12 +27,13 @@ import be.atbash.runtime.core.data.config.Config;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
+import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.profile.Profile;
-import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
-import be.atbash.runtime.monitor.core.MonitoringService;
+import be.atbash.runtime.core.data.watcher.WatcherService;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -45,6 +46,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static be.atbash.runtime.core.data.module.event.Events.CONFIGURATION_UPDATE;
 
 public class ConfigModule implements Module<ConfigurationParameters> {
 
@@ -87,12 +90,12 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     }
 
     @Override
-    public List<Class<?>> getExposedTypes() {
+    public List<Class<?>> getRuntimeObjectTypes() {
         return List.of(RuntimeConfiguration.class, PersistedDeployments.class);
     }
 
     @Override
-    public <T> T getExposedObject(Class<T> exposedObjectType) {
+    public <T> T getRuntimeObject(Class<T> exposedObjectType) {
         if (exposedObjectType.equals(RuntimeConfiguration.class)) {
             return (T) runtimeConfiguration;
         }
@@ -115,7 +118,8 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
     @Override
     public void run() {
-        MonitoringService.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Config Module startup");
+        WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
+        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Config Module startup");
 
         readProfiles();
         Profile profile = findProfile();
@@ -144,9 +148,11 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         builder.setConfig(config);
         runtimeConfiguration = builder.build();
 
-        RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+        EventManager.getInstance().publishEvent(CONFIGURATION_UPDATE, runtimeConfiguration);
+        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
         runData.registerDeploymentListener(new ArchiveDeploymentStorage(runtimeConfiguration));
-        MonitoringService.logMonitorEvent(Module.CONFIG_MODULE_NAME, "Config Module ready");
+
+        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Config Module ready");
     }
 
     private Profile findProfile() {

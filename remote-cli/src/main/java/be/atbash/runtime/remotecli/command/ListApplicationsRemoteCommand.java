@@ -19,7 +19,7 @@ import be.atbash.runtime.common.command.data.CommandResponse;
 import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.deployment.monitor.ApplicationInfo;
-import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,7 +33,7 @@ public class ListApplicationsRemoteCommand implements ServerRemoteCommand {
         CommandResponse result = new CommandResponse();
         result.setSuccess(true);
 
-        RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
 
         ObjectMapper mapper = new ObjectMapper();
         if (runData.getDeployments().isEmpty()) {

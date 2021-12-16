@@ -41,12 +41,12 @@ public class LoggingModule implements Module<RuntimeConfiguration> {
     }
 
     @Override
-    public List<Class<?>> getExposedTypes() {
+    public List<Class<?>> getRuntimeObjectTypes() {
         return new ArrayList<>();
     }
 
     @Override
-    public <T> T getExposedObject(Class<T> exposedObjectType) {
+    public <T> T getRuntimeObject(Class<T> exposedObjectType) {
         return null;
     }
 

@@ -13,25 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.monitor.core;
+package be.atbash.runtime.core.data.config;
 
-public enum MonitorBean {
-    RuntimeMonitorBean("Atbash.Runtime", "Info"),
-    ApplicationMonitorBean("Atbash.Server.Applications", "data");
+public class Monitoring {
 
-    private String hierarchyName;
-    private String name;
+    private boolean jmx;
+    private boolean flightRecorder;
 
-    MonitorBean(String hierarchyName, String name) {
-        this.hierarchyName = hierarchyName;
-        this.name = name;
+    public boolean isJmx() {
+        return jmx;
     }
 
-    public String getHierarchyName() {
-        return hierarchyName;
+    public void setJmx(boolean jmx) {
+        this.jmx = jmx;
     }
 
-    public String getName() {
-        return name;
+    public boolean isFlightRecorder() {
+        return flightRecorder;
+    }
+
+    public void setFlightRecorder(boolean flightRecorder) {
+        this.flightRecorder = flightRecorder;
     }
 }

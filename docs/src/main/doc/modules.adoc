@@ -1,0 +1,47 @@
+== Modules
+
+=== Core module
+
+*Reacts on : Configuration changes*
+
+Exposes some crucial data and services
+
+- RunData: All essential data of the current run of the Runtime
+- WatcherService : A service to perform some logging (with JFR events if activated) and storing some POJO that might be exposed through JMX (if activated)
+
+=== Config module
+
+*Dependent on : Core Module*
+
+Responsible for reading the configuration file, create them if needed, including the profile.
+
+It exposes the following objects
+
+- RuntimeConfiguration : The entire configuration of the current runtime instance
+- PersistedDeployments : The Deployment information on the archives that are stored during the previous run.
+
+=== Logging Module
+
+*Dependent on : Config Module*
+
+Based on the configuration information, it starts the logging.  It also ends the 'temporary logging'.
+
+It does not expose any Objects.
+
+=== Jetty module
+
+*Dependent on : Config Module*
+
+It starts up the Jetty server based on the configuration information.  When there is no `health` module active, it makes sure there is a basic handler for _/health_ so that system that inquiry if the runtime is healthy, behave properly.
+
+It exposes
+
+- HandlerCollection : So that other modules can add their own support for specifications or endpoints.
+
+The module is also responsible for deploying applications that only use HTML or Servlet resources.
+
+=== Jersey module
+
+*Dependent on : Jetty Module*
+
+The module is responsible for deploying applications that use JAX-RS resources.

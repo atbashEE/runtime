@@ -22,7 +22,7 @@ import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
-import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.jersey.util.ResourcePathUtil;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -54,12 +54,12 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
     }
 
     @Override
-    public List<Class<?>> getExposedTypes() {
+    public List<Class<?>> getRuntimeObjectTypes() {
         return Collections.emptyList();
     }
 
     @Override
-    public <T> T getExposedObject(Class<T> exposedObjectType) {
+    public <T> T getRuntimeObject(Class<T> exposedObjectType) {
         return null;
     }
 
@@ -141,7 +141,7 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
     @Override
     public void run() {
 
-        handlers = ExposedObjectsModuleManager.getInstance().getExposedObject(HandlerCollection.class);
+        handlers = RuntimeObjectsManager.getInstance().getExposedObject(HandlerCollection.class);
 
         LOGGER.info("JERSEY-101: Started Jersey");
 

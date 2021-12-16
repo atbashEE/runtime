@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.monitor.data;
+package be.atbash.runtime.core.data.watcher.model;
 
 import java.util.List;
 
 public class ServerMon implements ServerMonMBean {
 
     private String version;
-    private long startOfServer;
+    private final long startOfServer;
     private List<String> startedModules;
 
     public ServerMon(long startOfServer) {

@@ -33,7 +33,7 @@ public class ConfigurationParameters {
     private boolean verbose = false;
 
     @CommandLine.Option(names = {"-w", "--watcher"}, description = "Activate the (internal) monitoring tooling")
-    private boolean watcher = false;
+    private WatcherType watcher = WatcherType.MINIMAL;
 
     @CommandLine.Option(names = {"-r", "--root"}, description = "Location of the Atbash runtime installation, current directory by default")
     private String rootDirectory = ".";
@@ -88,11 +88,11 @@ public class ConfigurationParameters {
         this.verbose = verbose;
     }
 
-    public boolean isWatcher() {
+    public WatcherType getWatcher() {
         return watcher;
     }
 
-    public void setWatcher(boolean watcher) {
+    public void setWatcher(WatcherType watcher) {
         this.watcher = watcher;
     }
 

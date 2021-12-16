@@ -89,12 +89,10 @@
         <module>demo</module>
         <module>core-data</module>
         <module>core</module>
-        <module>monitor-core</module>
         <module>config-core</module>
         <module>config-module</module>
         <module>logging-core</module>
         <module>logging-module</module>
-        <module>monitor-data</module>
         <module>jetty</module>
         <module>jersey</module>
         <module>weld</module>

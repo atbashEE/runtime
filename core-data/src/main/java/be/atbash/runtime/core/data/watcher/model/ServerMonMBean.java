@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.data.module.event;
+package be.atbash.runtime.core.data.watcher.model;
 
-public final class Events {
+import java.util.List;
 
-    public static final String DEPLOYMENT = "Deployment";  // For the core to start deployment
-    public static final String VERIFY_DEPLOYMENT = "VerifyDeployment";  // For the core to verify if PersistedDeployment is still valid.
-    public static final String UNDEPLOYMENT = "Undeployment";  // For the core to remove the deployment
+public interface ServerMonMBean {
 
-    public static final String CONFIGURATION_UPDATE = "ConfigurationUpdate";  // Update of the RuntimeConfiguration
+    String getVersion();
 
-    private Events() {
-    }
+    Long uptime();
+
+    List<String> getStartedModules();
 }

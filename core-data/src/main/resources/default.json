@@ -6,5 +6,9 @@
   "endpoints" : [
     { "name" : "http",
       "port":  8080}
-  ]
+  ],
+  "monitoring" : {
+    "jmx" : false,
+    "flightRecorder" : false
+  }
 }

@@ -24,6 +24,7 @@ public class Config {
 
     private List<Endpoint> endpoints;
     private Logging logging;
+    private Monitoring monitoring;
 
     public Logging getLogging() {
         return logging;
@@ -41,4 +42,11 @@ public class Config {
         this.endpoints = endpoints;
     }
 
+    public Monitoring getMonitoring() {
+        return monitoring;
+    }
+
+    public void setMonitoring(Monitoring monitoring) {
+        this.monitoring = monitoring;
+    }
 }

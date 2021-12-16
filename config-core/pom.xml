@@ -39,12 +39,6 @@
             <version>${project.parent.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>be.atbash.runtime</groupId>
-            <artifactId>monitor-core</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
     </dependencies>
 
 </project>

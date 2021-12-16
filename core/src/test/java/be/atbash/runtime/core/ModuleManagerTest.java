@@ -16,16 +16,15 @@
 package be.atbash.runtime.core;
 
 
+import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.IncorrectUsageException;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.module.ModuleManager;
 import be.atbash.runtime.core.modules.ModulesLogger;
-import be.atbash.runtime.monitor.core.MonitorBean;
-import be.atbash.runtime.monitor.core.MonitoringService;
-import be.atbash.runtime.monitor.data.ServerMon;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 
+import java.io.File;
 import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -47,9 +46,12 @@ class ModuleManagerTest {
     @Test
     @Order(3)
     public void startAndStopModules() {
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
 
-
-        MonitoringService.registerBean(MonitorBean.RuntimeMonitorBean, new ServerMon(System.currentTimeMillis()));
+         RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
 
         ConfigurationParameters parameters = new ConfigurationParameters();
         parameters.setModules("module1,module2");

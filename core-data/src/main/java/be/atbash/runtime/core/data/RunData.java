@@ -19,13 +19,23 @@ import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.ArchiveDeploymentListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RunData {
 
+    private List<String> startedModules;
     private final List<ArchiveDeployment> deployments = new ArrayList<>();
     private final List<ArchiveDeploymentListener> listeners = new ArrayList<>();
     private boolean domainMode;
+
+    public List<String> getStartedModules() {
+        return startedModules;
+    }
+
+    public void setStartedModules(List<String> startedModules) {
+        this.startedModules = Collections.unmodifiableList(startedModules);
+    }
 
     public void deployed(ArchiveDeployment deployment) {
         deployments.add(deployment);

@@ -23,19 +23,21 @@ import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
+import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.data.parameter.WatcherType;
 import be.atbash.runtime.core.data.util.ArchiveDeploymentUtil;
 import be.atbash.runtime.core.data.util.SpecificationUtil;
 import be.atbash.runtime.core.data.version.VersionInfo;
+import be.atbash.runtime.core.data.watcher.WatcherBean;
+import be.atbash.runtime.core.data.watcher.WatcherService;
+import be.atbash.runtime.core.data.watcher.model.ServerMon;
 import be.atbash.runtime.core.deployment.SnifferManager;
-import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.LoggingManager;
 import be.atbash.runtime.logging.earlylog.EarlyLogRecords;
-import be.atbash.runtime.monitor.core.MonitorBean;
-import be.atbash.runtime.monitor.core.MonitoringService;
-import be.atbash.runtime.monitor.data.ServerMon;
 import org.slf4j.Logger;
 import picocli.CommandLine;
 
@@ -84,13 +86,14 @@ public class RuntimeMain {
             }
         } else {
 
-            MonitoringService.setActive(command.getConfigurationParameters().isWatcher());
+            // WatcherService only available when ModuleManger starts the modules
+            // WatcherService is created by the first Module, the CoreModule.
+            // So we create here a temporary just to get some JFR events.
+            WatcherService temporaryWatcherService = new WatcherService(WatcherType.MINIMAL);
 
             VersionInfo versionInfo = VersionInfo.getInstance();
-            MonitoringService.logMonitorEvent("Main", String.format("CLI-102: Starting Atbash Runtime version %s", versionInfo.getReleaseVersion()));
+            temporaryWatcherService.logWatcherEvent(Module.CORE_MODULE_NAME, String.format("CLI-102: Starting Atbash Runtime version %s", versionInfo.getReleaseVersion()));
             serverMon.setVersion(versionInfo.getReleaseVersion());
-
-            MonitoringService.registerBean(MonitorBean.RuntimeMonitorBean, serverMon);
 
             try {
                 actualCommand.call();
@@ -113,9 +116,16 @@ public class RuntimeMain {
             LOGGER = LoggingManager.getInstance().getMainLogger(RuntimeMain.class, logToConsole);
             LOGGER.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
 
+            // Now that all Modules are initialized, we can use the real WatcherService and the bean will
+            // registered within JMX if the configuration indicates we need to do it.
+            WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
+
+            RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+            serverMon.setStartedModules(runData.getStartedModules());
+            watcherService.registerBean(WatcherBean.RuntimeWatcherBean, serverMon);
+
             deployAndRunArchives(command);
 
-            RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
             int applications = runData.getDeployments().size();
 
             if (applications > 0) {
@@ -173,7 +183,7 @@ public class RuntimeMain {
 
         EventManager eventManager = EventManager.getInstance();
 
-        List<ArchiveDeployment> persistedDeployments = ExposedObjectsModuleManager.getInstance()
+        List<ArchiveDeployment> persistedDeployments = RuntimeObjectsManager.getInstance()
                 .getExposedObject(PersistedDeployments.class)
                 .getDeployments()
                 .stream()

@@ -13,15 +13,7 @@ The product has several ways of operation
 
 Applications are internally identified by the contextroot they are available (must be unique on the runtime) and when performing remote administration, applications are indicated by their deployment name.
 
-== Modules
-
-config
-
-logging
-
-jetty
-
-jersey
+include::modules.adoc[]
 
 == Configuration
 

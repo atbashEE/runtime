@@ -26,7 +26,7 @@ public interface Module<C> extends Runnable, ModuleEventListener {
 
     String LOGGING_MODULE_NAME = "Logging";
     String CONFIG_MODULE_NAME = "Config";
-    String DATA_MODULE_NAME = "Data";
+    String CORE_MODULE_NAME = "Core";
 
     /**
      * The Name of the module
@@ -78,9 +78,9 @@ public interface Module<C> extends Runnable, ModuleEventListener {
      *
      * @return
      */
-    List<Class<?>> getExposedTypes();
+    List<Class<?>> getRuntimeObjectTypes();
 
-    <T> T getExposedObject(Class<T> exposedObjectType);
+    <T> T getRuntimeObject(Class<T> exposedObjectType);
 
     default void stop() {}
 

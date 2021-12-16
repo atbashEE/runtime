@@ -25,7 +25,7 @@ import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
-import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -56,12 +56,12 @@ public class JettyModule implements Module<RuntimeConfiguration> {
     }
 
     @Override
-    public List<Class<?>> getExposedTypes() {
+    public List<Class<?>> getRuntimeObjectTypes() {
         return List.of(HandlerCollection.class);
     }
 
     @Override
-    public <T> T getExposedObject(Class<T> exposedObjectType) {
+    public <T> T getRuntimeObject(Class<T> exposedObjectType) {
         if (exposedObjectType.equals(HandlerCollection.class)) {
             return (T) handlers;
         }
@@ -142,7 +142,7 @@ public class JettyModule implements Module<RuntimeConfiguration> {
             // But if health module is node active, this HealthHandler should give basics
             // so that MicroShed testing is working.
             // register health
-            RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+            RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
             handlers.addHandler(new HealthHandler(runData));
         }
     }

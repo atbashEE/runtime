@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.monitor.core.util;
+package be.atbash.runtime.core.data.watcher;
 
 import jdk.jfr.*;
 

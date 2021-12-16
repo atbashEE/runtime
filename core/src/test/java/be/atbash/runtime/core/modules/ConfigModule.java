@@ -47,12 +47,12 @@ public class ConfigModule extends AbstractTestModule<ConfigurationParameters> {
     }
 
     @Override
-    public List<Class<?>> getExposedTypes() {
+    public List<Class<?>> getRuntimeObjectTypes() {
         return List.of(RuntimeConfiguration.class);
     }
 
     @Override
-    public <T> T getExposedObject(Class<T> exposedObjectType) {
+    public <T> T getRuntimeObject(Class<T> exposedObjectType) {
         if (exposedObjectType.equals(RuntimeConfiguration.class)) {
 
             RuntimeConfiguration.Builder builder = new RuntimeConfiguration.Builder(new File("."), "");

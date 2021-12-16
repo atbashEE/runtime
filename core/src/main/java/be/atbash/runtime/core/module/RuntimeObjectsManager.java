@@ -16,36 +16,34 @@
 package be.atbash.runtime.core.module;
 
 import be.atbash.runtime.core.data.module.Module;
-import be.atbash.runtime.core.deployment.Deployer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-// FIXME naming should be different I guess.
-public class ExposedObjectsModuleManager {
+public class RuntimeObjectsManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExposedObjectsModuleManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RuntimeObjectsManager.class);
 
-    private static final ExposedObjectsModuleManager INSTANCE = new ExposedObjectsModuleManager();
+    private static final RuntimeObjectsManager INSTANCE = new RuntimeObjectsManager();
 
-    private Map<Class<?>, Module<?>> exposedObjectMapping = new HashMap<>();
+    private final Map<Class<?>, Module<?>> runtimeObjectMapping = new HashMap<>();
 
     void register(Module<?> module) {
-        module.getExposedTypes().forEach(c -> exposedObjectMapping.put(c, module));
+        module.getRuntimeObjectTypes().forEach(c -> runtimeObjectMapping.put(c, module));
     }
 
     public <T> T getExposedObject(Class<T> exposedObjectType) {
-        if (exposedObjectMapping.containsKey(exposedObjectType)) {
-            return exposedObjectMapping.get(exposedObjectType).getExposedObject(exposedObjectType);
+        if (runtimeObjectMapping.containsKey(exposedObjectType)) {
+            return runtimeObjectMapping.get(exposedObjectType).getRuntimeObject(exposedObjectType);
         } else {
-            LOGGER.error(String.format("DE-101: Object '%s' not exposed by any Module", exposedObjectType.getName()));
+            LOGGER.error(String.format("RO-101: Object '%s' not exposed by any Module", exposedObjectType.getName()));
         }
         return null;
     }
 
-    public static ExposedObjectsModuleManager getInstance() {
+    public static RuntimeObjectsManager getInstance() {
         return INSTANCE;
     }
 }

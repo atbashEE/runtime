@@ -26,10 +26,10 @@ import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.event.ModuleEventListener;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.data.watcher.WatcherBean;
+import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.deployment.monitor.ApplicationMon;
-import be.atbash.runtime.core.module.ExposedObjectsModuleManager;
-import be.atbash.runtime.monitor.core.MonitorBean;
-import be.atbash.runtime.monitor.core.MonitoringService;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,10 +52,10 @@ public class Deployer implements ModuleEventListener {
     private final List<Module> modules;
     private final ApplicationMon applicationMon = new ApplicationMon();
 
-    public Deployer(RuntimeConfiguration runtimeConfiguration, List<Module> modules) {
+    public Deployer(WatcherService watcherService, RuntimeConfiguration runtimeConfiguration, List<Module> modules) {
         this.runtimeConfiguration = runtimeConfiguration;
         this.modules = modules;
-        MonitoringService.registerBean(MonitorBean.ApplicationMonitorBean, applicationMon);
+        watcherService.registerBean(WatcherBean.ApplicationWatcherBean, applicationMon);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class Deployer implements ModuleEventListener {
     }
 
     private void undeploy(String deploymentName) {
-        RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
         Optional<ArchiveDeployment> archiveDeployment = runData.getDeployments()
                 .stream()
                 .filter(ad -> ad.getDeploymentName().equals(deploymentName))
@@ -138,7 +138,7 @@ public class Deployer implements ModuleEventListener {
 
         deployment.setDeployed();
         //EventManager.getInstance().publishEvent(Events.REGISTER_DEPLOYMENT, deployment);
-        RunData runData = ExposedObjectsModuleManager.getInstance().getExposedObject(RunData.class);
+        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
         runData.deployed(deployment);
 
         applicationMon.registerApplication(deployment);
