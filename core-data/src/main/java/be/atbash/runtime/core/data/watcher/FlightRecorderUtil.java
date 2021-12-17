@@ -15,8 +15,11 @@
  */
 package be.atbash.runtime.core.data.watcher;
 
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import jdk.jfr.*;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +29,7 @@ public final class FlightRecorderUtil {
     private static final FlightRecorderUtil INSTANCE = new FlightRecorderUtil();
 
     private List<ValueDescriptor> fields;
+    private Recording recording;
 
     private FlightRecorderUtil() {
 
@@ -48,8 +52,8 @@ public final class FlightRecorderUtil {
         List<AnnotationElement> eventAnnotations = new ArrayList<>();
 
         eventAnnotations.add(new AnnotationElement(Name.class, name));
-        eventAnnotations.add(new AnnotationElement(Label.class, "Atbash Runtime monitoring event"));
-        eventAnnotations.add(new AnnotationElement(Description.class, "Atbash Runtime monitoring event"));
+        eventAnnotations.add(new AnnotationElement(Label.class, "Atbash Runtime event"));
+        eventAnnotations.add(new AnnotationElement(Description.class, "Atbash Runtime event"));
         eventAnnotations.add(new AnnotationElement(Category.class, categories));
 
         EventFactory eventFactory = EventFactory.create(eventAnnotations, fields);
@@ -57,6 +61,22 @@ public final class FlightRecorderUtil {
         event.set(0, message);
 
         event.commit();
+    }
+
+    public void startRecording() {
+        Configuration conf;
+        try {
+            conf = Configuration.getConfiguration("default");
+        } catch (IOException | ParseException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        }
+
+        recording = new Recording(conf);
+
+        // disable disk writes
+        recording.setToDisk(false);
+        recording.setDumpOnExit(true);
+        recording.start();
     }
 
     public static FlightRecorderUtil getInstance() {

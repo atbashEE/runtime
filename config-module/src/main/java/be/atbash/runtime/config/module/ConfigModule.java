@@ -31,6 +31,7 @@ import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
+import be.atbash.runtime.core.data.parameter.WatcherType;
 import be.atbash.runtime.core.data.profile.Profile;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
@@ -119,7 +120,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     @Override
     public void run() {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
-        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Config Module startup");
+        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "CONFIG-101: Module startup");
 
         readProfiles();
         Profile profile = findProfile();
@@ -152,7 +153,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
         runData.registerDeploymentListener(new ArchiveDeploymentStorage(runtimeConfiguration));
 
-        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Config Module ready");
+        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "CONFIG-102: Module ready");
     }
 
     private Profile findProfile() {
@@ -167,9 +168,14 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     }
 
     private void overruleConfiguration() {
-        // FIXME Check logic if this is OK.
         if (parameters.isLogToConsole()) {
             config.getLogging().setLogToConsole(true);
+        }
+        if (parameters.getWatcher() == WatcherType.JFR || parameters.getWatcher() == WatcherType.ALL ) {
+            config.getMonitoring().setFlightRecorder(true);
+        }
+        if (parameters.getWatcher() == WatcherType.JMX || parameters.getWatcher() == WatcherType.ALL ) {
+            config.getMonitoring().setJmx(true);
         }
     }
 

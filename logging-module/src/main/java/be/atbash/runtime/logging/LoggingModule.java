@@ -20,6 +20,8 @@ import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.data.watcher.WatcherService;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,10 +78,14 @@ public class LoggingModule implements Module<RuntimeConfiguration> {
 
     @Override
     public void run() {
-        LOGGER.info("Logging Module start");
+        WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
+        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-101: Module startup");
 
         LoggingManager.getInstance().configureLogging(configuration);
 
         LoggingManager.getInstance().removeEarlyLogHandler();
+
+        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-102: Module startup");
+
     }
 }

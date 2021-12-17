@@ -17,10 +17,12 @@ include::modules.adoc[]
 
 == Configuration
 
-== Logging
-
 include::logging.adoc[]
 
 include::commandlineoptions.adoc[]
 
+include::integrations.adoc[]
+
 include::domain-api.adoc[]
+
+include::messages.adoc[]

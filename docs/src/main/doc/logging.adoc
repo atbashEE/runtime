@@ -1,3 +1,5 @@
+== Logging
+
 The runtime controls the entire logging subsystem.
 
 The configuration is performed through a properties file that configures the Java Util Logging system.  The file is expected at  `<instance>/logging.properties` and is created from a default when not found.

@@ -1,0 +1,26 @@
+== Messages
+
+=== Core module
+
+- DE-101(INFO): Start of the Deployment of the application.
+- DE-102(INFO): End of the Deployment of the application.
+
+=== Config module
+
+- CONFIG-101(INFO): Start of the Module setup
+- CONFIG-102(INFO): End of the Module setup
+
+=== Logging Module
+
+- LOG-101(INFO): Start of the Module setup
+- LOG-102(INFO): End of the Module setup
+
+=== Jetty module
+
+- JETTY-101(INFO): Start of the Module setup
+- JETTY-102(INFO): End of the Module setup
+
+=== Jersey module
+
+- JERSEY-101(INFO): Start of the Module setup
+- JERSEY-102(INFO): End of the Module setup

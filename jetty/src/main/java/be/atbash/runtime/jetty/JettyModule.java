@@ -25,6 +25,7 @@ import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -125,6 +126,9 @@ public class JettyModule implements Module<RuntimeConfiguration> {
 
     @Override
     public void run() {
+        WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
+        watcherService.logWatcherEvent("Jetty", "JETTY-101: Module startup");
+
         Endpoint httpEndpoint = ConfigUtil.getHttpEndpoint(configuration.getConfig());
         server = new Server(httpEndpoint.getPort());
         handlers = new HandlerCollection(true);
@@ -135,8 +139,6 @@ public class JettyModule implements Module<RuntimeConfiguration> {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
-        LOGGER.info("JETTY:101: Started Jetty");
-
         if (Arrays.stream(configuration.getRequestedModules()).noneMatch("health"::equals)) {
             // FIXME create a proper health module.
             // But if health module is node active, this HealthHandler should give basics
@@ -145,6 +147,8 @@ public class JettyModule implements Module<RuntimeConfiguration> {
             RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
             handlers.addHandler(new HealthHandler(runData));
         }
+
+        watcherService.logWatcherEvent("Jetty", "JETTY-102: Module ready");
     }
 
     @Override

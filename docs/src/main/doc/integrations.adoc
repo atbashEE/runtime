@@ -1,0 +1,7 @@
+== Integrations
+
+=== Java Flight Recorder
+
+Atbash Runtime has support for the Java Flight recorder functionality.  When defining the option `--watcher JFR` or  `--watcher ALL` for the instance/domain, a JFR Recording is started automatically and written out when the JVM exits. Several messages are also created as JFR events and allow the analysis of the JVM behaviour.
+
+The JFR file is created in the current directory.

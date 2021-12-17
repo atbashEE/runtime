@@ -45,6 +45,9 @@ public class WatcherService {
             minimal = false;
             jmxActive = true;
         }
+        if (flightRecorderActive) {
+            FlightRecorderUtil.getInstance().startRecording();
+        }
     }
 
     public void reconfigure(RuntimeConfiguration configuration) {

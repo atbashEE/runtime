@@ -10,6 +10,13 @@ java -jar atbash-runtime.jar <options>
 
 -v|--verbose: Are all log messages shown on the console.
 
+--watcher:  Defines the type of the diagnostics, valid values are  +
+`MINIMAL`: (default) only the events from the Core module are sent to JFR.  +
+`OFF`: JFR and JMX are disabled  +
+`JFR`: Events are send to JFR system and Recording is started which is dump to file at JVM exit.  +
+`JMX`: Some data is available within the JMX system.  +
+`ALL`: Combination of `JFR` and `JMX`
+
 zero, one or more WAR files can be added to the command line that needs to be deployd. Also the applications that are already 'deployed' within the configuration are started.
 
 === CLI
