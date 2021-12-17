@@ -22,7 +22,7 @@ import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.parameter.WatcherType;
 import be.atbash.runtime.core.data.watcher.model.ServerMon;
 import jdk.jfr.consumer.RecordedEvent;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import javax.management.MBeanServer;
@@ -37,6 +37,11 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class WatcherServiceTest {
+
+    @BeforeAll
+    public static void setup() {
+        System.setProperty("be.atbash.runtime.test", "Active");
+    }
 
     @Test
     void registerBean() throws MalformedObjectNameException {

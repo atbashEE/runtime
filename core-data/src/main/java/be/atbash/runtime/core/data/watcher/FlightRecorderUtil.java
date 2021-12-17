@@ -64,6 +64,9 @@ public final class FlightRecorderUtil {
     }
 
     public void startRecording() {
+        if (System.getProperty("be.atbash.runtime.test") != null) {
+            return;
+        }
         Configuration conf;
         try {
             conf = Configuration.getConfiguration("default");
