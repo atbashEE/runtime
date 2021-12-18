@@ -39,9 +39,12 @@ public class DeploymentMetadata {
 
     public DeploymentMetadata(ArchiveDeployment deployment, RuntimeConfiguration runtimeConfiguration) {
         deploymentName = deployment.getDeploymentName();
-        String absolutePath = deployment.getDeploymentLocation().getAbsolutePath();
-        // Remove config directory location from the path.
-        deploymentLocation = absolutePath.substring(runtimeConfiguration.getApplicationDirectory().getAbsolutePath().length());
+        // When undeploying a corrupted Persisted deployment, deploymentLocation is null.
+        if (deployment.getDeploymentLocation() != null) {
+            String absolutePath = deployment.getDeploymentLocation().getAbsolutePath();
+            // Remove config directory location from the path.
+            deploymentLocation = absolutePath.substring(runtimeConfiguration.getApplicationDirectory().getAbsolutePath().length());
+        }
         specifications = deployment.getSpecifications().stream()
                 .map(Specification::name)
                 .collect(Collectors.toList());

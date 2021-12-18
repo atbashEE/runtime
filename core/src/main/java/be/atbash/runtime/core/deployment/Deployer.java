@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 public class Deployer implements ModuleEventListener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Deployer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Deployer.class);
 
     // FIXME This should be made available to a reworked ExposedObjectsModuleManager
     // Do we need a Core module to be consistent?
@@ -108,6 +108,7 @@ public class Deployer implements ModuleEventListener {
         File realApplicationDeploymentLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getDeploymentLocation().getAbsolutePath() + "/WEB-INF");
         if (!realApplicationDeploymentLocation.exists()) {
             // Does no longer exists.
+            LOGGER.warn(String.format("DEPLOY-102: Deployment artifact for %s not found", deployment.getDeploymentName()));
             deployment.setDeploymentLocation(null);
         } else {
             // realApplicationDeploymentLocation points to /WEB-INF, we need to go 1 up.
@@ -177,7 +178,7 @@ public class Deployer implements ModuleEventListener {
     }
 
     private boolean loadArchive(ArchiveDeployment deployment) {
-        LOG.info(String.format("Loading application %s", deployment.getDeploymentName()));
+        LOGGER.info(String.format("Loading application %s", deployment.getDeploymentName()));
 
         Unpack unpack = new Unpack(deployment.getDeploymentLocation());
         ArchiveContent archiveContent = unpack.processExpandedArchive();
@@ -226,7 +227,7 @@ public class Deployer implements ModuleEventListener {
      * @return
      */
     private boolean unpackArchive(ArchiveDeployment deployment) {
-        LOG.info(String.format("Deploying application %s", deployment.getArchiveFile()));
+        LOGGER.info(String.format("Deploying application %s", deployment.getArchiveFile()));
 
         if (!checkDeployment(deployment)) {
             return false;
@@ -251,7 +252,7 @@ public class Deployer implements ModuleEventListener {
         // FIXME We need more checks?
         boolean result = deployment.getArchiveFile().exists();
         if (!result) {
-            LOG.warn(String.format("DEPLOY-101: Deployment %s not found", deployment.getArchiveFile()));
+            LOGGER.warn(String.format("DEPLOY-101: Deployment %s not found", deployment.getArchiveFile()));
         }
         return result;
     }

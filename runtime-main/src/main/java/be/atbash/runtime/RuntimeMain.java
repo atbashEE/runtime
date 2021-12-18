@@ -202,7 +202,7 @@ public class RuntimeMain {
         }
     }
 
-
+    // FIXME Move to a more appropriate class?
     private static ArchiveDeployment createArchiveDeployment(DeploymentMetadata metadata, EventManager eventManager) {
         List<Sniffer> sniffers = SnifferManager.getInstance().retrieveSniffers(metadata.getSniffers());
         ArchiveDeployment deployment = new ArchiveDeployment(metadata.getDeploymentLocation(), metadata.getDeploymentName()
@@ -210,7 +210,10 @@ public class RuntimeMain {
         eventManager.publishEvent(Events.VERIFY_DEPLOYMENT, deployment);
         if (deployment.getDeploymentLocation() == null) {
             // The Deployment location is gone
-            // FIXME remove from persistedDeployments.
+            // FIXME Or should we just do undeploy to handle for example partial corruption?
+            RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+            runData.undeployed(deployment);
+
             deployment = null;
         }
         return deployment;
