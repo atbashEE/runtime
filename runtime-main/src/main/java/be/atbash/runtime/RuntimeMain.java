@@ -42,10 +42,7 @@ import org.slf4j.Logger;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -197,9 +194,18 @@ public class RuntimeMain {
 
         ArchiveDeploymentUtil.assignContextRoots(archives, command.getConfigurationParameters().getContextRoot());
 
-        if (!archives.isEmpty()) {
-            archives.forEach(a -> eventManager.publishEvent(Events.DEPLOYMENT, a));
+        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+        for (ArchiveDeployment deployment : archives) {
+            Optional<ArchiveDeployment> otherDeployment = runData.getDeployments().stream()
+                    .filter(ad -> ad.getDeploymentName().equals(deployment.getDeploymentName()))
+                    .findAny();
+            if (otherDeployment.isPresent()) {
+                LOGGER.error(String.format("CLI-109: Deployment %s already active, can't deploy application with same name twice.", deployment.getDeploymentName()));
+                System.exit(-1);  // FIXME Is this the correct way?
+            }
+            eventManager.publishEvent(Events.DEPLOYMENT, deployment);
         }
+
     }
 
     // FIXME Move to a more appropriate class?

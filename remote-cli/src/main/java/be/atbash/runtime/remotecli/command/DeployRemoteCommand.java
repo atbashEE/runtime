@@ -16,12 +16,14 @@
 package be.atbash.runtime.remotecli.command;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
+import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.util.ArchiveDeploymentUtil;
 import be.atbash.runtime.core.data.util.StringUtil;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,6 +32,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUpload {
@@ -55,10 +58,20 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
             return result;
         }
         ArchiveDeploymentUtil.assignContextRoots(deployments, contextRoots);
-        deployments.forEach(
-                deployment ->
-                        eventManager.publishEvent(Events.DEPLOYMENT, deployment)
-        );
+
+        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+        for (ArchiveDeployment deployment : deployments) {
+            Optional<ArchiveDeployment> otherDeployment = runData.getDeployments().stream()
+                    .filter(ad -> ad.getDeploymentName().equals(deployment.getDeploymentName()))
+                    .findAny();
+            if (otherDeployment.isPresent()) {
+                result.setSuccess(false);
+                result.setErrorMessage(String.format("RC-106: Deployment %s already active, can't deploy application with same name twice.", deployment.getDeploymentName()));
+                return result;
+            }
+
+            eventManager.publishEvent(Events.DEPLOYMENT, deployment);
+        }
 
         deployments.forEach(
                 deployment -> {
