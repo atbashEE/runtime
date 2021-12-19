@@ -18,27 +18,38 @@ package be.atbash.runtime.core.data;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+/**
+ * ClassLoader used by the sniffers to analyse the deployment. This loader is not used during the processing of user calls.
+ */
 public class WebAppClassLoader extends ClassLoader {
 
     private DelegatingURLClassLoader classesClassLoader;
-    private URLClassLoader libClassLoader;
+    //private URLClassLoader libClassLoader;  TODO Scan also libs for Servlets, JAX-RS endpoints, ... ?
 
     public WebAppClassLoader(File rootDirectory, ClassLoader parent) {
         super("WebAppClassLoader", parent);
         URL url = null;
         try {
             URI uri = new File(rootDirectory, "WEB-INF/classes/").toURI();
-            url = uri.toURL();  // FIXME
-            url = URI.create(uri.toString() + "/").toURL();
+            url = URI.create(uri + "/").toURL();
         } catch (MalformedURLException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
         classesClassLoader = new DelegatingURLClassLoader(new URL[]{url}, parent);
+    }
+
+    public void close() {
+        try {
+            classesClassLoader.close();
+        } catch (IOException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        }
     }
 
     @Override

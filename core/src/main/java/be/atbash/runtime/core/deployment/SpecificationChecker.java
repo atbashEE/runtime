@@ -40,6 +40,10 @@ public class SpecificationChecker {
         triggeredSniffers = new ArrayList<>();
     }
 
+    /**
+     * Feed all classes of the archive itself to the Sniffers to determine what the Archive contains.
+     * Note that the Classloader used for this is closed after performing this operation.
+     */
     public void perform() {
         try {
             for (String archiveClass : archiveContent.getArchiveClasses()) {
@@ -64,6 +68,7 @@ public class SpecificationChecker {
             e.printStackTrace();
             // FIXME;
         }
+        classLoader.close();
     }
 
     private void updateSniffers(List<Sniffer> triggeredSniffers) {
