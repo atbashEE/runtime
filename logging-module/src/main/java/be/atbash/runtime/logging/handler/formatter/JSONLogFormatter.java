@@ -95,6 +95,7 @@ public class JSONLogFormatter extends CommonFormatter {
      */
     @Deprecated
     private static final String PAYARA_JSONLOGFORMATTER_UNDERSCORE = "fish.payara.deprecated.jsonlogformatter.underscoreprefix";
+    // FIXME remove
 
     public JSONLogFormatter(String excludeFields) {
         super(excludeFields);

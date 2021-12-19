@@ -24,12 +24,12 @@
     <parent>
         <groupId>be.atbash.runtime</groupId>
         <artifactId>parent</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>remote-cli</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <dependencies>

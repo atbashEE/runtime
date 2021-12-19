@@ -24,12 +24,12 @@
     <parent>
         <groupId>be.atbash.runtime</groupId>
         <artifactId>parent</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>jersey-module</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.0</version>  <!-->FIXME constant -->
         </dependency>
 
 

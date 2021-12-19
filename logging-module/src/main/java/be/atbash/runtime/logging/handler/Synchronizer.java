@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// Portions Copyright [2019] Payara Foundation and/or affiliates
 
 package be.atbash.runtime.logging.handler;
 
@@ -22,20 +21,20 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Synchronize actions between 2 Threads.
- *
+ * <p>
  * Usage
- *
+ * <p>
  * Thread 1
- *                 while (!synchronizer.isSignalled()) {
- *                     //
- *                 }
- *                 synchronizer.release();
- *
- *
+ * while (!synchronizer.isSignalled()) {
+ * //
+ * }
+ * synchronizer.release();
+ * <p>
+ * <p>
  * Thread 2
- *
- *         synchronizer.raiseSignal(1, TimeUnit.SECONDS);
- *         // Either Thread 1 stopped the loop or we waited 1 sec and can interupt the thread 1
+ * <p>
+ * synchronizer.raiseSignal(1, TimeUnit.SECONDS);
+ * // Either Thread 1 stopped the loop or we waited 1 sec and can interupt the thread 1
  */
 public class Synchronizer {
 

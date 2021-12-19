@@ -24,7 +24,7 @@
     <parent>
         <groupId>be.atbash.runtime</groupId>
         <artifactId>parent</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -32,7 +32,7 @@
     <!-- This module doesn't contain anything. Is it required -->
 
     <artifactId>logging-core</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <dependencies>

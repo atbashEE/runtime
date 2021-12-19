@@ -2,6 +2,7 @@
 
 Goal: A small modular Jakarta EE Core Profile runtime.
 
+(And a means to learn a lot by performing real world challenges)
 
 Details:
 
@@ -10,11 +11,20 @@ Details:
 - Cloud Native
 - Extensible
 - DevOps in mind (configure, monitor, ...)
-- Runtime and Server mode
+- Runtime and Domain mode
 
 Current status
 
-version 0.1
+
+**version 0.2**
+
+- Docker image
+- Domain mode support (with remote CLI)
+- Basic /health endpoint
+- Restart runtime with previously deployed applications
+- Java Flight Recorder integration
+
+**version 0.1**
 
 Proof of Concept
 
