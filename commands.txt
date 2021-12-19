@@ -30,4 +30,4 @@ mvn license:format
 
 # Setting versions
 
-mvn versions:set -DnewVersion=0.2-SNAPSHOT -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=0.3-SNAPSHOT -DgenerateBackupPoms=false
