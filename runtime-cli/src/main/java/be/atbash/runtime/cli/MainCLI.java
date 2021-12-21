@@ -15,8 +15,8 @@
  */
 package be.atbash.runtime.cli;
 
+import be.atbash.runtime.cli.command.RuntimeCommand;
 import be.atbash.runtime.common.command.AbstractAtbashCommand;
-import be.atbash.runtime.common.command.RuntimeCommand;
 import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import org.slf4j.Logger;
@@ -25,13 +25,13 @@ import picocli.CommandLine;
 
 import java.util.List;
 
-public class Main_CLI {
+public class MainCLI {
 
 
     public static void main(String[] args) {
 
         // We can't create a logger before we have installed our EarlyLogHandler
-        Logger LOGGER = LoggerFactory.getLogger(Main_CLI.class);
+        Logger LOGGER = LoggerFactory.getLogger(MainCLI.class);
 
         RuntimeCommand command = new RuntimeCommand();
         CommandLine commandLine = new CommandLine(command);
@@ -42,19 +42,13 @@ public class Main_CLI {
             // FIXME
         }
 
-        if (actualCommand.getCommandType() == AbstractAtbashCommand.CommandType.CLI) {
-            try {
-                actualCommand.call();
-            } catch (AtbashRuntimeException e) {
-                // actually, this was just a way to jump to here :)
-                return;
-            } catch (Exception e) {
-                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
-            }
-        } else {
-            // FIXME
-            System.out.println("TODO: Implement runtime command ");
-
+        try {
+            actualCommand.call();
+        } catch (AtbashRuntimeException e) {
+            // actually, this was just a way to jump to here :)
+            return;
+        } catch (Exception e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
     }
@@ -67,12 +61,6 @@ public class Main_CLI {
             List<CommandLine> commandLines = parseResult.asCommandLineList();
             result = commandLines.get(commandLines.size() - 1).getCommand();
 
-            if (result.getCommandType() == AbstractAtbashCommand.CommandType.RUNTIME) {
-                if (!command.getConfigurationParameters().isDaemon()) {
-                    System.out.println("CLI-001: The CLI can only start the runtime as a daemon (use -d option)");
-                    result = null;
-                }
-            }
 
         } catch (CommandLine.ParameterException e) {
             // FIXME Test if this is properly printed out

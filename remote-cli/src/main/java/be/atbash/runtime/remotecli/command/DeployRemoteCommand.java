@@ -112,7 +112,7 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
     }
 
     public static File storeStreamToTempFile(InputStream in) throws IOException {
-        final File tempFile = File.createTempFile("tmp_deploy_", "");
+        final File tempFile = File.createTempFile("tmp_deploy_", ".war");
         tempFile.deleteOnExit();
         try (FileOutputStream out = new FileOutputStream(tempFile)) {
             in.transferTo(out);

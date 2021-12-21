@@ -36,8 +36,36 @@
 
         <dependency>
             <groupId>be.atbash.runtime</groupId>
+            <artifactId>core-data</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
             <artifactId>runtime-common</artifactId>
             <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>config-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>logging-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
     </dependencies>
@@ -65,7 +93,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>be.atbash.runtime.cli.Main_CLI</Main-Class>
+                                        <Main-Class>be.atbash.runtime.cli.MainCLI</Main-Class>
                                         <Release-Version>${project.parent.version}</Release-Version>
                                         <buildTime>${maven.build.timestamp}</buildTime>
                                     </manifestEntries>

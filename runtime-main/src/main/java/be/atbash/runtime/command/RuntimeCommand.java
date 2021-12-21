@@ -13,29 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.common.command;
+package be.atbash.runtime.command;
 
+import be.atbash.runtime.common.command.*;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.module.ModuleManager;
 import picocli.CommandLine;
 
-@CommandLine.Command(subcommands =
-        {CreateConfigCommand.class,
-                StatusCommand.class,
-                DeployCommand.class,
-                ListApplicationsCommand.class,
-                UndeployCommand.class}
-        , name = "")
+@CommandLine.Command(name = "")
 public class RuntimeCommand extends AbstractAtbashCommand {
 
     @CommandLine.Mixin
     private ConfigurationParameters configurationParameters;
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.RUNTIME;
-    }
 
     @Override
     public Integer call() throws Exception {
@@ -45,13 +35,7 @@ public class RuntimeCommand extends AbstractAtbashCommand {
             throw new AtbashStartupAbortException();
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                manager.stopModules();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(manager::stopModules));
         return 0;
     }
 

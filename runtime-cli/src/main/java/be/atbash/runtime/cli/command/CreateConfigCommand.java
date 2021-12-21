@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.common.command;
+package be.atbash.runtime.cli.command;
 
 import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.config.ConfigInstanceUtil;
 import be.atbash.runtime.core.data.parameter.ConfigConfigurationParameters;
 import picocli.CommandLine;
 
+import java.util.concurrent.Callable;
+
 @CommandLine.Command(name = "create-config")
-public class CreateConfigCommand extends AbstractAtbashCommand {
+public class CreateConfigCommand implements Callable<Integer> {
 
     @CommandLine.Mixin
     private ConfigConfigurationParameters config;
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.CLI;
-    }
 
     @Override
     public Integer call() throws Exception {

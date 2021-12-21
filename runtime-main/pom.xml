@@ -45,12 +45,6 @@
 
         <dependency>
             <groupId>be.atbash.runtime</groupId>
-            <artifactId>runtime-common</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>be.atbash.runtime</groupId>
             <artifactId>config-module</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

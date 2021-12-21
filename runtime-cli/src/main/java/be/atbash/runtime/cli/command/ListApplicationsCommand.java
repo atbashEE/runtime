@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.common.command;
+package be.atbash.runtime.cli.command;
 
 import picocli.CommandLine;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@CommandLine.Command(name = "status")
-public class StatusCommand extends AbstractRemoteAtbashCommand {
+@CommandLine.Command(name = "list-applications")
+public class ListApplicationsCommand extends AbstractRemoteAtbashCommand {
 
     @Override
     public Integer call() throws Exception {
         Map<String, String> options = new HashMap<>();
 
-        callRemoteCLI("GET", "status", basicRemoteCLIParameters, options);
+        callRemoteCLI("GET", "list-applications", basicRemoteCLIParameters, options);
         return 0;
     }
 }

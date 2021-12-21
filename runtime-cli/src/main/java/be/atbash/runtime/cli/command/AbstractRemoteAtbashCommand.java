@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.common.command;
+package be.atbash.runtime.cli.command;
 
+import be.atbash.runtime.cli.command.exception.DomainConnectException;
+import be.atbash.runtime.cli.command.util.MultipartBodyPublisher;
+import be.atbash.runtime.common.command.AbstractAtbashCommand;
 import be.atbash.runtime.common.command.data.CommandResponse;
-import be.atbash.runtime.common.command.exception.DomainConnectException;
-import be.atbash.runtime.common.command.util.MultipartBodyPublisher;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.parameter.BasicRemoteCLIParameters;
 import be.atbash.runtime.core.data.parameter.RemoteCLIOutputFormat;
@@ -53,11 +54,6 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
 
     @CommandLine.Mixin
     protected BasicRemoteCLIParameters basicRemoteCLIParameters;
-
-    @Override
-    public CommandType getCommandType() {
-        return CommandType.CLI;
-    }
 
     void callRemoteCLI(String method, String command, BasicRemoteCLIParameters remoteCLIParameters, Map<String, String> options) {
 

@@ -19,9 +19,4 @@ import java.util.concurrent.Callable;
 
 public abstract class AbstractAtbashCommand implements Callable<Integer> {
 
-    public abstract CommandType getCommandType();
-
-    public enum CommandType {
-        CLI, RUNTIME
-    }
 }

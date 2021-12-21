@@ -15,14 +15,13 @@
  */
 package be.atbash.runtime;
 
+import be.atbash.runtime.command.RuntimeCommand;
 import be.atbash.runtime.common.command.AbstractAtbashCommand;
-import be.atbash.runtime.common.command.RuntimeCommand;
 import be.atbash.runtime.core.data.CriticalThreadCount;
 import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
-import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
@@ -74,68 +73,59 @@ public class RuntimeMain {
             LOGGER.error("CLI-111: Number of values for parameter --contextroot does not math number of application to be deployed.");
         }
 
-        if (actualCommand.getCommandType() == AbstractAtbashCommand.CommandType.CLI) {
-            try {
-                LoggingManager.getInstance().restoreOriginalHandlers();
-                actualCommand.call();
-            } catch (Exception e) {
-                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
-            }
-        } else {
+        // WatcherService only available when ModuleManger starts the modules
+        // WatcherService is created by the first Module, the CoreModule.
+        // So we create here a temporary just to get some JFR events.
+        WatcherService temporaryWatcherService = new WatcherService(WatcherType.MINIMAL);
 
-            // WatcherService only available when ModuleManger starts the modules
-            // WatcherService is created by the first Module, the CoreModule.
-            // So we create here a temporary just to get some JFR events.
-            WatcherService temporaryWatcherService = new WatcherService(WatcherType.MINIMAL);
+        VersionInfo versionInfo = VersionInfo.getInstance();
+        temporaryWatcherService.logWatcherEvent(Module.CORE_MODULE_NAME, String.format("CLI-102: Starting Atbash Runtime version %s", versionInfo.getReleaseVersion()));
+        serverMon.setVersion(versionInfo.getReleaseVersion());
 
-            VersionInfo versionInfo = VersionInfo.getInstance();
-            temporaryWatcherService.logWatcherEvent(Module.CORE_MODULE_NAME, String.format("CLI-102: Starting Atbash Runtime version %s", versionInfo.getReleaseVersion()));
-            serverMon.setVersion(versionInfo.getReleaseVersion());
-
-            try {
-                actualCommand.call();
-            } catch (Exception e) {
-                // If a problem during Config Module start -> we need to write out the problem
-                // If Logging Module is started, we have a log with the issue.
-                EarlyLogRecords.getEarlyMessages()
-                        .stream()
-                        .filter(lr -> lr.getLevel() == Level.SEVERE)
-                        .forEach(lr -> LOGGER.error(lr.getMessage().substring(1)));
-                // Why do we loose the handler on our Logger?
-                LOGGER = LoggingManager.getInstance().getMainLogger(RuntimeMain.class, logToConsole);
-
-                LOGGER.info("CLI-107: Atbash Runtime startup aborted due to previous errors. (See log if created for the reason of the abort)");
-                return;
-            }
-
-            long end = System.currentTimeMillis();
+        try {
+            actualCommand.call();
+        } catch (Exception e) {
+            // If a problem during Config Module start -> we need to write out the problem
+            // If Logging Module is started, we have a log with the issue.
+            EarlyLogRecords.getEarlyMessages()
+                    .stream()
+                    .filter(lr -> lr.getLevel() == Level.SEVERE)
+                    .forEach(lr -> LOGGER.error(lr.getMessage().substring(1)));
             // Why do we loose the handler on our Logger?
             LOGGER = LoggingManager.getInstance().getMainLogger(RuntimeMain.class, logToConsole);
-            LOGGER.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
 
-            // Now that all Modules are initialized, we can use the real WatcherService and the bean will
-            // registered within JMX if the configuration indicates we need to do it.
-            WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
+            LOGGER.info("CLI-107: Atbash Runtime startup aborted due to previous errors. (See log if created for the reason of the abort)");
+            return;
+        }
 
-            RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
-            serverMon.setStartedModules(runData.getStartedModules());
-            watcherService.registerBean(WatcherBean.RuntimeWatcherBean, serverMon);
+        long end = System.currentTimeMillis();
+        // Why do we loose the handler on our Logger?
+        LOGGER = LoggingManager.getInstance().getMainLogger(RuntimeMain.class, logToConsole);
+        LOGGER.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
 
-            deployAndRunArchives(command);
+        // Now that all Modules are initialized, we can use the real WatcherService and the bean will
+        // registered within JMX if the configuration indicates we need to do it.
+        WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
 
-            int applications = runData.getDeployments().size();
+        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+        serverMon.setStartedModules(runData.getStartedModules());
+        watcherService.registerBean(WatcherBean.RuntimeWatcherBean, serverMon);
 
-            if (applications > 0) {
-                LOGGER.info(String.format("CLI-104: %s Applications running", applications));
-            } else {
+        deployAndRunArchives(command);
 
-                LOGGER.warn("CLI-105: No Applications running");
-                if (!runData.isDomainMode()) {
-                    LOGGER.info("CLI-108: Atbash Runtime stopped as there are no applications deployed and Runtime is not in domain mode.");
-                    System.exit(0);  // Normal status.
-                }
+        int applications = runData.getDeployments().size();
+
+        if (applications > 0) {
+            LOGGER.info(String.format("CLI-104: %s Applications running", applications));
+        } else {
+
+            LOGGER.warn("CLI-105: No Applications running");
+            if (!runData.isDomainMode()) {
+                LOGGER.info("CLI-108: Atbash Runtime stopped as there are no applications deployed and Runtime is not in domain mode.");
+                System.exit(0);  // Normal status.
             }
         }
+
 
         if (command.getConfigurationParameters().isWarmup()) {
             CriticalThreadCount.getInstance().waitForCriticalThreadsToFinish();
