@@ -16,10 +16,17 @@
 package be.atbash.runtime.core.data.util;
 
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 public final class ArchiveDeploymentUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveDeploymentUtil.class);
 
     private ArchiveDeploymentUtil() {
     }
@@ -32,5 +39,24 @@ public final class ArchiveDeploymentUtil {
         for (int i = 0; i < rootValues.length; i++) {
             archives.get(i).setContextRoot(rootValues[i]);
         }
+    }
+    public static boolean testOnArchive(File archiveFile) {
+        boolean result = archiveFile.exists();
+        if (!result) {
+            LOGGER.warn(String.format("DEPLOY-105: Archive file %s not found", archiveFile));
+        }
+        if (result) {
+            try {
+                result = archiveFile.getCanonicalPath().endsWith(".war");
+                if (!result) {
+                    LOGGER.warn(String.format("DEPLOY-106: Archive file %s is not a war file", archiveFile));
+                }
+
+            } catch (IOException e) {
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+            }
+        }
+        return result;
+
     }
 }

@@ -21,8 +21,11 @@ import be.atbash.runtime.common.command.util.MultipartBodyPublisher;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.parameter.BasicRemoteCLIParameters;
 import be.atbash.runtime.core.data.parameter.RemoteCLIOutputFormat;
+import be.atbash.runtime.core.data.util.ArchiveDeploymentUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -45,6 +48,8 @@ import static be.atbash.runtime.common.command.RuntimeCommonConstant.CLASS_INFO_
  * Abstract class for all Remote CLI commands as it contains the code to call the Runtime endpoint.
  */
 public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     @CommandLine.Mixin
     protected BasicRemoteCLIParameters basicRemoteCLIParameters;
@@ -171,6 +176,15 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
 
     void callRemoteCLI(String command, BasicRemoteCLIParameters remoteCLIParameters, Map<String, String> options, File[] archives) {
 
+        if (archives == null) {
+            LOGGER.warn("RC-108: The command is missing one or more file arguments.");
+            return;
+        }
+        for (File file : archives) {
+            if (!ArchiveDeploymentUtil.testOnArchive(file)) {
+                return;
+            }
+        }
         try {
             HttpClient client = HttpClient.newHttpClient();
 

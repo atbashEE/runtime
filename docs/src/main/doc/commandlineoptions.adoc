@@ -56,6 +56,8 @@ Deploys the application on the runtime, and optionally define the context root.
 
 `deploy --contextroot <root1,root2> <file1> <file2>`
 
+Altough deploying multiple applications is supported, it is not recommended as the outcome might not be clear in case one of the deployments fails.
+
 === list-applications (remote)
 
 List all applications running on the runtime.

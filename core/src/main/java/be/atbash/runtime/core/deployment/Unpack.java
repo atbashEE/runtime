@@ -54,6 +54,9 @@ public class Unpack {
         } catch (IOException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
+        if (archiveFiles.isEmpty()) {
+            return null;
+        }
         return new ArchiveContent(archiveFiles);
     }
 

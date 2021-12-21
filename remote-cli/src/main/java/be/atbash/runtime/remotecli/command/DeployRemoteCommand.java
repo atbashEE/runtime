@@ -60,6 +60,8 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
         ArchiveDeploymentUtil.assignContextRoots(deployments, contextRoots);
 
         RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+        int applicationCount = runData.getDeployments().size();
+
         for (ArchiveDeployment deployment : deployments) {
             Optional<ArchiveDeployment> otherDeployment = runData.getDeployments().stream()
                     .filter(ad -> ad.getDeploymentName().equals(deployment.getDeploymentName()))
@@ -71,6 +73,16 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
             }
 
             eventManager.publishEvent(Events.DEPLOYMENT, deployment);
+
+            if (applicationCount == runData.getDeployments().size()) {
+                // The application did not deploy
+                result.setSuccess(false);
+                result.setErrorMessage(String.format("RC-107: Deployment of '%s' failed. Invalid Archive", deployment.getDeploymentName()));
+                return result;
+
+            }
+
+            applicationCount = runData.getDeployments().size();
         }
 
         deployments.forEach(

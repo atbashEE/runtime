@@ -2,8 +2,13 @@
 
 === Core module
 
-- DE-101(INFO): Start of the Deployment of the application.
-- DE-102(INFO): End of the Deployment of the application.
+- DEPLOY-101(INFO): Start of the Deployment of the application.
+- DEPLOY-102(INFO): End of the Deployment of the application.
+- DEPLOY-103(WARNING): The archive cannot be found. +
+   when starting the Runtime and previously installed applications are started.
+- DEPLOY-104(WARNING): The archive could not be inspected  +
+   When deploying the application but the war file corrupt or the contents of the war file is empty.
+- DEPLOY-105()
 
 === Config module
 
