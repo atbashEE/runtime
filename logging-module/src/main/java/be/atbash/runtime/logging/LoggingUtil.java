@@ -23,6 +23,7 @@ public final class LoggingUtil {
 
     public static final String LOGTOCONSOLE_PROPERTY = "be.atbash.runtime.logging.handler.LogFileHandler.logtoConsole";
     public static final String SYSTEM_PROPERTY_LOGGING_CONSOLE = "runtime.logging.console";
+    public static final String SYSTEM_PROPERTY_LOGGING_VERBOSE = "runtime.logging.verbose";
 
     private static final String HANDLERS = "handlers";
 
@@ -42,6 +43,10 @@ public final class LoggingUtil {
 
     public static boolean isLogToConsole() {
         return Boolean.parseBoolean(System.getProperty(LoggingUtil.SYSTEM_PROPERTY_LOGGING_CONSOLE, "false"));
+    }
+
+    public static boolean isVerbose() {
+        return Boolean.parseBoolean(System.getProperty(LoggingUtil.SYSTEM_PROPERTY_LOGGING_VERBOSE, "false"));
     }
 
 }

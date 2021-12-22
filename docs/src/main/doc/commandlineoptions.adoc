@@ -17,11 +17,17 @@ java -jar atbash-runtime.jar <options>
 `JMX`: Some data is available within the JMX system.  +
 `ALL`: Combination of `JFR` and `JMX`
 
-zero, one or more WAR files can be added to the command line that needs to be deployd. Also the applications that are already 'deployed' within the configuration are started.
+zero, one or more WAR files can be added to the command line that needs to be deployed. Also the applications that are already 'deployed' within the configuration are started.
+
+The exit status of the process it
+
+- 0: normal exit
+- -1: Incorrect commandline options specified
+- -2: Runtime failed to start due to some error.
 
 === CLI
 
-java -jar atbash-runtime.jar <command> <options>
+java -jar atbash-cli.jar <command> <options>
 
 ==== create-config
 

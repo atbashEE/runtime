@@ -15,13 +15,12 @@
  */
 package be.atbash.runtime.logging;
 
-import java.io.OutputStream;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
 /**
- * We need a specific ConsoleHandler where we provide the
+ * We need a specific ConsoleHandler to remove the early logged messages as they are already on console.
  */
 public class RuntimeConsoleHandler extends StreamHandler {
 

@@ -42,4 +42,9 @@ public class RuntimeCommand extends AbstractAtbashCommand {
     public ConfigurationParameters getConfigurationParameters() {
         return configurationParameters;
     }
+
+    @Override
+    public String toString() {
+        return configurationParameters.toString();
+    }
 }

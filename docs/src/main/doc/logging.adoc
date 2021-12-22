@@ -1,6 +1,6 @@
 == Logging
 
-The runtime controls the entire logging subsystem.
+The Runtime controls the entire logging subsystem.
 
 The configuration is performed through a properties file that configures the Java Util Logging system.  The file is expected at  `<instance>/logging.properties` and is created from a default when not found.
 
@@ -21,7 +21,22 @@ LoggingManager.getInstance().initializeEarlyLogging(logToConsole);
 
 Performed steps are
 
-- Define RuntimeLogManager as Log manager.
+- Define _RuntimeLogManager_ as Log manager.
 - Set logToConsole value as System property (`LoggingUtil.SYSTEM_PROPERTY_LOGGING_CONSOLE = "runtime.logging.console"`)
-- Remove all handlers from th Root Logger.
+- Remove all handlers from the Root Logger.
 - Add the Early Logging Handler.
+
+When the Logging module has configured the Logging system (defined the logging properties), it _terminates_ the early logging. All messages stored in memory are written out to the loggers so they will appear in the logging file.
+
+=== Important console logging
+
+When specifying `--logToConsole` all logging also appears on the console when starting the Runtime.  Without this option, only a few important messages appears.
+
+Any part of the code can write to the console by getting a special logger like this.
+
+[source,java]
+----
+LoggingManager.getInstance().getMainLogger(xxx.class);
+----
+
+This will return a Logger that is properly setup forthe Console according the logToConsole option.

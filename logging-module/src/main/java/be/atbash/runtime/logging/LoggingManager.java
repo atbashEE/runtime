@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 
@@ -35,20 +36,19 @@ public final class LoggingManager {
     public static final PrintStream oStdErrBackup = System.err;
     public static final PrintStream oStdOutBackup = System.out;
 
-    private Handler[] originalHandlers;
-
     private EarlyLogHandler handler;
 
     private LoggingManager() {
     }
 
-    public void initializeEarlyLogging(Boolean logToConsole) {
+    public void initializeEarlyLogging(Boolean logToConsole, Boolean verbose) {
         System.setProperty("java.util.logging.manager", RuntimeLogManager.class.getName());
         System.setProperty(LoggingUtil.SYSTEM_PROPERTY_LOGGING_CONSOLE, logToConsole.toString());
+        System.setProperty(LoggingUtil.SYSTEM_PROPERTY_LOGGING_VERBOSE, verbose.toString());
 
-        java.util.logging.Logger rootLogger = getRootLogger();
-        originalHandlers = rootLogger.getHandlers();
-        // remove current handlers.
+        java.util.logging.Logger rootLogger = getRootLogger();  // This triggers already RuntimeLogManager.readConfiguration.
+        Handler[] originalHandlers = rootLogger.getHandlers();
+        // remove current handlers = ConsoleHandler
         Arrays.stream(originalHandlers)
                 // RuntimeLogManager.readConfiguration already added
                 // our Console Handler which we should not remove.
@@ -62,18 +62,6 @@ public final class LoggingManager {
 
     private java.util.logging.Logger getRootLogger() {
         return LogManager.getLogManager().getLogger("");
-    }
-
-    /**
-     * Add the ConsoleHandler again to the RootLogger and push the EarlyLog to the logger again.
-     */
-    public void restoreOriginalHandlers() {
-
-        java.util.logging.Logger rootLogger = getRootLogger();
-        Arrays.stream(originalHandlers).forEach(rootLogger::addHandler);
-
-        removeEarlyLogHandler();
-
     }
 
     public void removeEarlyLogHandler() {
@@ -125,19 +113,30 @@ public final class LoggingManager {
 
     }
 
-    public static LoggingManager getInstance() {
-        return INSTANCE;
-    }
+    public Logger getMainLogger(Class<?> runtimeMainClass) {
 
-    public Logger getMainLogger(Class<?> runtimeMainClass, boolean logToConsole) {
-
-        if (!logToConsole) {
-            // The runtime main class needs output to Console!
+        if (!LoggingUtil.isLogToConsole()) {
+            // This logger needs access to the console
             java.util.logging.Logger logger = java.util.logging.Logger.getLogger(runtimeMainClass.getName());
-            logger.addHandler(new RuntimeConsoleHandler());
+            addConsoleHandlerIfNeeded(logger);
         }
 
         // Now, return the normal SLF4J logger.
         return LoggerFactory.getLogger(runtimeMainClass);
+    }
+
+    private void addConsoleHandlerIfNeeded(java.util.logging.Logger logger) {
+        Handler[] originalHandlers = logger.getHandlers();
+
+        Optional<Handler> hasConsoleHandler = Arrays.stream(originalHandlers)
+                .filter(h -> h.getClass().equals(RuntimeConsoleHandler.class))
+                .findAny();
+        if (hasConsoleHandler.isEmpty()) {
+            logger.addHandler(new RuntimeConsoleHandler());
+        }
+    }
+
+    public static LoggingManager getInstance() {
+        return INSTANCE;
     }
 }

@@ -18,8 +18,13 @@ package be.atbash.runtime.core.data.parameter;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class ConfigurationParameters {
+    public static final String LOG_TO_CONSOLE_OPTION = "--logToConsole";
+    public static final String VERBOSE_OPTION = "--verbose";
+    public static final String VERBOSE_OPTION_SHORT = "-v";
+
     @CommandLine.Option(names = {"-d", "--daemon"}, description = "Start as background task")
     private boolean daemon = false;
 
@@ -29,7 +34,7 @@ public class ConfigurationParameters {
     @CommandLine.Option(names = {"-m", "--modules"}, description = "Comma separated list of modules that needs to be started.")
     private String modules;
 
-    @CommandLine.Option(names = {"-v", "--verbose"}, description = "Start with Verbose logging")
+    @CommandLine.Option(names = {VERBOSE_OPTION_SHORT, VERBOSE_OPTION}, description = "Start with Verbose logging")
     private boolean verbose = false;
 
     @CommandLine.Option(names = {"-w", "--watcher"}, description = "Activate the (internal) monitoring tooling")
@@ -44,7 +49,7 @@ public class ConfigurationParameters {
     @CommandLine.Option(names = {"-n", "--configName"}, description = "Configuration name")
     private String configName = "default";
 
-    @CommandLine.Option(names = {"--logToConsole"}, description = "Does the runtime logs to the console")
+    @CommandLine.Option(names = {LOG_TO_CONSOLE_OPTION}, description = "Does the Runtime logs to the console?")
     private boolean logToConsole = false;
 
     @CommandLine.Option(names = {"--warmup"}, description = "In warmup mode, runtime exists when application(s) are ready.")
@@ -150,5 +155,30 @@ public class ConfigurationParameters {
 
     public void setArchives(File[] archives) {
         this.archives = archives;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ConfigurationParameters{");
+        sb.append("--daemon=").append(daemon);
+        sb.append(", --profile='").append(profile).append('\'');
+        if (modules != null) {
+            sb.append(", --modules='").append(modules).append('\'');
+        }
+        sb.append(", --verbose=").append(verbose);
+        sb.append(", --watcher=").append(watcher);
+        sb.append(", --root='").append(rootDirectory).append('\'');
+        if (deploymentDirectory != null) {
+            sb.append(", --deploymentdirectory=").append(deploymentDirectory);
+        }
+        sb.append(", --configName='").append(configName).append('\'');
+        sb.append(", --logToConsole=").append(logToConsole);
+        sb.append(", --warmup=").append(warmup);
+        sb.append(", --contextRoot='").append(contextRoot).append('\'');
+        if (archives != null) {
+            sb.append(", archives=").append(Arrays.toString(archives));
+        }
+        sb.append('}');
+        return sb.toString();
     }
 }
