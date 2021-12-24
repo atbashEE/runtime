@@ -17,6 +17,22 @@ java -jar atbash-runtime.jar <options>
 `JMX`: Some data is available within the JMX system.  +
 `ALL`: Combination of `JFR` and `JMX`
 
+-p|--profile:  The name of the active profile. The Profile defines a set of modules that are started.  When not specified, the profile id `default`. Also `domain` is supported. +
+
+-m|--modules: Change the modules that are active.  the option is a comma separated ist list of _module definitions_.  +
+A module definition  consist of the module name that is optionally prepended by `+` or `-` or no action indicator. +
+The final list of modules that are used is determined by the profile and then changes are done as following
+
+No action, the modules defined in the profile are replaced by these modules.  +
+`+` The module is added to the current list of modules  +
+`-` The module is removed from the current list of modules
+
+The mandatory modules _Config_  and _Logging_  are always added to the list.
+
+The `--modules` option is an expert setting and using it incorrectly can result in a failure to run your application.
+
+
+
 zero, one or more WAR files can be added to the command line that needs to be deployed. Also the applications that are already 'deployed' within the configuration are started.
 
 The exit status of the process it

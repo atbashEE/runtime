@@ -58,7 +58,7 @@ public class MainRunnerHelper {
 
     public MainRunnerHelper(String[] programArguments) {
 
-        logger = LoggingManager.getInstance().getMainLogger(RuntimeMain.class);
+        logger = LoggingUtil.getMainLogger(RuntimeMain.class);
         this.programArguments = programArguments;
     }
 
@@ -106,7 +106,7 @@ public class MainRunnerHelper {
             result = commandLines.get(commandLines.size() - 1).getCommand();
 
         } catch (CommandLine.ParameterException e) {
-            Logger logger = LoggingManager.getInstance().getMainLogger(RuntimeMain.class);
+            Logger logger = LoggingUtil.getMainLogger(RuntimeMain.class);
             logger.error(e.getMessage());
             String usageMessage = commandLine.getUsageMessage(CommandLine.Help.Ansi.AUTO);
             logger.info(usageMessage);
@@ -160,7 +160,7 @@ public class MainRunnerHelper {
             actualCommand.call();
 
             // We perform a reset of the entire logging system and thus loggers are reinitialized.
-            logger = LoggingManager.getInstance().getMainLogger(RuntimeMain.class);
+            logger = LoggingUtil.getMainLogger(RuntimeMain.class);
         } catch (Exception e) {
             // If a problem during Config Module start -> we need to write out the problem
             // If Logging Module is started, we have a log with the issue.
@@ -169,7 +169,7 @@ public class MainRunnerHelper {
                     .filter(lr -> lr.getLevel() == Level.SEVERE)
                     .forEach(lr -> logger.error(lr.getMessage().substring(1)));
 
-            logger = LoggingManager.getInstance().getMainLogger(RuntimeMain.class);
+            logger = LoggingUtil.getMainLogger(RuntimeMain.class);
 
             logger.info("CLI-107: Atbash Runtime startup aborted due to previous errors. (See log if created for the reason of the abort)");
             System.exit(-2);

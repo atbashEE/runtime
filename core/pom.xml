@@ -41,6 +41,12 @@
         </dependency>
 
         <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>logging-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
             <version>9.1.0</version>

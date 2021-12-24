@@ -19,13 +19,15 @@ import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.profile.Profile;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProfileManager {
 
-    public static final List<String> REQUIRED_MODULES = List.of(Module.LOGGING_MODULE_NAME, Module.CONFIG_MODULE_NAME);
+    private static final List<String> REQUIRED_MODULES = List.of(Module.LOGGING_MODULE_NAME, Module.CONFIG_MODULE_NAME);
+    private static final String MODULE_ACTION_ADD = "Add";
+    private static final String MODULE_ACTION_REMOVE = "Remove";
+    private static final String MODULE_ACTION_REPLACE = "Replace";
 
     private ConfigurationParameters parameters;
     private Profile profile;
@@ -37,22 +39,56 @@ public class ProfileManager {
     }
 
     public String[] getRequestedModules() {
-        List<String> result = new ArrayList<>(defineModules());
+        // We first start with the profile
+        Set<String> result = new HashSet<>(profile.getModules());
+        if (parameters.getModules() != null && !parameters.getModules().isBlank()) {
+            // There are modules defined, let analyse the input
+
+            Map<String, List<String>> moduleActions = Arrays.stream(parameters.getModules().split(","))
+                    .map(String::trim)
+                    .collect(Collectors.groupingBy(this::determineModuleAction, Collectors.mapping(this::determineModuleName, Collectors.toList())));
+
+            if (moduleActions.containsKey(MODULE_ACTION_REPLACE)) {
+                result.clear();
+                result.addAll(moduleActions.get(MODULE_ACTION_REPLACE));
+            }
+            if (moduleActions.containsKey(MODULE_ACTION_ADD)) {
+                result.addAll(moduleActions.get(MODULE_ACTION_ADD));
+            }
+            if (moduleActions.containsKey(MODULE_ACTION_REMOVE)) {
+                moduleActions.get(MODULE_ACTION_REMOVE).forEach(result::remove);
+            }
+
+        }
+
         // We add the Required modules (like config and logging here) so that they
         // appear in the monitoring part. But they are started separately by the ModuleManager
         result.addAll(REQUIRED_MODULES);
-        result.addAll(profile.getModules());
 
-        // Define Other modules;
-        // FIXME based on parameters.getModules().
         return result.toArray(new String[]{});
     }
 
-    private List<String> defineModules() {
-        // FIXME check Profile.
-        if (parameters.getModules() == null || parameters.getModules().isBlank()) {
-            return Collections.emptyList();
+    private String determineModuleName(String moduleDefinition) {
+        if (moduleDefinition.startsWith("+") || moduleDefinition.startsWith("-")) {
+            return moduleDefinition.substring(1);
         }
-        return List.of(parameters.getModules().split(","));
+        return moduleDefinition;
+    }
+
+    private String determineModuleAction(String moduleDefinition) {
+        String action;
+
+        switch (moduleDefinition.charAt(0)) {
+            case '+':
+                action = MODULE_ACTION_ADD;
+                break;
+            case '-':
+                action = MODULE_ACTION_REMOVE;
+                break;
+            default:
+                action = MODULE_ACTION_REPLACE;
+                break;
+        }
+        return action;
     }
 }

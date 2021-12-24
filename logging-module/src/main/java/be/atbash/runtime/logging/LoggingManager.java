@@ -18,6 +18,7 @@ package be.atbash.runtime.logging;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.logging.earlylog.EarlyLogHandler;
 import be.atbash.runtime.logging.earlylog.EarlyLogRecords;
+import be.atbash.runtime.logging.handler.RuntimeConsoleHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +34,6 @@ public final class LoggingManager {
     private static Logger LOGGER;  // Do not initialize as initializeEarlyLogging needs to be run first!!
 
     private static final LoggingManager INSTANCE = new LoggingManager();
-    public static final PrintStream oStdErrBackup = System.err;
-    public static final PrintStream oStdOutBackup = System.out;
 
     private EarlyLogHandler handler;
 
@@ -113,28 +112,6 @@ public final class LoggingManager {
 
     }
 
-    public Logger getMainLogger(Class<?> runtimeMainClass) {
-
-        if (!LoggingUtil.isLogToConsole()) {
-            // This logger needs access to the console
-            java.util.logging.Logger logger = java.util.logging.Logger.getLogger(runtimeMainClass.getName());
-            addConsoleHandlerIfNeeded(logger);
-        }
-
-        // Now, return the normal SLF4J logger.
-        return LoggerFactory.getLogger(runtimeMainClass);
-    }
-
-    private void addConsoleHandlerIfNeeded(java.util.logging.Logger logger) {
-        Handler[] originalHandlers = logger.getHandlers();
-
-        Optional<Handler> hasConsoleHandler = Arrays.stream(originalHandlers)
-                .filter(h -> h.getClass().equals(RuntimeConsoleHandler.class))
-                .findAny();
-        if (hasConsoleHandler.isEmpty()) {
-            logger.addHandler(new RuntimeConsoleHandler());
-        }
-    }
 
     public static LoggingManager getInstance() {
         return INSTANCE;

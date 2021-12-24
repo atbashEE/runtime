@@ -21,6 +21,7 @@ import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.EnhancedLogRecord;
 import be.atbash.runtime.logging.LoggingManager;
+import be.atbash.runtime.logging.LoggingUtil;
 import be.atbash.runtime.logging.handler.formatter.JSONLogFormatter;
 import be.atbash.runtime.logging.handler.formatter.ODLLogFormatter;
 import be.atbash.runtime.logging.handler.formatter.UniformLogFormatter;
@@ -532,8 +533,8 @@ public class LogFileHandler extends StreamHandler {
 
          */
 
-        System.setOut(LoggingManager.oStdOutBackup);
-        System.setErr(LoggingManager.oStdErrBackup);
+        System.setOut(LoggingUtil.oStdOutBackup);
+        System.setErr(LoggingUtil.oStdErrBackup);
 
         try {
             if (stdoutOutputStream != null) {
@@ -1060,8 +1061,8 @@ public class LogFileHandler extends StreamHandler {
         if (logStandardStreams) {
             logStandardStreams();
         } else {
-            System.setOut(LoggingManager.oStdOutBackup);
-            System.setErr(LoggingManager.oStdErrBackup);
+            System.setOut(LoggingUtil.oStdOutBackup);
+            System.setErr(LoggingUtil.oStdErrBackup);
         }
     }
 }

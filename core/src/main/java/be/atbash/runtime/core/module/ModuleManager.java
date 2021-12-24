@@ -56,10 +56,6 @@ public class ModuleManager {
             throw new AtbashStartupAbortException();
         }
 
-        // Register deployer as Event Listener.
-        RuntimeConfiguration runtimeConfiguration = RuntimeObjectsManager.getInstance().getExposedObject(RuntimeConfiguration.class);
-        List<Module> modulesCopy = new ArrayList<>(this.modules);
-        EventManager.getInstance().registerListener(new Deployer(watcherService, runtimeConfiguration, modulesCopy));
     }
 
     private boolean init(ConfigurationParameters configurationParameters) {
@@ -83,13 +79,12 @@ public class ModuleManager {
             return false;
         }
 
-        registerSniffers();
         return true;
     }
 
     private void registerSniffers() {
         SnifferManager snifferManager = SnifferManager.getInstance();
-        modules.forEach(m -> snifferManager.registerSniffer(m.moduleSniffer()));
+        startedModules.forEach(m -> snifferManager.registerSniffer(m.moduleSniffer()));
     }
 
     public boolean startModules() {
@@ -104,6 +99,11 @@ public class ModuleManager {
             findAndStartModules(requestedModules);
 
             runData.setStartedModules(startedModuleNames);
+            registerSniffers();
+
+            // Register deployer as Event Listener.
+            List<Module> modulesCopy = new ArrayList<>(this.startedModules);
+            EventManager.getInstance().registerListener(new Deployer(watcherService, runtimeConfiguration, modulesCopy));
 
             return true;
         } else {

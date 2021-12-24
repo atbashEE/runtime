@@ -85,7 +85,7 @@ public class LoggingModule implements Module<RuntimeConfiguration> {
 
         LoggingManager.getInstance().removeEarlyLogHandler();
 
-        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-102: Module startup");
+        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-102: Module ready");
 
     }
 }

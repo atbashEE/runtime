@@ -15,7 +15,15 @@
  */
 package be.atbash.runtime.logging;
 
+import be.atbash.runtime.logging.handler.RuntimeConsoleHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.logging.Handler;
 
 // Based on Payara code
 
@@ -24,6 +32,9 @@ public final class LoggingUtil {
     public static final String LOGTOCONSOLE_PROPERTY = "be.atbash.runtime.logging.handler.LogFileHandler.logtoConsole";
     public static final String SYSTEM_PROPERTY_LOGGING_CONSOLE = "runtime.logging.console";
     public static final String SYSTEM_PROPERTY_LOGGING_VERBOSE = "runtime.logging.verbose";
+
+    public static final PrintStream oStdErrBackup = System.err;
+    public static final PrintStream oStdOutBackup = System.out;
 
     private static final String HANDLERS = "handlers";
 
@@ -47,6 +58,29 @@ public final class LoggingUtil {
 
     public static boolean isVerbose() {
         return Boolean.parseBoolean(System.getProperty(LoggingUtil.SYSTEM_PROPERTY_LOGGING_VERBOSE, "false"));
+    }
+
+    public static Logger getMainLogger(Class<?> runtimeMainClass) {
+
+        if (!LoggingUtil.isLogToConsole()) {
+            // This logger needs access to the console
+            java.util.logging.Logger logger = java.util.logging.Logger.getLogger(runtimeMainClass.getName());
+            addConsoleHandlerIfNeeded(logger);
+        }
+
+        // Now, return the normal SLF4J logger.
+        return LoggerFactory.getLogger(runtimeMainClass);
+    }
+
+    private static void addConsoleHandlerIfNeeded(java.util.logging.Logger logger) {
+        Handler[] originalHandlers = logger.getHandlers();
+
+        Optional<Handler> hasConsoleHandler = Arrays.stream(originalHandlers)
+                .filter(h -> h.getClass().equals(RuntimeConsoleHandler.class))
+                .findAny();
+        if (hasConsoleHandler.isEmpty()) {
+            logger.addHandler(new RuntimeConsoleHandler());
+        }
     }
 
 }

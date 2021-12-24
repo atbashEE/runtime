@@ -31,6 +31,7 @@ import be.atbash.runtime.core.data.watcher.WatcherBean;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.deployment.monitor.ApplicationMon;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
+import be.atbash.runtime.logging.LoggingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,6 +140,11 @@ public class Deployer implements ModuleEventListener {
 
         determineDeploymentModule(deployment);
 
+        if (deployment.getDeploymentModule() == null) {
+            Logger logger = LoggingUtil.getMainLogger(Deployer.class);
+            logger.error(String.format("DEPLOY-107: No module available that can run the deployment '%s'", deployment.getDeploymentName()));
+            return;
+        }
         deployment.getDeploymentModule().registerDeployment(deployment);
 
         deployment.setDeployed();
@@ -200,9 +206,13 @@ public class Deployer implements ModuleEventListener {
 
             if (matchesSpecification(module, specifications)) {
                 deployerModule = module;
-                // Don't break, other modules can override this decission.
+                // Don't break, other modules can override this decision.
             }
         }
+        // FIXME we also have to consider the following case
+        // There is a DeploymentModule found, but what if not all Specifications are satisfied.
+        // App with Servlets and JAX-RS started but when we de a restart of the instance, we limit the modules to Jetty.
+        // But the app also needs Jersey module.
         deployment.setDeploymentModule(deployerModule);
     }
 

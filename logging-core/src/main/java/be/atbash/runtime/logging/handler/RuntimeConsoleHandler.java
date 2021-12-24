@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.logging;
+package be.atbash.runtime.logging.handler;
+
+import be.atbash.runtime.logging.LoggingUtil;
 
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
@@ -32,7 +34,7 @@ public class RuntimeConsoleHandler extends StreamHandler {
      */
     public RuntimeConsoleHandler() {
         // configure with specific defaults for ConsoleHandler
-        super(LoggingManager.oStdErrBackup, new SimpleFormatter());
+        super(LoggingUtil.oStdErrBackup, new SimpleFormatter());
     }
 
     /**
