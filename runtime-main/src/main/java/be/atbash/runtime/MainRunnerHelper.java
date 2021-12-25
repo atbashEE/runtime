@@ -35,7 +35,6 @@ import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.data.watcher.model.ServerMon;
 import be.atbash.runtime.core.deployment.SnifferManager;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
-import be.atbash.runtime.logging.LoggingManager;
 import be.atbash.runtime.logging.LoggingUtil;
 import be.atbash.runtime.logging.earlylog.EarlyLogRecords;
 import org.slf4j.Logger;
@@ -151,7 +150,7 @@ public class MainRunnerHelper {
         WatcherService temporaryWatcherService = new WatcherService(WatcherType.MINIMAL);
 
         VersionInfo versionInfo = VersionInfo.getInstance();
-        temporaryWatcherService.logWatcherEvent(Module.CORE_MODULE_NAME, String.format("CLI-102: Starting Atbash Runtime version %s", versionInfo.getReleaseVersion()));
+        temporaryWatcherService.logWatcherEvent(Module.CORE_MODULE_NAME, String.format("CLI-102: Starting Atbash Runtime version %s", versionInfo.getReleaseVersion()), true);
         serverMon.setVersion(versionInfo.getReleaseVersion());
     }
 

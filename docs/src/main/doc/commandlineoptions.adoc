@@ -8,7 +8,7 @@ java -jar atbash-runtime.jar <options>
 
 -n|--configname: Configuration name within the domain, by default `default`.
 
--v|--verbose: Are all log messages shown on the console.
+-v|--verbose: When active, more messages are shown in the log.  This can be enforced 'permanent' by putting `be.atbash.runtime.level=ALL` in the logging configuration.
 
 --watcher:  Defines the type of the diagnostics, valid values are  +
 `MINIMAL`: (default) only the events from the Core module are sent to JFR.  +

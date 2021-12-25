@@ -16,6 +16,7 @@
 package be.atbash.runtime.core.module;
 
 import be.atbash.runtime.core.data.module.Module;
+import be.atbash.runtime.logging.LoggingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,13 @@ public class RuntimeObjectsManager {
     private final Map<Class<?>, Module<?>> runtimeObjectMapping = new HashMap<>();
 
     void register(Module<?> module) {
-        module.getRuntimeObjectTypes().forEach(c -> runtimeObjectMapping.put(c, module));
+        module.getRuntimeObjectTypes().forEach(c -> {
+            if (LoggingUtil.isVerbose()) {
+                LOGGER.trace(String.format("CORE-1003: Registering instance of %s against Module %s", c, module.name()));
+            }
+
+            runtimeObjectMapping.put(c, module);
+        });
     }
 
     public <T> T getExposedObject(Class<T> exposedObjectType) {

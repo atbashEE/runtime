@@ -36,7 +36,7 @@ public class RuntimeCommand extends AbstractAtbashCommand {
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(manager::stopModules));
-        return 0;
+        return 0;  //Throws exception when start failed.
     }
 
     public ConfigurationParameters getConfigurationParameters() {

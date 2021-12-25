@@ -15,6 +15,9 @@
  */
 package be.atbash.runtime.core.modules;
 
+import static be.atbash.runtime.core.ModuleManagerTest.FAIL_MODULE1;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class Module1 extends AbstractTestModule {
     @Override
     public String name() {
@@ -32,8 +35,12 @@ public class Module1 extends AbstractTestModule {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            fail(e);
         }
+        if (System.getProperty(FAIL_MODULE1) != null) {
+            throw new IllegalStateException("Forced test exception");
+        }
+
         ModulesLogger.addEvent("End Module 1");
     }
 }

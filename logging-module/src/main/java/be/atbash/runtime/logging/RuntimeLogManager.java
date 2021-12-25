@@ -23,7 +23,6 @@ import java.util.Properties;
 import java.util.logging.LogManager;
 
 // Based on Payara code
-
 public class RuntimeLogManager extends LogManager {
 
     @Override
@@ -36,6 +35,7 @@ public class RuntimeLogManager extends LogManager {
         configuration = new PropertyPlaceholderHelper(System.getenv(), PropertyPlaceholderHelper.ENV_REGEX).replacePropertiesPlaceholder(configuration);
 
         LoggingUtil.handleConsoleHandlerLogic(configuration);
+        LoggingUtil.handleVerboseLogic(configuration);
 
         StringWriter writer = new StringWriter();
         configuration.store(new PrintWriter(writer), null);

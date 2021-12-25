@@ -24,9 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 
@@ -66,9 +64,10 @@ public final class LoggingManager {
     public void removeEarlyLogHandler() {
         LOGGER = LoggerFactory.getLogger(LoggingManager.class);
         java.util.logging.Logger rootLogger = getRootLogger();
-
         rootLogger.removeHandler(handler);
-        EarlyLogRecords.getEarlyMessages().forEach(rootLogger::log);
+
+        java.util.logging.Logger logger = java.util.logging.Logger.getLogger("be.atbash.runtime");
+        EarlyLogRecords.getEarlyMessages().forEach(logger::log);
     }
 
     public void configureLogging(RuntimeConfiguration configuration) {

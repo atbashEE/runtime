@@ -142,11 +142,11 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
     @Override
     public void run() {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
-        watcherService.logWatcherEvent("Jersey", "JERSEY-101: Module startup");
+        watcherService.logWatcherEvent("Jersey", "JERSEY-1001: Module startup", false);
 
         handlers = RuntimeObjectsManager.getInstance().getExposedObject(HandlerCollection.class);
 
-        watcherService.logWatcherEvent("Jersey", "JERSEY-102: Module ready");
+        watcherService.logWatcherEvent("Jersey", "JERSEY-1002: Module ready", false);
 
     }
 

@@ -19,10 +19,12 @@ import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
-import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.parameter.WatcherType;
 import be.atbash.runtime.core.data.watcher.WatcherService;
+import be.atbash.runtime.logging.LoggingUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -33,6 +35,8 @@ import static be.atbash.runtime.core.data.module.event.Events.CONFIGURATION_UPDA
  * on what is running at the moment.
  */
 public class CoreModule implements Module<WatcherType> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoreModule.class);
 
     private RunData runData;
     private WatcherType watcherType;
@@ -87,9 +91,15 @@ public class CoreModule implements Module<WatcherType> {
 
     @Override
     public void run() {
+        if (LoggingUtil.isVerbose()) {
+            LOGGER.trace("CORE-1001: Module startup");
+        }
         // The run of the module only requires that we have an empty instance
         // of this instance that can be retrieved.
         runData = new RunData();
         watcherService = new WatcherService(watcherType);
+        if (LoggingUtil.isVerbose()) {
+            LOGGER.trace("CORE-1002: Module ready");
+        }
     }
 }

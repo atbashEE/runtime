@@ -19,6 +19,7 @@ import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.parameter.WatcherType;
+import be.atbash.runtime.logging.LoggingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +59,7 @@ public class WatcherService {
         }
     }
 
-    public void logWatcherEvent(String module, String message) {
+    public void logWatcherEvent(String module, String message, boolean asInfo) {
         if (flightRecorderActive || (minimal && Module.CORE_MODULE_NAME.equals(module))) {
             FlightRecorderUtil.getInstance().emitEvent(module, message);
 
@@ -67,7 +68,13 @@ public class WatcherService {
         // stacktrace. So we need a customer version of slf4j -> jdk (4 CLASSES)
         String callingClassName = Thread.currentThread().getStackTrace()[2].getClassName();
         Logger logger = LoggerFactory.getLogger(callingClassName);
-        logger.info(message);
+        if (asInfo) {
+            logger.info(message);
+        } else {
+            if (LoggingUtil.isVerbose()) {
+                logger.trace(message);
+            }
+        }
 
     }
 

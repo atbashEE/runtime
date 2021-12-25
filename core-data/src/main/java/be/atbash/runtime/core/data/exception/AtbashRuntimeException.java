@@ -18,7 +18,7 @@ package be.atbash.runtime.core.data.exception;
 public class AtbashRuntimeException extends RuntimeException {
 
     public AtbashRuntimeException(String code, String message) {
-        super(code + ":" + message);
+        super(code + ": " + message);
     }
 
     public AtbashRuntimeException(String message, Throwable cause) {

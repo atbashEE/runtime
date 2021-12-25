@@ -15,6 +15,10 @@
  */
 package be.atbash.runtime.core.modules;
 
+import static be.atbash.runtime.core.ModuleManagerTest.FAIL_CONFIG_MODULE;
+import static be.atbash.runtime.core.ModuleManagerTest.FAIL_LOGGING_MODULE;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class LoggingModule extends AbstractTestModule {
     @Override
     public String name() {
@@ -32,7 +36,10 @@ public class LoggingModule extends AbstractTestModule {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            fail(e);
+        }
+        if (System.getProperty(FAIL_LOGGING_MODULE) != null) {
+            throw new IllegalStateException("Forced test exception");
         }
         ModulesLogger.addEvent("End Logging Module");
     }

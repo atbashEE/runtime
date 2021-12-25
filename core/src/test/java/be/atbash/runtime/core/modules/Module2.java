@@ -15,6 +15,8 @@
  */
 package be.atbash.runtime.core.modules;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class Module2 extends AbstractTestModule {
     @Override
     public String name() {
@@ -32,7 +34,7 @@ public class Module2 extends AbstractTestModule {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            fail(e);
         }
         ModulesLogger.addEvent("End Module 2");
     }

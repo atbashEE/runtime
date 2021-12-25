@@ -127,7 +127,7 @@ public class JettyModule implements Module<RuntimeConfiguration> {
     @Override
     public void run() {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
-        watcherService.logWatcherEvent("Jetty", "JETTY-101: Module startup");
+        watcherService.logWatcherEvent("Jetty", "JETTY-1001: Module startup", false);
 
         Endpoint httpEndpoint = ConfigUtil.getHttpEndpoint(configuration.getConfig());
         server = new Server(httpEndpoint.getPort());
@@ -148,7 +148,7 @@ public class JettyModule implements Module<RuntimeConfiguration> {
             handlers.addHandler(new HealthHandler(runData));
         }
 
-        watcherService.logWatcherEvent("Jetty", "JETTY-102: Module ready");
+        watcherService.logWatcherEvent("Jetty", "JETTY-1002: Module ready", false);
     }
 
     @Override

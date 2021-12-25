@@ -120,7 +120,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     @Override
     public void run() {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
-        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "CONFIG-101: Module startup");
+        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "CONFIG-1001: Module startup", false);
 
         readProfiles();
         Profile profile = findProfile();
@@ -153,7 +153,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
         runData.registerDeploymentListener(new ArchiveDeploymentStorage(runtimeConfiguration));
 
-        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "CONFIG-102: Module ready");
+        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "CONFIG-1002: Module ready", false);
     }
 
     private Profile findProfile() {

@@ -121,7 +121,7 @@ public class Deployer implements ModuleEventListener {
 
     private void deployArchive(ArchiveDeployment deployment) {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
-        watcherService.logWatcherEvent("Deployer", String.format("DEPLOY-101: Starting deployment of %s", deployment.getDeploymentName()));
+        watcherService.logWatcherEvent("Deployer", String.format("DEPLOY-101: Starting deployment of %s", deployment.getDeploymentName()), true);
 
         currentArchiveDeployment = deployment;
 
@@ -153,7 +153,7 @@ public class Deployer implements ModuleEventListener {
         runData.deployed(deployment);
 
         applicationMon.registerApplication(deployment);
-        watcherService.logWatcherEvent("Deployer", String.format("DEPLOY-102: End of deployment of %s", deployment.getDeploymentName()));
+        watcherService.logWatcherEvent("Deployer", String.format("DEPLOY-102: End of deployment of %s", deployment.getDeploymentName()), true);
 
     }
 

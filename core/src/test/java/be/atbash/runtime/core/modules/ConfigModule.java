@@ -17,10 +17,14 @@ package be.atbash.runtime.core.modules;
 
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
+import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 
 import java.io.File;
 import java.util.List;
+
+import static be.atbash.runtime.core.ModuleManagerTest.FAIL_CONFIG_MODULE;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ConfigModule extends AbstractTestModule<ConfigurationParameters> {
 
@@ -28,7 +32,7 @@ public class ConfigModule extends AbstractTestModule<ConfigurationParameters> {
 
     @Override
     public String name() {
-        return "Config";
+        return Module.CONFIG_MODULE_NAME;
     }
 
     @Override
@@ -68,7 +72,10 @@ public class ConfigModule extends AbstractTestModule<ConfigurationParameters> {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            fail(e);
+        }
+        if (System.getProperty(FAIL_CONFIG_MODULE) != null) {
+            throw new IllegalStateException("Forced test exception");
         }
         ModulesLogger.addEvent("End Config Module");
     }

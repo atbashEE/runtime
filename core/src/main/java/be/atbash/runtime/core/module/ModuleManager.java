@@ -26,6 +26,7 @@ import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.deployment.Deployer;
 import be.atbash.runtime.core.deployment.SnifferManager;
+import be.atbash.runtime.logging.LoggingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,14 +39,19 @@ public class ModuleManager {
     private static ModuleManager INSTANCE;
     private static final Logger LOGGER = LoggerFactory.getLogger(ModuleManager.class);
 
-    private static final Object MODULE_START_LOCK = new Object();
     private ConfigurationParameters configurationParameters;
+
+    private static final Object MODULE_START_LOCK = new Object();
+    // The next properties need to be thread safe and guarded by the MODULE_START_LOCK
     private final List<String> startedModuleNames = new CopyOnWriteArrayList<>();
     private final List<Module<?>> startedModules = new CopyOnWriteArrayList<>();
-    private List<String> installingModules = new CopyOnWriteArrayList<>();
+    private final List<String> installingModules = new CopyOnWriteArrayList<>();
+
     private List<Module> modules;  // Only read, no need for synchronization.
 
     private boolean modulesStarted = false;
+
+    // The core objects but used several times in various methods, so we keep a reference here.
     private RunData runData;
     private WatcherService watcherService;
 
@@ -63,18 +69,27 @@ public class ModuleManager {
 
         // Data Module must be the first one as everything else can be dependent on it.
         Module<?> coreModule = findModule(Module.CORE_MODULE_NAME);
-        startEssentialModule(coreModule, configurationParameters.getWatcher());
+        if (!startEssentialModule(coreModule, configurationParameters.getWatcher())) {
+            return false;
+        }
+
+        // keep a reference to the core objects
         runData = coreModule.getRuntimeObject(RunData.class);
         watcherService = coreModule.getRuntimeObject(WatcherService.class);
+        // Core module is interested in events.
         EventManager.getInstance().registerListener(coreModule);
 
+        // Start Config module
         Module<?> module2 = findModule(Module.CONFIG_MODULE_NAME);
         if (!startEssentialModule(module2, this.configurationParameters)) {
             return false;
         }
 
-        Module<?> module3 = findModule(Module.LOGGING_MODULE_NAME);
+        // get RuntimeConfiguration from Config Module.
         RuntimeConfiguration runtimeConfiguration = module2.getRuntimeObject(RuntimeConfiguration.class);
+
+        // Start Logging
+        Module<?> module3 = findModule(Module.LOGGING_MODULE_NAME);
         if (!startEssentialModule(module3, runtimeConfiguration)) {
             return false;
         }
@@ -87,6 +102,11 @@ public class ModuleManager {
         startedModules.forEach(m -> snifferManager.registerSniffer(m.moduleSniffer()));
     }
 
+    /**
+     * Starts all the non-essential modules. Return false when a module is requested that doesn't exist.
+     * It can also throw an {@link AtbashStartupAbortException} when a module fails to start.
+     * @return
+     */
     public boolean startModules() {
         if (modulesStarted) {
             // Don't start twice
@@ -107,6 +127,7 @@ public class ModuleManager {
 
             return true;
         } else {
+            // validateRequestedModules() has already logged the error.
             return false;
         }
     }
@@ -119,7 +140,8 @@ public class ModuleManager {
                 .filter(n -> !moduleNames.contains(n))
                 .collect(Collectors.toList());
         if (!unknownModules.isEmpty()) {
-            LOGGER.error(String.format("CONFIG-012: Incorrect Module name(s) specified '%s' (abort startup)", String.join(",", unknownModules)));
+            Logger logger = LoggingUtil.getMainLogger(ModuleManager.class);
+            logger.error(String.format("CONFIG-012: Incorrect Module name(s) specified '%s' (abort startup)", String.join(",", unknownModules)));
         }
         return unknownModules.isEmpty();
     }
@@ -151,30 +173,47 @@ public class ModuleManager {
     }
 
     private void startModule(Module<Object> module, String[] requestedModules) {
-        Thread moduleStarterThread = new Thread(new ModuleStarter(module));
+        // ModuleStarter can keep track of a successful start of the module.
+
+        ModuleStarter starter = new ModuleStarter(module);
+        Thread moduleStarterThread = new Thread(starter);
+        // Does the module need configuration?
         Class<?> moduleConfigClass = module.getModuleConfigClass();
         if (moduleConfigClass != null) {
             Object exposedObject = RuntimeObjectsManager.getInstance().getExposedObject(moduleConfigClass);
             if (exposedObject == null) {
-                // FIXME Logging/Exception??
+                throw new IllegalArgumentException(String.format("ModuleConfigClass %s not found for Module %s", moduleConfigClass, module.name()));
             }
+            // Set the configuration
             module.setConfig(exposedObject);
         }
 
+        // Start the Thread that start the module.
         moduleStarterThread.start();
         Thread.yield();  // So that other modules can start in parallel
+
+        // Wait for the module to be started
         try {
             moduleStarterThread.join();
         } catch (InterruptedException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
+        // Module failed? Abort startup.
+        if (!starter.isSuccess()) {
+            throw new AtbashStartupAbortException();
+        }
+        // Some bookkeeping around modules.
         synchronized (MODULE_START_LOCK) {
             installingModules.remove(module.name());
             startedModules.add(module);
             startedModuleNames.add(module.name());
         }
+        // Register Objects for this module
         RuntimeObjectsManager.getInstance().register(module);
+        // Register module as event listener
         EventManager.getInstance().registerListener(module);
+
+        // More modules to start?
         if (requestedModules != null) {
             findAndStartModules(requestedModules);
         }
@@ -185,7 +224,8 @@ public class ModuleManager {
         Thread moduleStarterThread = new Thread(starter);
         module.setConfig((T) configValue);
         moduleStarterThread.start();
-        Thread.yield();  // So that other modules can start in parallel
+        Thread.yield();  // We have a generic ModuleStarter that runs in a separate Thread.
+        // We are reusing that here so we make sure we give the change the other thread starts and we can wait for its completion.
         try {
             moduleStarterThread.join();
         } catch (InterruptedException e) {
@@ -209,13 +249,21 @@ public class ModuleManager {
                 .allMatch(startedModules::contains);
     }
 
+    /**
+     * Load all modules through the Service Loader mechanism
+     * @return
+     */
     private List<Module> findAllModules() {
         ServiceLoader<Module> loader = ServiceLoader.load(Module.class);
-        //return loader.stream().map(ServiceLoader.Provider::get).collect(Collectors.toList());
+
         Iterator<Module> iterator = loader.iterator();
         List<Module> result = new ArrayList<>();
         while (iterator.hasNext()) {
             result.add(iterator.next());
+        }
+        if (LoggingUtil.isVerbose()) {
+            String moduleList = result.stream().map(Module::name).collect(Collectors.joining(","));
+            LOGGER.trace(String.format("MODULE-1001: List of Modules included in Runtime %s", moduleList));
         }
         return result;
     }
@@ -232,6 +280,12 @@ public class ModuleManager {
                 .forEachRemaining(Module::stop);
     }
 
+    /**
+     * Initialize the Module Manager.  This already starts the essential modules (core, Config and Logging) and
+     * can result in a {@link AtbashStartupAbortException} when a module fails to start.
+     * @param configurationParameters
+     * @return
+     */
     public static ModuleManager initModuleManager(ConfigurationParameters configurationParameters) {
         INSTANCE = new ModuleManager(configurationParameters);
         return INSTANCE;

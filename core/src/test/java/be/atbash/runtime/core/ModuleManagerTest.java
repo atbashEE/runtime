@@ -17,6 +17,7 @@ package be.atbash.runtime.core;
 
 
 import be.atbash.runtime.core.data.RuntimeConfiguration;
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.IncorrectUsageException;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.module.ModuleManager;
@@ -28,19 +29,25 @@ import java.io.File;
 import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ModuleManagerTest {
+public class ModuleManagerTest {
+
+    public static final String FAIL_CONFIG_MODULE = "be.atbash.runtime.test.config.fail";
+    public static final String FAIL_LOGGING_MODULE = "be.atbash.runtime.test.logging.fail";
+    public static final String FAIL_MODULE1 = "be.atbash.runtime.test.module1.fail";
 
     @AfterEach
     public void cleanUp() {
         ModulesLogger.clearEvents();
+        System.clearProperty(FAIL_CONFIG_MODULE);
+        System.clearProperty(FAIL_LOGGING_MODULE);
+        System.clearProperty(FAIL_MODULE1);
     }
 
     @Test()
     @Order(1)
     public void getInstanceWithoutConfig() {
-        Assertions.assertThatThrownBy(() -> {
-            ModuleManager.getInstance();
-        }).isInstanceOf(IncorrectUsageException.class);
+        Assertions.assertThatThrownBy(ModuleManager::getInstance)
+                .isInstanceOf(IncorrectUsageException.class);
     }
 
     @Test
@@ -49,7 +56,7 @@ class ModuleManagerTest {
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
-         RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
                 configDirectory, "JUnitTest")
                 .build();
 
@@ -75,6 +82,82 @@ class ModuleManagerTest {
         Assertions.assertThat(events.get(9)).isEqualTo("Stop Module1");
         Assertions.assertThat(events.get(10)).isEqualTo("Stop LoggingModule");
         Assertions.assertThat(events.get(11)).isEqualTo("Stop ConfigModule");
+    }
+
+    @Test
+    @Order(4)
+    public void configModuleFail() {
+        System.setProperty(FAIL_CONFIG_MODULE, "true");
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
+
+        ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setModules("module1,module2");
+        Assertions.assertThatThrownBy(() -> ModuleManager.initModuleManager(parameters))
+                .isInstanceOf(AtbashStartupAbortException.class);
+
+        List<String> events = ModulesLogger.getEvents();
+
+        Assertions.assertThat(events).hasSize(1);
+        Assertions.assertThat(events.get(0)).isEqualTo("Start Config Module");
+
+    }
+
+    @Test
+    @Order(5)
+    public void loggingModuleFail() {
+        System.setProperty(FAIL_LOGGING_MODULE, "true");
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
+
+        ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setModules("module1,module2");
+        Assertions.assertThatThrownBy(() -> ModuleManager.initModuleManager(parameters))
+                .isInstanceOf(AtbashStartupAbortException.class);
+
+        List<String> events = ModulesLogger.getEvents();
+
+        Assertions.assertThat(events).hasSize(3);
+        Assertions.assertThat(events.get(0)).isEqualTo("Start Config Module");
+        Assertions.assertThat(events.get(1)).isEqualTo("End Config Module");
+        Assertions.assertThat(events.get(2)).isEqualTo("Start Logging Module");
+
+    }
+
+    @Test
+    @Order(6)
+    public void module1Fail() {
+        System.setProperty(FAIL_MODULE1, "true");
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
+
+        ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setModules("module1,module2");
+        ModuleManager moduleManager = ModuleManager.initModuleManager(parameters);
+        Assertions.assertThatThrownBy(moduleManager::startModules)
+                .isInstanceOf(AtbashStartupAbortException.class);
+
+        List<String> events = ModulesLogger.getEvents();
+
+        Assertions.assertThat(events).hasSize(5);
+        Assertions.assertThat(events.get(0)).isEqualTo("Start Config Module");
+        Assertions.assertThat(events.get(1)).isEqualTo("End Config Module");
+        Assertions.assertThat(events.get(2)).isEqualTo("Start Logging Module");
+        Assertions.assertThat(events.get(3)).isEqualTo("End Logging Module");
+        Assertions.assertThat(events.get(4)).isEqualTo("Start Module 1");
+
     }
 
 

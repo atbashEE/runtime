@@ -52,6 +52,12 @@ public final class LoggingUtil {
         loggingProperties.put(LOGTOCONSOLE_PROPERTY, Boolean.toString(logToConsole));
     }
 
+    public static void handleVerboseLogic(Properties loggingProperties) {
+        if (isVerbose()) {
+            loggingProperties.setProperty("be.atbash.runtime.level", "ALL");
+        }
+    }
+
     public static boolean isLogToConsole() {
         return Boolean.parseBoolean(System.getProperty(LoggingUtil.SYSTEM_PROPERTY_LOGGING_CONSOLE, "false"));
     }

@@ -79,13 +79,13 @@ public class LoggingModule implements Module<RuntimeConfiguration> {
     @Override
     public void run() {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
-        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-101: Module startup");
+        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-1001: Module startup", false);
 
         LoggingManager.getInstance().configureLogging(configuration);
 
         LoggingManager.getInstance().removeEarlyLogHandler();
 
-        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-102: Module ready");
+        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-1002: Module ready", false);
 
     }
 }

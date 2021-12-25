@@ -35,6 +35,11 @@
     <dependencies>
 
         <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>logging-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>

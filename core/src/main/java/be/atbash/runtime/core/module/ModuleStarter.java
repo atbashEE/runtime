@@ -19,6 +19,9 @@ import be.atbash.runtime.core.data.module.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Runnable that starts the {@link Module}.
+ */
 public class ModuleStarter implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModuleStarter.class);

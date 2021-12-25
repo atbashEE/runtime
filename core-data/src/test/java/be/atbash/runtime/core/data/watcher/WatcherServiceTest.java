@@ -81,7 +81,7 @@ class WatcherServiceTest {
 
         JFRTestUtil.startFlightRecorder();
 
-        service.logWatcherEvent(Module.CORE_MODULE_NAME, "Our message");
+        service.logWatcherEvent(Module.CORE_MODULE_NAME, "Our message", false);
 
         List<RecordedEvent> events = JFRTestUtil.stopAndReadEvents();
         assertThat(events).hasSize(1);
@@ -95,7 +95,7 @@ class WatcherServiceTest {
 
         JFRTestUtil.startFlightRecorder();
 
-        service.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Our message");
+        service.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Our message", false);
 
         List<RecordedEvent> events = JFRTestUtil.stopAndReadEvents();
         assertThat(events).isEmpty();
@@ -107,7 +107,7 @@ class WatcherServiceTest {
 
         JFRTestUtil.startFlightRecorder();
 
-        service.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Our message");
+        service.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Our message", false);
 
         List<RecordedEvent> events = JFRTestUtil.stopAndReadEvents();
         assertThat(events).hasSize(1);
@@ -121,7 +121,7 @@ class WatcherServiceTest {
 
         JFRTestUtil.startFlightRecorder();
 
-        service.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Our message");
+        service.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Our message", false);
 
         List<RecordedEvent> events = JFRTestUtil.stopAndReadEvents();
         assertThat(events).isEmpty();
@@ -133,7 +133,7 @@ class WatcherServiceTest {
 
         JFRTestUtil.startFlightRecorder();
 
-        service.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Our message");
+        service.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Our message", false);
 
         List<RecordedEvent> events = JFRTestUtil.stopAndReadEvents();
         assertThat(events).hasSize(1);
@@ -151,7 +151,7 @@ class WatcherServiceTest {
         service.reconfigure(configuration);
         JFRTestUtil.startFlightRecorder();
 
-        service.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Our message");
+        service.logWatcherEvent(Module.CONFIG_MODULE_NAME, "Our message", false);
 
         List<RecordedEvent> events = JFRTestUtil.stopAndReadEvents();
         assertThat(events).hasSize(1);
