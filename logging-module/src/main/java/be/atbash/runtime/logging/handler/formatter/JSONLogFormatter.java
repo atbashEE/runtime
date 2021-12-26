@@ -15,8 +15,8 @@
  */
 package be.atbash.runtime.logging.handler.formatter;
 
+import be.atbash.json.JSONValue;
 import be.atbash.runtime.logging.EnhancedLogRecord;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -295,7 +295,7 @@ public class JSONLogFormatter extends CommonFormatter {
                         logMessage = stringWriter.toString();
 
                         traceObject.put(STACK_TRACE_KEY, logMessage);
-                        eventObject.put(THROWABLE_KEY, new ObjectMapper().writeValueAsString(traceObject));
+                        eventObject.put(THROWABLE_KEY, JSONValue.toJSONString(traceObject));
                     }
                 }
             } else {
@@ -314,7 +314,7 @@ public class JSONLogFormatter extends CommonFormatter {
                         logMessage = stringWriter.toString();
                         traceObject.put(EXCEPTION_KEY, logMessageBuilder.toString());
                         traceObject.put(STACK_TRACE_KEY, logMessage);
-                        eventObject.put(THROWABLE_KEY, new ObjectMapper().writeValueAsString(traceObject));
+                        eventObject.put(THROWABLE_KEY, JSONValue.toJSONString(traceObject));
 
                     }
                 } else {
@@ -323,7 +323,7 @@ public class JSONLogFormatter extends CommonFormatter {
                 }
             }
 
-            return new ObjectMapper().writeValueAsString(eventObject) + LINE_SEPARATOR;
+            return JSONValue.toJSONString(eventObject) + LINE_SEPARATOR;
 
         } catch (Exception ex) {
             new ErrorManager().error(

@@ -46,10 +46,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>be.atbash.json</groupId>
+            <artifactId>octopus-json-smart</artifactId>
         </dependency>
-
     </dependencies>
 
 </project>

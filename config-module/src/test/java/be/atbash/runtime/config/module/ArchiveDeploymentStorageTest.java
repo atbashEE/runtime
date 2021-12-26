@@ -51,10 +51,10 @@ class ArchiveDeploymentStorageTest {
         String content = Files.readString(new File(configDirectory, APPLICATIONS_FILE).toPath());
 
         assertThat(content).contains("\"deploymentName\":\"test\"");
-        assertThat(content).contains("\"deploymentLocation\":\"/test.war\"");
+        assertThat(content).contains("\"deploymentLocation\":\"\\/test.war\"");
         assertThat(content).contains("\"specifications\":[\"REST\",\"HTML\"]");
         assertThat(content).contains("\"sniffers\":[\"TestSniffer1\"]");
-        assertThat(content).contains("\"contextRoot\":\"/test\"");
+        assertThat(content).contains("\"contextRoot\":\"\\/test\"");
     }
 
     @Test
@@ -79,9 +79,9 @@ class ArchiveDeploymentStorageTest {
 
         String content = Files.readString(new File(configDirectory, APPLICATIONS_FILE).toPath());
 
-        assertThat(content).contains("{\"deploymentName\":\"test\",\"deploymentLocation\":\"/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"],\"contextRoot\":null}");
+        assertThat(content).contains("{\"deploymentName\":\"test\",\"deploymentLocation\":\"\\/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"]}");
         assertThat(content).contains("\"deploymentName\":\"test2\"");
-        assertThat(content).contains("\"deploymentLocation\":\"/test2.war\"");
+        assertThat(content).contains("\"deploymentLocation\":\"\\/test2.war\"");
         assertThat(content).contains("\"specifications\":[\"SERVLET\"]");
         assertThat(content).contains("\"sniffers\":[\"TestSniffer2\"]");
     }
@@ -108,9 +108,9 @@ class ArchiveDeploymentStorageTest {
 
         String content = Files.readString(new File(configDirectory, APPLICATIONS_FILE).toPath());
 
-        assertThat(content).contains("{\"deploymentName\":\"test\",\"deploymentLocation\":\"/applications/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"],\"contextRoot\":null}");
+        assertThat(content).contains("{\"deploymentName\":\"test\",\"deploymentLocation\":\"\\/applications\\/test.war\",\"specifications\":[\"REST\",\"HTML\"],\"sniffers\":[\"TestSniffer1\"]}");
         assertThat(content).doesNotContain("\"deploymentName\":\"test2\"");
-        assertThat(content).doesNotContain("\"deploymentLocation\":\"/applications/test2.war\"");
+        assertThat(content).doesNotContain("\"deploymentLocation\":\"\\/applications\\/test2.war\"");
         assertThat(content).doesNotContain("\"specifications\":[\"SERVLET\"]");
         assertThat(content).doesNotContain("\"sniffers\":[\"TestSniffer2\"]");
     }

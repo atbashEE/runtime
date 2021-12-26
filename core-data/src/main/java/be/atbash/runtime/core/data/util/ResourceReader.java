@@ -25,7 +25,6 @@ public final class ResourceReader {
     private ResourceReader() {
     }
 
-    //"/default.json"
     public static String readResource(String location) throws IOException {
         InputStream profilesJSONStream = ResourceReader.class.getResourceAsStream(location);
         ByteArrayOutputStream result = new ByteArrayOutputStream();

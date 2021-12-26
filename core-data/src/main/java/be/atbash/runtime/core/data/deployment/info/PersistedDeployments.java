@@ -15,13 +15,11 @@
  */
 package be.atbash.runtime.core.data.deployment.info;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@JsonRootName("deployments")
 public class PersistedDeployments {
     private List<DeploymentMetadata> deployments = new ArrayList<>();
 

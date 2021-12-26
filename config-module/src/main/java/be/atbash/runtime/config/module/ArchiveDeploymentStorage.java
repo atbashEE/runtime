@@ -15,7 +15,7 @@
  */
 package be.atbash.runtime.config.module;
 
-import be.atbash.runtime.config.module.exception.IncorrectFileContentException;
+import be.atbash.json.JSONValue;
 import be.atbash.runtime.config.util.FileUtil;
 import be.atbash.runtime.core.data.CriticalThreadCount;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
@@ -23,10 +23,6 @@ import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.ArchiveDeploymentListener;
 import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static be.atbash.runtime.config.RuntimeConfigConstants.APPLICATIONS_FILE;
 
 public class ArchiveDeploymentStorage implements ArchiveDeploymentListener {
 
@@ -58,12 +54,8 @@ public class ArchiveDeploymentStorage implements ArchiveDeploymentListener {
     }
 
     private void writeApplicationDeploymentsData(PersistedDeployments deployments) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String content = mapper.writeValueAsString(deployments);
-            FileUtil.writeDeployedApplicationsContent(runtimeConfiguration, content);
-        } catch (JsonProcessingException e) {
-            throw new IncorrectFileContentException(APPLICATIONS_FILE);
-        }
+        String content = JSONValue.toJSONString(deployments);
+        FileUtil.writeDeployedApplicationsContent(runtimeConfiguration, content);
+
     }
 }

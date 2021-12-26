@@ -15,6 +15,8 @@
  */
 package be.atbash.runtime.config.module;
 
+import be.atbash.json.JSONValue;
+import be.atbash.json.TypeReference;
 import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.config.ConfigInstanceUtil;
 import be.atbash.runtime.config.module.exception.ProfileNameException;
@@ -33,18 +35,13 @@ import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.parameter.WatcherType;
 import be.atbash.runtime.core.data.profile.Profile;
+import be.atbash.runtime.core.data.util.ResourceReader;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -171,51 +168,31 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         if (parameters.isLogToConsole()) {
             config.getLogging().setLogToConsole(true);
         }
-        if (parameters.getWatcher() == WatcherType.JFR || parameters.getWatcher() == WatcherType.ALL ) {
+        if (parameters.getWatcher() == WatcherType.JFR || parameters.getWatcher() == WatcherType.ALL) {
             config.getMonitoring().setFlightRecorder(true);
         }
-        if (parameters.getWatcher() == WatcherType.JMX || parameters.getWatcher() == WatcherType.ALL ) {
+        if (parameters.getWatcher() == WatcherType.JMX || parameters.getWatcher() == WatcherType.ALL) {
             config.getMonitoring().setJmx(true);
         }
     }
 
     private void readConfiguration(ConfigInstance configInstance) {
         String content = FileUtil.readConfigurationContent(configInstance);
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            config = mapper.readValue(content, Config.class);
-        } catch (JsonProcessingException e) {
-            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE002, e);
-        }
+
+        config = JSONValue.parse(content, Config.class);
     }
 
     private void readProfiles() {
         String content;
         try {
-            content = readProfileJson();
+            content = ResourceReader.readResource("/profiles.json");
         } catch (IOException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            profiles = Arrays.asList(mapper.readValue(content, Profile[].class));
-        } catch (JsonProcessingException e) {
-            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE002, e);
-        }
-
+        profiles = (List<Profile>) JSONValue.parse(content,
+                new TypeReference<List<Profile>>() {
+                });
     }
-
-    private String readProfileJson() throws IOException {
-        InputStream profilesJSONStream = ConfigModule.class.getResourceAsStream("/profiles.json");
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        for (int length; (length = profilesJSONStream.read(buffer)) != -1; ) {
-            result.write(buffer, 0, length);
-        }
-        profilesJSONStream.close();
-        return result.toString(StandardCharsets.UTF_8.name());
-    }
-
 
 }

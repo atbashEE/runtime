@@ -15,14 +15,10 @@
  */
 package be.atbash.runtime.config.module;
 
-import be.atbash.runtime.config.module.exception.IncorrectFileContentException;
+import be.atbash.json.JSONValue;
 import be.atbash.runtime.config.util.FileUtil;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static be.atbash.runtime.config.RuntimeConfigConstants.APPLICATIONS_FILE;
 
 final class ConfigUtil {
 
@@ -32,12 +28,8 @@ final class ConfigUtil {
     public static PersistedDeployments readApplicationDeploymentsData(RuntimeConfiguration runtimeConfiguration) {
 
         String content = FileUtil.readDeployedApplicationsContent(runtimeConfiguration);
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.readValue(content, PersistedDeployments.class);
-        } catch (JsonProcessingException e) {
-            throw new IncorrectFileContentException(APPLICATIONS_FILE);
-        }
+        return JSONValue.parse(content, PersistedDeployments.class);
+
     }
 
 }
