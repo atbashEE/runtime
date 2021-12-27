@@ -20,23 +20,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Handler;
-
-// Based on Payara code
 
 public final class LoggingUtil {
 
     public static final String LOGTOCONSOLE_PROPERTY = "be.atbash.runtime.logging.handler.LogFileHandler.logtoConsole";
+    public static final String LOGTOFILE_PROPERTY = "be.atbash.runtime.logging.handler.LogFileHandler.logToFile";
     public static final String SYSTEM_PROPERTY_LOGGING_CONSOLE = "runtime.logging.console";
+    public static final String SYSTEM_PROPERTY_FILE_LOGGING = "runtime.logging.file";
     public static final String SYSTEM_PROPERTY_LOGGING_VERBOSE = "runtime.logging.verbose";
 
     public static final PrintStream oStdErrBackup = System.err;
     public static final PrintStream oStdOutBackup = System.out;
 
     private static final String HANDLERS = "handlers";
+    private static final String LOGFILEHANDLER = "be.atbash.runtime.logging.handler.LogFileHandler";
 
     private LoggingUtil() {
     }
@@ -44,12 +43,32 @@ public final class LoggingUtil {
     public static void handleConsoleHandlerLogic(Properties loggingProperties) {
         boolean logToConsole = isLogToConsole();
 
-        if (logToConsole) {
-            String handlers = loggingProperties.getProperty(HANDLERS);
+        String handlers = loggingProperties.getProperty(HANDLERS);
+        if (logToConsole && !handlers.contains(RuntimeConsoleHandler.class.getName())) {
             loggingProperties.setProperty(HANDLERS, handlers + "," + RuntimeConsoleHandler.class.getName());
+        }
+        if (!logToConsole && handlers.contains(RuntimeConsoleHandler.class.getName())) {
+            loggingProperties.setProperty(HANDLERS, removeHandler(handlers , RuntimeConsoleHandler.class.getName()));
         }
 
         loggingProperties.put(LOGTOCONSOLE_PROPERTY, Boolean.toString(logToConsole));
+    }
+
+    public static void handleLogToFileHandlerLogic(Properties loggingProperties) {
+        boolean logToFile = isLogToFile();
+
+        String handlers = loggingProperties.getProperty(HANDLERS);
+        if (!logToFile && handlers.contains(LOGFILEHANDLER)) {
+            loggingProperties.setProperty(HANDLERS, removeHandler(handlers, LOGFILEHANDLER));
+        }
+
+        loggingProperties.put(LOGTOFILE_PROPERTY, Boolean.toString(logToFile));
+    }
+
+    private static String removeHandler(String handlers, String handlerName) {
+        List<String> parts = new ArrayList<>(Arrays.asList(handlers.split(",")));
+        parts.remove(handlerName);
+        return String.join(",", parts);
     }
 
     public static void handleVerboseLogic(Properties loggingProperties) {
@@ -60,6 +79,10 @@ public final class LoggingUtil {
 
     public static boolean isLogToConsole() {
         return Boolean.parseBoolean(System.getProperty(LoggingUtil.SYSTEM_PROPERTY_LOGGING_CONSOLE, "false"));
+    }
+
+    public static boolean isLogToFile() {
+        return Boolean.parseBoolean(System.getProperty(LoggingUtil.SYSTEM_PROPERTY_FILE_LOGGING, "true"));
     }
 
     public static boolean isVerbose() {

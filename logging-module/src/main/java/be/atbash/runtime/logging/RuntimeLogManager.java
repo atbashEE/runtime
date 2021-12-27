@@ -35,6 +35,7 @@ public class RuntimeLogManager extends LogManager {
         configuration = new PropertyPlaceholderHelper(System.getenv(), PropertyPlaceholderHelper.ENV_REGEX).replacePropertiesPlaceholder(configuration);
 
         LoggingUtil.handleConsoleHandlerLogic(configuration);
+        LoggingUtil.handleLogToFileHandlerLogic(configuration);
         LoggingUtil.handleVerboseLogic(configuration);
 
         StringWriter writer = new StringWriter();

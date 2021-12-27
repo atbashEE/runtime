@@ -31,7 +31,11 @@ The mandatory modules _Config_  and _Logging_  are always added to the list.
 
 The `--modules` option is an expert setting and using it incorrectly can result in a failure to run your application.
 
-*--stateless*:  No configuration information is stored on disk for future runs.  Ideal for creating stateless containers in combination with `--logToFile false`.
+*--stateless*:  No configuration information is stored on disk for future runs.  Ideal for creating stateless containers in combination with `--no-logToFile`.
+
+*--logToConsole*: Send all logging to the console.  This overrules the value in the logging configuration file (TBC)
+
+*--no-logToFile*: Does not send logging to the file.  This overrules the value in the logging configuration file (TBC)
 
 zero, one or more WAR files can be added to the command line that needs to be deployed. Also the applications that are already 'deployed' within the configuration are started.
 

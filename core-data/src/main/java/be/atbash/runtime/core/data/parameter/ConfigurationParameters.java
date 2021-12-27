@@ -52,6 +52,9 @@ public class ConfigurationParameters {
     @CommandLine.Option(names = {LOG_TO_CONSOLE_OPTION}, description = "Does the Runtime logs to the console?")
     private boolean logToConsole = false;
 
+    @CommandLine.Option(names = {"--no-logToFile"}, description = "Does the Runtime logs to the logging file?", negatable = true)
+    private boolean logToFile = true;
+
     @CommandLine.Option(names = {"--warmup"}, description = "In warmup mode, runtime exists when application(s) are ready.")
     private boolean warmup = false;
 
@@ -136,6 +139,14 @@ public class ConfigurationParameters {
         this.logToConsole = logToConsole;
     }
 
+    public boolean isLogToFile() {
+        return logToFile;
+    }
+
+    public void setLogToFile(boolean logToFile) {
+        this.logToFile = logToFile;
+    }
+
     public boolean isWarmup() {
         return warmup;
     }
@@ -184,7 +195,9 @@ public class ConfigurationParameters {
         }
         sb.append(", --configName='").append(configName).append('\'');
         sb.append(", --logToConsole=").append(logToConsole);
+        sb.append(", --logToFile=").append(logToFile);
         sb.append(", --warmup=").append(warmup);
+        sb.append(", --stateless=").append(stateless);
         sb.append(", --contextRoot='").append(contextRoot).append('\'');
         if (archives != null) {
             sb.append(", archives=").append(Arrays.toString(archives));

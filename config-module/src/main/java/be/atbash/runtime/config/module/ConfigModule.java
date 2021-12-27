@@ -39,6 +39,7 @@ import be.atbash.runtime.core.data.profile.Profile;
 import be.atbash.runtime.core.data.util.ResourceReader;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
+import be.atbash.runtime.logging.LoggingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,6 +143,9 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         readConfiguration(configInstance);
         overruleConfiguration();
 
+        // Handle log to file correctly
+        System.setProperty(LoggingUtil.SYSTEM_PROPERTY_FILE_LOGGING, Boolean.toString(config.getLogging().isLogToFile()));
+
         RuntimeConfiguration.Builder builder;
         if (parameters.isStateless()) {
             builder = new RuntimeConfiguration.Builder(configInstance.getLoggingConfigurationFile());
@@ -176,6 +180,9 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     private void overruleConfiguration() {
         if (parameters.isLogToConsole()) {
             config.getLogging().setLogToConsole(true);
+        }
+        if (!parameters.isLogToFile()) {
+            config.getLogging().setLogToFile(false);
         }
         if (parameters.getWatcher() == WatcherType.JFR || parameters.getWatcher() == WatcherType.ALL) {
             config.getMonitoring().setFlightRecorder(true);

@@ -20,7 +20,6 @@ import be.atbash.runtime.core.data.exception.IncorrectConfigurationException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.EnhancedLogRecord;
-import be.atbash.runtime.logging.LoggingManager;
 import be.atbash.runtime.logging.LoggingUtil;
 import be.atbash.runtime.logging.handler.formatter.JSONLogFormatter;
 import be.atbash.runtime.logging.handler.formatter.ODLLogFormatter;
@@ -48,6 +47,8 @@ import static java.security.AccessController.doPrivileged;
  * Inspired by code of GlassFish
  */
 public class LogFileHandler extends StreamHandler {
+    // This class is referenced by name in a constant of LoggingUtil.
+    // If name or package changes, make sure the String constant is also changed.
 
     private static final Logger LOGGER = Logger.getLogger(LogFileHandler.class.getName());
 
