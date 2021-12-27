@@ -43,7 +43,8 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <assertj.version>3.12.0</assertj.version>
+        <junit.jupiter.version>5.8.2</junit.jupiter.version>
+        <assertj.version>3.21.0</assertj.version>
         <slf4j.version>2.0.0-alpha1</slf4j.version> <!-- So that it is aligned with the Jetty version -->
         <jersey.version>3.0.3</jersey.version>
     </properties>
@@ -82,7 +83,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.8.1</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
 
