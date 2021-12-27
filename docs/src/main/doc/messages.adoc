@@ -8,22 +8,24 @@ Values smaller than 1000 indicate some info, warning or error that is important 
 - DEPLOY-101(INFO): Start of the Deployment of the application.
 - DEPLOY-102(INFO): End of the Deployment of the application.
 - DEPLOY-103(WARNING): The archive cannot be found. +
-   When starting the Runtime and previously installed applications are started.
+When starting the Runtime and previously installed applications are started.
 - DEPLOY-104(WARNING): The archive could not be inspected  +
-   When deploying the application but the war file corrupt or the contents of the war file is empty.
-- DEPLOY-105(WARNING): The archive cannot be found. When passing a file name on tehe command line.
+When deploying the application but the war file corrupt or the contents of the war file is empty.
+- DEPLOY-105(WARNING): The archive cannot be found.
+When passing a file name on tehe command line.
 - DEPLOY-106(WARNING): The archive file does not have the extension `.war`.
-
 
 === Config module
 
 - CONFIG-011(ERROR): Incorrect profile name specified.
 - CONFIG-012(ERROR): Incorrect module name specified.
 - CONFIG-013(ERROR): Unable to parse the content of a configuration file. (file is indicated in the error message)
-
+- CONFIG-014(ERROR): The directory specified in the --root option does not exists.
+- CONFIG-015(ERROR): The directory specified in the --root option is not a directory.
+- CONFIG-016(ERROR): Cannot create the directory for the 'domain' (configuration, logs, ...).
+- CONFIF-017(ERROR): The directory for the 'domain' (configuration, logs, ...) already exists and is not allowed for the Runtime CLI tool.
 
 === Logging Module
-
 
 === Jetty module
 

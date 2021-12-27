@@ -15,6 +15,8 @@
  */
 package be.atbash.runtime.core.module;
 
+import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.module.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,9 @@ public class ModuleStarter implements Runnable {
             module.run();
             success = true;
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage());
+            if (!(e instanceof AtbashStartupAbortException)) {
+                LOGGER.error(e.getMessage());
+            }
             success = false;
         }
     }

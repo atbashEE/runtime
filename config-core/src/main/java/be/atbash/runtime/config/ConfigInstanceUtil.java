@@ -17,12 +17,19 @@ package be.atbash.runtime.config;
 
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.util.ResourceReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import static be.atbash.runtime.config.RuntimeConfigConstants.CONFIG_FILE;
+import static be.atbash.runtime.config.RuntimeConfigConstants.DEFAULT_CONFIG_FILE;
+
 public final class ConfigInstanceUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigInstanceUtil.class);
 
     private ConfigInstanceUtil() {
     }
@@ -31,6 +38,13 @@ public final class ConfigInstanceUtil {
 
         String rootDirectory = configInstance.getRootDirectory();
         File root = new File(rootDirectory);
+        // if readonly, root Directory and Config name doesn't matter.
+        if (configInstance.isReadOnlyFlag()) {
+            configInstance.setConfigDirectory(root);
+            // NO further processing needed
+            return;
+        }
+
         try {
             root = root.getCanonicalFile();
         } catch (IOException e) {
@@ -39,14 +53,12 @@ public final class ConfigInstanceUtil {
         }
 
         if (!root.exists()) {
-            if (!configInstance.isReadOnlyFlag()) {
-                System.out.printf("CI-001: The specified root directory '%s' doesn't point to an existing directory%n", root.getAbsolutePath());
-            }
+            writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-014: The specified root directory '%s' doesn't point to an existing directory", root.getAbsolutePath()));
             return;
         }
 
         if (!root.isDirectory()) {
-            System.out.printf("CI-002: The specified root directory '%s' is not a directory%n", root.getAbsolutePath());
+            writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-015: The specified root directory '%s' is not a directory", root.getAbsolutePath()));
             return;
         }
 
@@ -56,14 +68,15 @@ public final class ConfigInstanceUtil {
 
         if (!configDirectory.exists()) {
             boolean created = configDirectory.mkdirs();
-            if (!created && !configInstance.isReadOnlyFlag()) {
-                System.out.printf("CI-003: Unable to create the directory '%s'%n", configDirectory.getAbsolutePath());
+            if (!created) {
+                writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-016: Unable to create the directory '%s'", configDirectory.getAbsolutePath()));
                 return;
 
             }
         } else {
             if (configInstance.isCreateCommand()) {
-                System.out.printf("CI-004: The config name '%s' already exists.%n", configInstance.getConfigName());
+                // CLI Only
+                writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-017: The config name '%s' already exists.", configInstance.getConfigName()));
             }
         }
 
@@ -71,25 +84,52 @@ public final class ConfigInstanceUtil {
 
     }
 
+    private static void writeErrorMessage(boolean isCLI, String message) {
+        if (isCLI) {
+            System.out.println(message);
+        } else {
+            LOGGER.error(message);
+        }
+    }
+
     public static void storeRuntimeConfig(ConfigInstance configInstance) {
-        writeFile(configInstance, "/default.json", "config.json");
+        if (!configInstance.isReadOnlyFlag()) {
+            writeFile(configInstance, DEFAULT_CONFIG_FILE, CONFIG_FILE, false);
+        }
     }
 
     public static void storeLoggingConfig(ConfigInstance configInstance) {
-       writeFile(configInstance, "/logging.properties", "logging.properties");
+        String targetFile;
+
+        if (configInstance.isReadOnlyFlag()) {
+            String property = "java.io.tmpdir";
+
+            // Get the temporary directory .
+            targetFile = System.getProperty(property) + "logging.properties";
+        } else {
+            targetFile = "/logging.properties";
+        }
+        String loggingConfigFile = writeFile(configInstance, "/logging.properties", targetFile, configInstance.isReadOnlyFlag());
+        configInstance.setLoggingConfigurationFile(loggingConfigFile);
     }
 
 
-    private static void writeFile(ConfigInstance configInstance, String source, String targetFile) {
+    private static String writeFile(ConfigInstance configInstance, String source, String targetFile, boolean absolute) {
         if (!configInstance.isValid()) {
             //
-            return;
+            return null;
         }
-        File target = new File(configInstance.getConfigDirectory(),  targetFile);
+
+        File target;
+        if (absolute) {
+            target = new File(targetFile);
+        } else {
+            target = new File(configInstance.getConfigDirectory(), targetFile);
+        }
 
         if (target.exists()) {
             // Nothing to do since it already exists. Don't overwrite as we can overwrite users updated config
-            return;
+            return target.getAbsolutePath();
         }
         String content;
         try {
@@ -101,7 +141,6 @@ public final class ConfigInstanceUtil {
 
         }
 
-
         byte[] strToBytes = content.getBytes();
 
         try {
@@ -111,5 +150,6 @@ public final class ConfigInstanceUtil {
                     , e);
 
         }
+        return target.getAbsolutePath();
     }
 }

@@ -58,6 +58,9 @@ public class ConfigurationParameters {
     @CommandLine.Option(names = {"--contextroot"}, description = "The context root for the application. Comma separated list when multiple applications are deployed.")
     private String contextRoot = "";
 
+    @CommandLine.Option(names = {"--stateless"}, description = "In stateless mode, no configuration files are written and logs are places in the temp directory..")
+    private boolean stateless = false;
+
     @CommandLine.Parameters(index = "0..*")
     private File[] archives;
 
@@ -147,6 +150,14 @@ public class ConfigurationParameters {
 
     public void setContextRoot(String contextRoot) {
         this.contextRoot = contextRoot;
+    }
+
+    public boolean isStateless() {
+        return stateless;
+    }
+
+    public void setStateless(boolean stateless) {
+        this.stateless = stateless;
     }
 
     public File[] getArchives() {

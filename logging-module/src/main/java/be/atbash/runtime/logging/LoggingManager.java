@@ -83,12 +83,15 @@ public final class LoggingManager {
 
         // logging.properties massaging.
         final LogManager logMgr = LogManager.getLogManager();
-        File loggingPropertiesFile = null;
+        File loggingPropertiesFile;
 
         // reset settings
         try {
-
-            loggingPropertiesFile = new File(configuration.getConfigDirectory(), "logging.properties");
+            if (configuration.isStateless()) {
+                loggingPropertiesFile = new File(configuration.getLoggingConfigurationFile());
+            } else {
+                loggingPropertiesFile = new File(configuration.getConfigDirectory(), "logging.properties");
+            }
             System.setProperty("java.util.logging.config.file", loggingPropertiesFile.getAbsolutePath());
 
             logMgr.readConfiguration();
@@ -105,9 +108,6 @@ public final class LoggingManager {
         // finally, listen to changes to the loggingPropertiesFile.properties file
         //listenToChangesOnloggingPropsFile(loggingPropertiesFile, logMgr);
         // FIXME
-
-        // Log the messages that were generated very early before this Service
-        // started.  Just use our own logger...
 
     }
 

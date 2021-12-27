@@ -27,6 +27,7 @@ import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.config.Config;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
@@ -55,8 +56,6 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     private RuntimeConfiguration runtimeConfiguration;
 
     private ConfigurationInformation configurationInformation;
-
-    private boolean statelessConfigRun;
 
     private Config config;
 
@@ -98,8 +97,11 @@ public class ConfigModule implements Module<ConfigurationParameters> {
             return (T) runtimeConfiguration;
         }
         if (exposedObjectType.equals(PersistedDeployments.class)) {
-
-            return (T) ConfigUtil.readApplicationDeploymentsData(runtimeConfiguration);
+            if (runtimeConfiguration.isStateless()) {
+                return (T) new PersistedDeployments();
+            } else {
+                return (T) ConfigUtil.readApplicationDeploymentsData(runtimeConfiguration);
+            }
         }
         return null;
     }
@@ -124,13 +126,12 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
         configurationInformation = new ConfigurationInformation();
 
-        // FIXME readOnlyPossible
-        ConfigInstance configInstance = new ConfigInstance(parameters.getRootDirectory(), parameters.getConfigName(), true, false);
+        ConfigInstance configInstance = new ConfigInstance(parameters.getRootDirectory(), parameters.getConfigName()
+                , parameters.isStateless(), false);
         ConfigInstanceUtil.processConfigInstance(configInstance);
 
-        // FIXME handle
         if (!configInstance.isValid()) {
-            // FIXME
+            throw new AtbashStartupAbortException();
         } else {
             ConfigInstanceUtil.storeRuntimeConfig(configInstance);
             ConfigInstanceUtil.storeLoggingConfig(configInstance);
@@ -141,14 +142,22 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         readConfiguration(configInstance);
         overruleConfiguration();
 
-        RuntimeConfiguration.Builder builder = new RuntimeConfiguration.Builder(configInstance.getConfigDirectory(), parameters.getConfigName());
+        RuntimeConfiguration.Builder builder;
+        if (parameters.isStateless()) {
+            builder = new RuntimeConfiguration.Builder(configInstance.getLoggingConfigurationFile());
+        } else {
+            builder = new RuntimeConfiguration.Builder(configInstance.getConfigDirectory(), parameters.getConfigName());
+        }
         builder.setRequestedModules(profileManager.getRequestedModules());
         builder.setConfig(config);
         runtimeConfiguration = builder.build();
 
         EventManager.getInstance().publishEvent(CONFIGURATION_UPDATE, runtimeConfiguration);
-        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
-        runData.registerDeploymentListener(new ArchiveDeploymentStorage(runtimeConfiguration));
+
+        if (!parameters.isStateless()) {
+            RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+            runData.registerDeploymentListener(new ArchiveDeploymentStorage(runtimeConfiguration));
+        }
 
         watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "CONFIG-1002: Module ready", false);
     }

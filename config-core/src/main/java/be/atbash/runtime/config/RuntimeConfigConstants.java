@@ -19,6 +19,7 @@ public final class RuntimeConfigConstants {
 
     public static final String APPLICATIONS_FILE = "applications.json";
     public static final String CONFIG_FILE = "config.json";
+    public static final String DEFAULT_CONFIG_FILE = "/default.json";
 
     private RuntimeConfigConstants() {
     }

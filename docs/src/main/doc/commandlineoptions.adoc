@@ -4,22 +4,22 @@
 
 java -jar atbash-runtime.jar <options>
 
--r|--root: Location of 'domain' directory, by default current directory.
+*-r|--root*: Location of 'domain' directory, by default current directory.
 
--n|--configname: Configuration name within the domain, by default `default`.
+*-n|--configname*: Configuration name within the domain, by default `default`.
 
--v|--verbose: When active, more messages are shown in the log.  This can be enforced 'permanent' by putting `be.atbash.runtime.level=ALL` in the logging configuration.
+*-v|--verbose*: When active, more messages are shown in the log.  This can be enforced 'permanent' by putting `be.atbash.runtime.level=ALL` in the logging configuration.
 
---watcher:  Defines the type of the diagnostics, valid values are  +
+*--watcher*:  Defines the type of the diagnostics, valid values are  +
 `MINIMAL`: (default) only the events from the Core module are sent to JFR.  +
 `OFF`: JFR and JMX are disabled  +
 `JFR`: Events are send to JFR system and Recording is started which is dump to file at JVM exit.  +
 `JMX`: Some data is available within the JMX system.  +
 `ALL`: Combination of `JFR` and `JMX`
 
--p|--profile:  The name of the active profile. The Profile defines a set of modules that are started.  When not specified, the profile id `default`. Also `domain` is supported. +
+*-p|--profile*:  The name of the active profile. The Profile defines a set of modules that are started.  When not specified, the profile id `default`. Also `domain` is supported. +
 
--m|--modules: Change the modules that are active.  the option is a comma separated ist list of _module definitions_.  +
+*-m|--modules*: Change the modules that are active.  the option is a comma separated ist list of _module definitions_.  +
 A module definition  consist of the module name that is optionally prepended by `+` or `-` or no action indicator. +
 The final list of modules that are used is determined by the profile and then changes are done as following
 
@@ -31,7 +31,7 @@ The mandatory modules _Config_  and _Logging_  are always added to the list.
 
 The `--modules` option is an expert setting and using it incorrectly can result in a failure to run your application.
 
-
+*--stateless*:  No configuration information is stored on disk for future runs.  Ideal for creating stateless containers in combination with `--logToFile false`.
 
 zero, one or more WAR files can be added to the command line that needs to be deployed. Also the applications that are already 'deployed' within the configuration are started.
 

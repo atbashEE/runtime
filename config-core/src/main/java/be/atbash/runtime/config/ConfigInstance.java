@@ -29,6 +29,7 @@ public class ConfigInstance {
     private final boolean createCommand;
     private File configDirectory;
     private boolean existingConfigDirectory;
+    private String loggingConfigurationFile;
 
     public ConfigInstance(String rootDirectory, String configName, boolean readOnlyFlag, boolean createCommand) {
 
@@ -68,6 +69,14 @@ public class ConfigInstance {
 
     public boolean isExistingConfigDirectory() {
         return existingConfigDirectory;
+    }
+
+    public String getLoggingConfigurationFile() {
+        return loggingConfigurationFile;
+    }
+
+    public void setLoggingConfigurationFile(String loggingConfigurationFile) {
+        this.loggingConfigurationFile = loggingConfigurationFile;
     }
 
     public boolean isValid() {

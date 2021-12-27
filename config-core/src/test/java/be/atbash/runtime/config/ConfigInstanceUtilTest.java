@@ -55,7 +55,7 @@ class ConfigInstanceUtilTest {
         ConfigInstance configInstance = new ConfigInstance(TEST_DIRECTORY.getAbsolutePath(), "testconfig", false, true);
         ConfigInstanceUtil.processConfigInstance(configInstance);
 
-        Assertions.assertThat(outCapture.toString()).isEqualTo("CI-004: The config name 'testconfig' already exists.\n");
+        Assertions.assertThat(outCapture.toString()).isEqualTo("CONFIG-017: The config name 'testconfig' already exists.\n");
         Assertions.assertThat(configInstance.isValid()).isTrue();
         Assertions.assertThat(configInstance.isExistingConfigDirectory()).isTrue();
     }
@@ -66,7 +66,7 @@ class ConfigInstanceUtilTest {
         ConfigInstance configInstance = new ConfigInstance(NONEXISTING_DIRECTORY.getAbsolutePath(), "testconfig", false, true);
         ConfigInstanceUtil.processConfigInstance(configInstance);
 
-        Assertions.assertThat(outCapture.toString()).isEqualTo("CI-001: The specified root directory '/does/not/exist' doesn't point to an existing directory\n");
+        Assertions.assertThat(outCapture.toString()).isEqualTo("CONFIG-014: The specified root directory '/does/not/exist' doesn't point to an existing directory\n");
         Assertions.assertThat(configInstance.isValid()).isFalse();
     }
 
@@ -77,7 +77,7 @@ class ConfigInstanceUtilTest {
         ConfigInstanceUtil.processConfigInstance(configInstance);
 
         String consoleOutput = outCapture.toString();
-        Assertions.assertThat(consoleOutput).contains("CI-002: The specified root directory");
+        Assertions.assertThat(consoleOutput).contains("CONFIG-015: The specified root directory");
         Assertions.assertThat(consoleOutput).contains("pom.xml' is not a directory");
         Assertions.assertThat(configInstance.isValid()).isFalse();
     }

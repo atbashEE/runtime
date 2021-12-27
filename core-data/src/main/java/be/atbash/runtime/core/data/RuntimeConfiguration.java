@@ -20,14 +20,20 @@ import be.atbash.runtime.core.data.config.Config;
 import java.io.File;
 
 public class RuntimeConfiguration {
-    private final File configDirectory;
-    private final String configName;
+    private File configDirectory; // null when stateless
+    private String configName;  // null when stateless
+    private String loggingConfigurationFile; // for stateless case, otherwise based on configDirectory and configName.
     private String[] requestedModules;
     private Config config;
 
+    // This is for the 'statefull' scenario
     private RuntimeConfiguration(File configDirectory, String configName) {
         this.configDirectory = configDirectory;
         this.configName = configName;
+    }
+
+    public RuntimeConfiguration(String loggingConfigurationFile) {
+        this.loggingConfigurationFile = loggingConfigurationFile;
     }
 
     public String[] getRequestedModules() {
@@ -54,12 +60,24 @@ public class RuntimeConfiguration {
         return config;
     }
 
+    public boolean isStateless() {
+        return configDirectory == null;
+    }
+
+    public String getLoggingConfigurationFile() {
+        return loggingConfigurationFile;
+    }
+
     public static class Builder {
 
         private final RuntimeConfiguration runtimeConfiguration;
 
         public Builder(File configDirectory, String configName) {
             runtimeConfiguration = new RuntimeConfiguration(configDirectory, configName);
+        }
+
+        public Builder(String loggingConfigurationFile) {
+            runtimeConfiguration = new RuntimeConfiguration(loggingConfigurationFile);
         }
 
         public Builder setRequestedModules(String[] requestedModules) {

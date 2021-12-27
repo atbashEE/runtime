@@ -18,13 +18,13 @@ package be.atbash.runtime.config.util;
 import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
+import be.atbash.runtime.core.data.util.ResourceReader;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static be.atbash.runtime.config.RuntimeConfigConstants.APPLICATIONS_FILE;
-import static be.atbash.runtime.config.RuntimeConfigConstants.CONFIG_FILE;
+import static be.atbash.runtime.config.RuntimeConfigConstants.*;
 
 public final class FileUtil {
 
@@ -32,11 +32,19 @@ public final class FileUtil {
     }
 
     public static String readConfigurationContent(ConfigInstance configInstance) {
-        File configFile = new File(configInstance.getConfigDirectory(), CONFIG_FILE);
-        try {
-            return Files.readString(configFile.toPath());
-        } catch (IOException e) {
-            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        if (configInstance.isReadOnlyFlag()) {
+            try {
+                return ResourceReader.readResource(DEFAULT_CONFIG_FILE);
+            } catch (IOException e) {
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+            }
+        } else {
+            File configFile = new File(configInstance.getConfigDirectory(), CONFIG_FILE);
+            try {
+                return Files.readString(configFile.toPath());
+            } catch (IOException e) {
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+            }
         }
     }
 
