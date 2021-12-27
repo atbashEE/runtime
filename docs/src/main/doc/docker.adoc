@@ -1,0 +1,28 @@
+=== Docker
+
+A Docker image is available to run the Atbash Runtime containerized.  It is based on JDK 11 and has several environment variables to configure its configuration.  The Runtime runs woth the stateless option, no files are created unless one confgiuration file in the temporary folder.
+
+Basic usage
+
+[source]
+----
+FROM runtime-main:0.3-SNAPSHOT
+COPY myservice.war $DEPLOYMENT_DIR
+----
+
+The $DEPLOYMENT_DIR is a variable that is also passed to the start up command as the directory that is scanned for WAR applications that needs to be deployed.
+
+These are the environment variables that can be used to modify the configuration:
+
+- *MEM_MAX_RAM_PERCENTAGE* (default "70.0"): The amount of the Java Heap within the container as a percentage of the total memory assigned to the container.
+- *MEM_XSS* (default 512k) Value of the stack size.
+- *JVM_ARGS*: Other JVM Arguments.
+- *ATBASH_ARGS*: Options for the Atbash Runtime.
+- *STATELESS*: Has by default the value _true_ which results in the addition of the options `--stateless --no-logToFile` to the options passed to Atbash Runtime.  When you define another value for the environment variable, you can have the non stateless behaviour.
+
+This is the command that starts the instance.
+
+[source]
+----
+exec java -XX:MaxRAMPercentage=${MEM_MAX_RAM_PERCENTAGE} -Xss${MEM_XSS} -XX:+UseContainerSupport ${JVM_ARGS} -jar atbash-runtime.jar --logToConsole --deploymentdirectory ${DEPLOYMENT_DIR} ${ATBASH_ARGS}
+----

@@ -8,6 +8,7 @@ ENV SCRIPT_DIR=${HOME_DIR} \
     DEPLOYMENT_DIR=${HOME_DIR}/deployment \
     JVM_ARGS="" \
     ATBASH_ARGS="" \
+    STATELESS="true" \
     MEM_MAX_RAM_PERCENTAGE="70.0" \
     MEM_XSS="512k"
 

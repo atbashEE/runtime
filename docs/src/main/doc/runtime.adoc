@@ -23,6 +23,8 @@ include::commandlineoptions.adoc[]
 
 include::integrations.adoc[]
 
+include::docker.adoc[]
+
 include::domain-api.adoc[]
 
 include::messages.adoc[]
