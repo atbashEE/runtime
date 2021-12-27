@@ -22,6 +22,8 @@ mvn clean package
 
 mvn clean package -Ddocumentation.skip
 
+# Fast artifact generation
+mvn clean install -Ddocumentation.skip -DskipTests
 
 # Update license header
 

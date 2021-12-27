@@ -24,7 +24,7 @@ import java.io.File;
 public class ConfigInstance {
 
     private final String rootDirectory;
-    private final String configName;
+    private String configName;
     private final boolean readOnlyFlag;
     private final boolean createCommand;
     private File configDirectory;
@@ -80,6 +80,14 @@ public class ConfigInstance {
     }
 
     public boolean isValid() {
-        return configDirectory != null;
+        return readOnlyFlag || configName != null;
+    }
+
+    /**
+     * Mark the Configuration (root or config name) as invalid.  But isValid() still can return true
+     * because we are in readOnly mode.
+     */
+    public void invalidConfig() {
+        configName = null;
     }
 }

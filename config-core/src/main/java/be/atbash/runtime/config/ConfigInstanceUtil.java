@@ -38,12 +38,6 @@ public final class ConfigInstanceUtil {
 
         String rootDirectory = configInstance.getRootDirectory();
         File root = new File(rootDirectory);
-        // if readonly, root Directory and Config name doesn't matter.
-        if (configInstance.isReadOnlyFlag()) {
-            configInstance.setConfigDirectory(root);
-            // NO further processing needed
-            return;
-        }
 
         try {
             root = root.getCanonicalFile();
@@ -53,12 +47,18 @@ public final class ConfigInstanceUtil {
         }
 
         if (!root.exists()) {
-            writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-014: The specified root directory '%s' doesn't point to an existing directory", root.getAbsolutePath()));
+            if (!configInstance.isReadOnlyFlag()) {
+                writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-014: The specified root directory '%s' doesn't point to an existing directory", root.getAbsolutePath()));
+            }
+            configInstance.invalidConfig();
             return;
         }
 
         if (!root.isDirectory()) {
-            writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-015: The specified root directory '%s' is not a directory", root.getAbsolutePath()));
+            if (!configInstance.isReadOnlyFlag()) {
+                writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-015: The specified root directory '%s' is not a directory", root.getAbsolutePath()));
+                configInstance.invalidConfig();
+            }
             return;
         }
 
@@ -67,6 +67,10 @@ public final class ConfigInstanceUtil {
         configInstance.setExistingConfigDirectory(configDirectory.exists());
 
         if (!configDirectory.exists()) {
+            if (configInstance.isReadOnlyFlag()) {
+                configInstance.invalidConfig();
+                return;
+            }
             boolean created = configDirectory.mkdirs();
             if (!created) {
                 writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-016: Unable to create the directory '%s'", configDirectory.getAbsolutePath()));
@@ -105,7 +109,7 @@ public final class ConfigInstanceUtil {
             String property = "java.io.tmpdir";
 
             // Get the temporary directory .
-            targetFile = System.getProperty(property) + "logging.properties";
+            targetFile = System.getProperty(property) + "/logging.properties";
         } else {
             targetFile = "/logging.properties";
         }

@@ -57,7 +57,8 @@ class ConfigInstanceUtilTest {
 
         Assertions.assertThat(outCapture.toString()).isEqualTo("CONFIG-017: The config name 'testconfig' already exists.\n");
         Assertions.assertThat(configInstance.isValid()).isTrue();
-        Assertions.assertThat(configInstance.isExistingConfigDirectory()).isTrue();
+        Assertions.assertThat(configInstance.isExistingConfigDirectory()).isTrue();  // This can be used to abort the command create-config
+        Assertions.assertThat(configInstance.getConfigName()).isEqualTo("testconfig");
     }
 
     @Test
@@ -91,6 +92,7 @@ class ConfigInstanceUtilTest {
         Assertions.assertThat(outCapture.toString()).isBlank();
         Assertions.assertThat(configInstance.isValid()).isTrue();
         Assertions.assertThat(configInstance.isExistingConfigDirectory()).isFalse();
+        Assertions.assertThat(configInstance.getConfigName()).isEqualTo("testconfig");
     }
 
     @Test
@@ -102,8 +104,47 @@ class ConfigInstanceUtilTest {
         Assertions.assertThat(outCapture.toString()).isBlank();
         Assertions.assertThat(configInstance.isValid()).isTrue();
         Assertions.assertThat(configInstance.isExistingConfigDirectory()).isTrue();
+        Assertions.assertThat(configInstance.getConfigName()).isEqualTo("testconfig");
     }
 
+    @Test
+    public void testNonExistingDirectory_stateless_invalidRoot() {
+
+        ConfigInstance configInstance = new ConfigInstance(NONEXISTING_DIRECTORY.getAbsolutePath(), "testconfig", true, false);
+        ConfigInstanceUtil.processConfigInstance(configInstance);
+
+        Assertions.assertThat(outCapture.toString()).isBlank();
+        Assertions.assertThat(configInstance.isValid()).isTrue();  // because of the readOnly
+        Assertions.assertThat(configInstance.isReadOnlyFlag()).isTrue();
+        Assertions.assertThat(configInstance.getConfigName()).isNull();  // so that the code knowns it should use the ConfigDirectory
+        Assertions.assertThat(configInstance.getConfigDirectory()).isNull();  // ConfigDirectory doesn't exists (but ok in readOnly mode)
+    }
+
+    @Test
+    public void testNonExistingDirectory_stateless_invalidConfig() {
+
+        ConfigInstance configInstance = new ConfigInstance(TEST_DIRECTORY.getAbsolutePath(), "something", true, false);
+        ConfigInstanceUtil.processConfigInstance(configInstance);
+
+        Assertions.assertThat(outCapture.toString()).isBlank();
+        Assertions.assertThat(configInstance.isValid()).isTrue();  // because of the readOnly
+        Assertions.assertThat(configInstance.isReadOnlyFlag()).isTrue();
+        Assertions.assertThat(configInstance.getConfigName()).isNull();  // so that the code knowns it should use the ConfigDirectory
+        Assertions.assertThat(configInstance.getConfigDirectory()).isNull();  // ConfigDirectory doesn't exists (but ok in readOnly mode)
+    }
+
+    @Test
+    public void testNonExistingDirectory_stateless_validDirectories() {
+
+        ConfigInstance configInstance = new ConfigInstance(TEST_DIRECTORY.getAbsolutePath(), "testconfig", true, false);
+        ConfigInstanceUtil.processConfigInstance(configInstance);
+
+        Assertions.assertThat(outCapture.toString()).isBlank();
+        Assertions.assertThat(configInstance.isValid()).isTrue();  // because of the readOnly
+        Assertions.assertThat(configInstance.isReadOnlyFlag()).isTrue();
+        Assertions.assertThat(configInstance.getConfigName()).isEqualTo("testconfig");
+        Assertions.assertThat(configInstance.getConfigDirectory()).isNotNull();  // ConfigDirectory is valid
+    }
 
     @Test
     public void test_storeConfig_HappyCase() {

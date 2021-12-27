@@ -20,7 +20,7 @@ import be.atbash.runtime.core.data.config.Config;
 import java.io.File;
 
 public class RuntimeConfiguration {
-    private File configDirectory; // null when stateless
+    private File configDirectory; // null when stateless unless config directory already existed
     private String configName;  // null when stateless
     private String loggingConfigurationFile; // for stateless case, otherwise based on configDirectory and configName.
     private String[] requestedModules;
@@ -30,6 +30,13 @@ public class RuntimeConfiguration {
     private RuntimeConfiguration(File configDirectory, String configName) {
         this.configDirectory = configDirectory;
         this.configName = configName;
+    }
+
+    // This is for the 'stateless' scenario with existing config directory
+    private RuntimeConfiguration(File configDirectory, String loggingConfigurationFile, boolean stateless) {
+        assert(stateless); // Not sure how we can avoid identical method signatures with different meanings
+        this.configDirectory = configDirectory;
+        this.loggingConfigurationFile = loggingConfigurationFile;
     }
 
     public RuntimeConfiguration(String loggingConfigurationFile) {
@@ -61,7 +68,7 @@ public class RuntimeConfiguration {
     }
 
     public boolean isStateless() {
-        return configDirectory == null;
+        return configName == null;
     }
 
     public String getLoggingConfigurationFile() {
@@ -78,6 +85,11 @@ public class RuntimeConfiguration {
 
         public Builder(String loggingConfigurationFile) {
             runtimeConfiguration = new RuntimeConfiguration(loggingConfigurationFile);
+        }
+
+        public Builder(File configDirectory, String loggingConfigurationFile, boolean stateless) {
+            assert (stateless);  // Not sure how we can avoid identical method signatures with different meanings
+            runtimeConfiguration = new RuntimeConfiguration(configDirectory, loggingConfigurationFile, stateless);
         }
 
         public Builder setRequestedModules(String[] requestedModules) {

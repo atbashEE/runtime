@@ -98,11 +98,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
             return (T) runtimeConfiguration;
         }
         if (exposedObjectType.equals(PersistedDeployments.class)) {
-            if (runtimeConfiguration.isStateless()) {
-                return (T) new PersistedDeployments();
-            } else {
-                return (T) ConfigUtil.readApplicationDeploymentsData(runtimeConfiguration);
-            }
+            return (T) ConfigUtil.readApplicationDeploymentsData(runtimeConfiguration);
         }
         return null;
     }
@@ -148,7 +144,11 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
         RuntimeConfiguration.Builder builder;
         if (parameters.isStateless()) {
-            builder = new RuntimeConfiguration.Builder(configInstance.getLoggingConfigurationFile());
+            if (configInstance.getConfigName() != null) {
+                builder = new RuntimeConfiguration.Builder(configInstance.getConfigDirectory(),  configInstance.getLoggingConfigurationFile(), true);
+            } else {
+                builder = new RuntimeConfiguration.Builder(configInstance.getLoggingConfigurationFile());
+            }
         } else {
             builder = new RuntimeConfiguration.Builder(configInstance.getConfigDirectory(), parameters.getConfigName());
         }
