@@ -17,6 +17,7 @@ package be.atbash.runtime;
 
 import be.atbash.runtime.core.data.watcher.model.ServerMon;
 import be.atbash.runtime.logging.LoggingManager;
+import be.atbash.runtime.logging.LoggingUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +37,10 @@ public class RuntimeMain {
         helper.handleCommandlineArguments();
 
         helper.temporaryWatcherService(serverMon);
+
+        if (LoggingUtil.isVerbose()) {
+            helper.logEnvironmentInformation();
+        }
 
         helper.performStartup();
 

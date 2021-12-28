@@ -265,6 +265,21 @@ public class MainRunnerHelper {
         }
     }
 
+    public void logEnvironmentInformation() {
+        logger.info(String.format("CLI-102: JDK Version 'JDK %s'", System.getProperty("java.vm.specification.version")));
+        logger.info(String.format("CLI-102: Full version '%s'", System.getProperty("java.vm.version")));
+        logger.info(String.format("CLI-102: JVM Vendor '%s'", System.getProperty("java.vm.vendor")));
+        logger.info(String.format("CLI-102: JVM name '%s'", System.getProperty("java.vm.name")));
+
+        logger.info(String.format("CLI-102: OS name '%s'", System.getProperty("os.name")));
+
+        Runtime runtime = Runtime.getRuntime();
+        double mem = runtime.totalMemory() / 1024.0 / 1024.0;
+
+
+        logger.info(String.format("CLI-102: Java memory %.0fMB", mem));
+    }
+
     private static class AlphabeticalComparator implements java.util.Comparator<File> {
 
         @Override

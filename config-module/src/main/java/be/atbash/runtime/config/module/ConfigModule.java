@@ -56,8 +56,6 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     private ConfigurationParameters parameters;
     private RuntimeConfiguration runtimeConfiguration;
 
-    private ConfigurationInformation configurationInformation;
-
     private Config config;
 
     private List<Profile> profiles;
@@ -120,8 +118,6 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
         readProfiles();
         Profile profile = findProfile();
-
-        configurationInformation = new ConfigurationInformation();
 
         ConfigInstance configInstance = new ConfigInstance(parameters.getRootDirectory(), parameters.getConfigName()
                 , parameters.isStateless(), false);
