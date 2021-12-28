@@ -13,6 +13,15 @@ The product has several ways of operation
 
 Applications are internally identified by the contextroot they are available (must be unique on the runtime) and when performing remote administration, applications are indicated by their deployment name.
 
+== Known issues
+
+- A Web application containing a _beans.xml_ file will result in
+
+[source]
+----
+WELD-001304: More than one context active for scope type jakarta.enterprise.context.RequestScoped
+----
+
 include::modules.adoc[]
 
 == Configuration

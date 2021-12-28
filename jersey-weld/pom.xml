@@ -34,11 +34,17 @@
 
     <dependencies>
 
+        <!-- FIXME This seems wrong but cannot make it work otherwise
+        Without out, I cannot inject in JAX-RS resources. But adding it
+        breaks the situation where you have a beans.xml
+        WELD-001304: More than one context active for scope type jakarta.enterprise.context.RequestScoped
 
+        http://blog.supol.cz/?p=243  And when we have Jakarta EE 10?
+        -->
         <dependency>
             <groupId>org.glassfish.jersey.ext.cdi</groupId>
             <artifactId>jersey-weld2-se</artifactId>
-            <version>3.0.2</version>
+            <version>${jersey.version}</version>
         </dependency>
 
     </dependencies>
