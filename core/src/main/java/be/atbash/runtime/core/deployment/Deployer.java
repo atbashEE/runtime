@@ -46,9 +46,7 @@ public class Deployer implements ModuleEventListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Deployer.class);
 
-    // FIXME This should be made available to a reworked ExposedObjectsModuleManager
-    // Do we need a Core module to be consistent?
-    public static ArchiveDeployment currentArchiveDeployment;
+    private static ArchiveDeployment currentArchiveDeployment;
 
     private final RuntimeConfiguration runtimeConfiguration;
     private final List<Module> modules;
@@ -263,4 +261,13 @@ public class Deployer implements ModuleEventListener {
         deployment.setClassLoader(appClassLoader);
     }
 
+    /*
+    * This is an exception as it is too difficult to expose this through RuntimeObjectsManager.
+    * The CoreModule.run() can't create an instance of the Deployer class yet since ModuleManager needs to
+    * install all modules first (as Deployer needs all started modules)
+    * And having the CoreModule to call a method like this is overhead if we want to enforce RuntimeObjectsManager usage.
+     */
+    public static ArchiveDeployment getCurrentDeployment() {
+        return currentArchiveDeployment;
+    }
 }

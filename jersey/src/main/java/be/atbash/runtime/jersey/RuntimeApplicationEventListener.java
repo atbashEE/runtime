@@ -44,7 +44,7 @@ public class RuntimeApplicationEventListener implements ApplicationEventListener
     @Override
     public void onEvent(ApplicationEvent event) {
         if (event.getType() == ApplicationEvent.Type.INITIALIZATION_APP_FINISHED) {
-            applicationPath = ResourcePathUtil.getInstance().findApplicationPath(Deployer.currentArchiveDeployment);
+            applicationPath = ResourcePathUtil.getInstance().findApplicationPath(Deployer.getCurrentDeployment());
             ResourceModel resourceModel = event.getResourceModel();
             final ResourceLogDetails logDetails = new ResourceLogDetails();
             resourceModel.getResources().stream().forEach((resource) -> {
