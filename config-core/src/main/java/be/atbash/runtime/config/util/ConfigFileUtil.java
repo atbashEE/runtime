@@ -19,6 +19,8 @@ import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.util.ResourceReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,9 +30,16 @@ import static be.atbash.runtime.config.RuntimeConfigConstants.*;
 
 public final class ConfigFileUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigFileUtil.class);
+
     private ConfigFileUtil() {
     }
 
+    /**
+     * Read the Runtime Configuration, either from the Config directory or the default when in read only (stateless mode)
+     * @param configInstance Information about the configuration of the instance.
+     * @return The content (as JSON)
+     */
     public static String readConfigurationContent(ConfigInstance configInstance) {
         if (configInstance.isReadOnlyFlag()) {
             try {
@@ -48,6 +57,11 @@ public final class ConfigFileUtil {
         }
     }
 
+    /**
+     * Read the information (as string) about the deployed application from a previous run (if any).
+     * @param runtimeConfiguration Information about the configuration of the instance.
+     * @return The content (as JSON)
+     */
     public static String readDeployedApplicationsContent(RuntimeConfiguration runtimeConfiguration) {
         File applicationFile = new File(runtimeConfiguration.getConfigDirectory(), APPLICATIONS_FILE);
         if (!applicationFile.exists()) {
@@ -67,9 +81,11 @@ public final class ConfigFileUtil {
                 applicationFile.createNewFile();
             }
 
-            // FIXME Test out what happens if file is read-only and we can capture this upstream of this method
-            // (At start of runtime)
-            Files.writeString(applicationFile.toPath(), content);
+            if (applicationFile.canWrite()) {
+                Files.writeString(applicationFile.toPath(), content);
+            } else {
+                LOGGER.warn(String.format("CONFIG-018: Unable to write to the file %s, the application will run but will not start the next time", APPLICATIONS_FILE));
+            }
         } catch (IOException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }

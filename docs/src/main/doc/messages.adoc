@@ -12,7 +12,7 @@ When starting the Runtime and previously installed applications are started.
 - DEPLOY-104(WARNING): The archive could not be inspected  +
 When deploying the application but the war file corrupt or the contents of the war file is empty.
 - DEPLOY-105(WARNING): The archive cannot be found.
-When passing a file name on tehe command line.
+When passing a file name on the command line.
 - DEPLOY-106(WARNING): The archive file does not have the extension `.war`.
 
 === Config module
@@ -23,7 +23,8 @@ When passing a file name on tehe command line.
 - CONFIG-014(ERROR): The directory specified in the --root option does not exists.
 - CONFIG-015(ERROR): The directory specified in the --root option is not a directory.
 - CONFIG-016(ERROR): Cannot create the directory for the 'domain' (configuration, logs, ...).
-- CONFIF-017(ERROR): The directory for the 'domain' (configuration, logs, ...) already exists and is not allowed for the Runtime CLI tool.
+- CONFIG-017(ERROR): The directory for the 'domain' (configuration, logs, ...) already exists and is not allowed for the Runtime CLI tool.
+- CONFIG-018(WARN): The file _applications.json_  cannot be written. This means that the application will not start the next time
 
 === Logging Module
 
