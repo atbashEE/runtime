@@ -16,7 +16,7 @@
 package be.atbash.runtime.config.module;
 
 import be.atbash.json.JSONValue;
-import be.atbash.runtime.config.util.FileUtil;
+import be.atbash.runtime.config.util.ConfigFileUtil;
 import be.atbash.runtime.core.data.CriticalThreadCount;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
@@ -55,7 +55,7 @@ public class ArchiveDeploymentStorage implements ArchiveDeploymentListener {
 
     private void writeApplicationDeploymentsData(PersistedDeployments deployments) {
         String content = JSONValue.toJSONString(deployments);
-        FileUtil.writeDeployedApplicationsContent(runtimeConfiguration, content);
+        ConfigFileUtil.writeDeployedApplicationsContent(runtimeConfiguration, content);
 
     }
 }

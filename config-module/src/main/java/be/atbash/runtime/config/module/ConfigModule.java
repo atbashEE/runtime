@@ -21,7 +21,7 @@ import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.config.ConfigInstanceUtil;
 import be.atbash.runtime.config.module.exception.ProfileNameException;
 import be.atbash.runtime.config.module.profile.ProfileManager;
-import be.atbash.runtime.config.util.FileUtil;
+import be.atbash.runtime.config.util.ConfigFileUtil;
 import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
@@ -193,7 +193,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     }
 
     private void readConfiguration(ConfigInstance configInstance) {
-        String content = FileUtil.readConfigurationContent(configInstance);
+        String content = ConfigFileUtil.readConfigurationContent(configInstance);
 
         config = JSONValue.parse(content, Config.class);
     }

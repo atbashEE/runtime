@@ -16,6 +16,7 @@
 package be.atbash.runtime.config;
 
 import be.atbash.runtime.core.data.exception.UnexpectedException;
+import be.atbash.runtime.core.data.util.FileUtil;
 import be.atbash.runtime.core.data.util.ResourceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,10 +107,8 @@ public final class ConfigInstanceUtil {
         String targetFile;
 
         if (configInstance.isReadOnlyFlag()) {
-            String property = "java.io.tmpdir";
-
             // Get the temporary directory .
-            targetFile = System.getProperty(property) + "/logging.properties";
+            targetFile = FileUtil.getTempDirectory() + "/logging.properties";
         } else {
             targetFile = "/logging.properties";
         }

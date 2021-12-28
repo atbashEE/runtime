@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.config.module;
+package be.atbash.runtime.core.data.util;
 
-import be.atbash.json.JSONValue;
-import be.atbash.runtime.config.util.ConfigFileUtil;
-import be.atbash.runtime.core.data.RuntimeConfiguration;
-import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
+public final class FileUtil {
 
-final class ConfigUtil {
 
-    private ConfigUtil() {
+    private FileUtil() {
     }
 
-    public static PersistedDeployments readApplicationDeploymentsData(RuntimeConfiguration runtimeConfiguration) {
-
-        String content = ConfigFileUtil.readDeployedApplicationsContent(runtimeConfiguration);
-        return JSONValue.parse(content, PersistedDeployments.class);
-
+    public static String getTempDirectory() {
+        return System.getProperty("java.io.tmpdir");
     }
-
 }

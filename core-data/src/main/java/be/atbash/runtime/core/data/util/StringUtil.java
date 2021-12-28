@@ -28,7 +28,6 @@ public final class StringUtil {
     }
 
     public static String determineDeploymentName(String filename) {
-        // FIXME we need to block anything that doesn't has the suffix .war?
         if (filename.endsWith(".war")) {
             filename = filename.substring(0, filename.length() - 4);
         }

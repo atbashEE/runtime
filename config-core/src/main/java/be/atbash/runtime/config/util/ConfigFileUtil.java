@@ -26,9 +26,9 @@ import java.nio.file.Files;
 
 import static be.atbash.runtime.config.RuntimeConfigConstants.*;
 
-public final class FileUtil {
+public final class ConfigFileUtil {
 
-    private FileUtil() {
+    private ConfigFileUtil() {
     }
 
     public static String readConfigurationContent(ConfigInstance configInstance) {

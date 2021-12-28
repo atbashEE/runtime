@@ -27,6 +27,7 @@ import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.event.ModuleEventListener;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.util.ArchiveDeploymentUtil;
+import be.atbash.runtime.core.data.util.FileUtil;
 import be.atbash.runtime.core.data.watcher.WatcherBean;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.deployment.monitor.ApplicationMon;
@@ -36,10 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Deployer implements ModuleEventListener {
@@ -241,19 +239,40 @@ public class Deployer implements ModuleEventListener {
         if (!ArchiveDeploymentUtil.testOnArchive(deployment.getArchiveFile())) {
             return false;
         }
-        File targetLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getDeploymentName() + ".war");
+
+        File targetLocation = defineTargetLocation(deployment);
+
         deployment.setDeploymentLocation(targetLocation);
+
         Unpack unpack = new Unpack(deployment.getArchiveFile(), targetLocation);
         ArchiveContent archiveContent = unpack.handleArchiveFile();
+
         if (archiveContent == null) {
             LOGGER.warn(String.format("DEPLOY-104: Archive is empty or not a valid archive, '%s'", deployment.getDeploymentName()));
             return false;
         }
+
         deployment.setArchiveContent(archiveContent);
 
         extractedsetClassloader(deployment);
 
         return true;
+    }
+
+    private File defineTargetLocation(ArchiveDeployment deployment) {
+        File targetLocation;
+        if (runtimeConfiguration.isStateless()) {
+            UUID uuid = UUID.randomUUID();
+
+            targetLocation = new File(FileUtil.getTempDirectory(), deployment.getDeploymentName() + "-" + uuid + ".war");
+            if (LoggingUtil.isVerbose()) {
+                LOGGER.trace(String.format("DEPLOY-1001: The Archive Deployment '%s' is unpacked to the location '%s'", deployment.getDeploymentName(), targetLocation));
+            }
+
+        } else {
+            targetLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getDeploymentName() + ".war");
+        }
+        return targetLocation;
     }
 
     private void extractedsetClassloader(ArchiveDeployment deployment) {
@@ -262,10 +281,10 @@ public class Deployer implements ModuleEventListener {
     }
 
     /*
-    * This is an exception as it is too difficult to expose this through RuntimeObjectsManager.
-    * The CoreModule.run() can't create an instance of the Deployer class yet since ModuleManager needs to
-    * install all modules first (as Deployer needs all started modules)
-    * And having the CoreModule to call a method like this is overhead if we want to enforce RuntimeObjectsManager usage.
+     * This is an exception as it is too difficult to expose this through RuntimeObjectsManager.
+     * The CoreModule.run() can't create an instance of the Deployer class yet since ModuleManager needs to
+     * install all modules first (as Deployer needs all started modules)
+     * And having the CoreModule to call a method like this is overhead if we want to enforce RuntimeObjectsManager usage.
      */
     public static ArchiveDeployment getCurrentDeployment() {
         return currentArchiveDeployment;
