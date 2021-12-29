@@ -43,9 +43,8 @@
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>3.0.0</version>  <!-->FIXME constant -->
+            <version>${jakarta.rest.api.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>

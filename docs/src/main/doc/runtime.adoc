@@ -24,8 +24,6 @@ WELD-001304: More than one context active for scope type jakarta.enterprise.cont
 
 include::modules.adoc[]
 
-== Configuration
-
 include::logging.adoc[]
 
 include::commandlineoptions.adoc[]
@@ -33,6 +31,8 @@ include::commandlineoptions.adoc[]
 include::integrations.adoc[]
 
 include::docker.adoc[]
+
+include::testing.adoc[]
 
 include::domain-api.adoc[]
 

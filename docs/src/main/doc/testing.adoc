@@ -1,0 +1,159 @@
+== Testing
+
+=== Runtime Testing Framework
+
+The Testing framework, based on testContainers has the following goals.
+
+. Allow the developer to test out application on Atbash Runtime.
+. Allow advanced testing of the Atbash Runtime features itself.
+
+The second goals allow us to automate as many as possible of the test cases of Atbash Runtime itself.
+
+The framework is based on JUnit 5 and make use of the https://www.testcontainers.org/[TestContainers framework].
+
+=== Setup
+
+Add the following dependency to your project.
+
+[source, xml]
+----
+    <dependency>
+        <groupId>be.atbash.runtime.testing</groupId>
+        <artifactId>framework</artifactId>
+        <version>${runtime.testing.framework.version}</version>
+        <scope>test</scope>
+    </dependency>
+----
+
+And create a class that extends from `be.atbash.runtime.testing.AbstractAtbashTest` and annotate it with `@AtbashContainerTest`.
+
+[source,java]
+----
+@AtbashContainerTest
+public class MyTestIT extends AbstractAtbashTest {
+    // ...
+}
+----
+
+The annotation makes sure the JUnit 5 extension is used and that a container running the Atbash Runtime is started.  The parent class give you access to many useful methods to test out your application and interact with the container.
+
+The application within the project itself will be added to the custom-created container.  It is deployed as `test.war` and thus accessible under the context root `/test`.  When it is a web application project, the war file will be build during package phase and available for testing (integration-test).  When you run the test from within the IDE, you need to make sure the application is build before the test runs.
+
+The abstract parent class give you some easy access to the root of the deployed application.  `atbash` is the name of the variable holding the container and the method `getClientWebTargetApplication()` returns a Rest Client Target to the deployed application.
+
+[source,java]
+----
+    @Test
+    public void testEndpoint() {
+
+        String result = getClientWebTargetApplication(atbash).path("/api/person").request().get(String.class);
+----
+
+=== Custom image
+
+Instead of using the official image of the Atbash Runtime, you can also define your own custom Docker script.  Define the _Dockerfile_ in the directory  `src/docker/<name>` together with all the other resources that are needed for the creation of the image. The directory itself and all subdirectories will be available for the docker build image command.
+
+The test class need to specify the name of the custom image in the `@AtbashContainerTest` annotation.
+
+[source,java]
+----
+@AtbashContainerTest(value = "<name>")
+----
+
+So the name of the directory must be used as the content for _value_ member.
+
+Unless otherwise configured, see next section, the test application is also added to the image and deployed by default.
+
+=== Define start up options
+
+You can define some startup options for the Atbash Runtime process through the `startupParameters` member of the `@AtbashContainerTest` annotation.
+
+To start the Runtime within the Docker container in domain mode, use the following definition.
+
+[source, java]
+----
+@AtbashContainerTest(startupParameters = "--profile domain")
+----
+
+=== No Test Application
+
+For some tests, you do not want that the framework adds the application as test application to the image.  You can indicate this by specifying the `testApplication` member of the annotation.
+
+[source,java]
+----
+@AtbashContainerTest(value = "<name>", testApplication = false)
+----
+
+This will also work with the standard image but is used most of the time in combination with a custom image.
+
+=== Version of the Docker Image
+
+The version of the Atbash Runtime Test framework determines the version of the Docker image that will be used. In our example we used earlier, the value of `${runtime.testing.framework.version}` determine the version of the Docker image.
+
+You can override this value by setting the Java System property `atbash.runtime.version` to the desired value.
+
+If you are using a custom image that is derived from the official Atbash Runtime image, the version is also updated automatically.
+
+In case the Dockerfile contains these lines
+
+[source]
+----
+FROM runtime-main:0.3
+...
+----
+
+And you are running version `0.5` of the Atbash Runtime Test framework (or you have specified the System property to that value), the Dockerfile content is rewritten on the fly to
+
+[source]
+----
+FROM runtime-main:0.5
+...
+----
+
+=== Advanced definition of Docker Version
+
+The previous section covered the basics about the version of the Docker Image that is used for the test run. The value of the _value_ member of `@AtbashContainerTest` is interpreted as 3 parts that are separated by `-`.
+
+[source]
+----
+<name>-<version>-<jdk>
+----
+
+The _<name>_ is already explained in the previous section. If not specified or `default` is entered, the official Docker image is taken.  Any other value defines the name of the directory that contains the definition of the Docker image.
+
+The _<version>_  determines the version of the docker image that is being used. If not specified, it is the version of the Test framework or the System property as indicated in previous section. But we can also define a version hardcoded in the string value and in that case this value is used. This version can contain a `-` itself when followed by `SNAPSHOT` or `RC`.
+
+The _<jdk>_ value indicates the JDK version of the Docker IMage. TODO  JDK17 based image will be created in the future for Atbash Runtime.
+
+
+=== Runtime Log
+
+When the test case fails, the Runtime log is shown 'on the console' to facilitate what went wrong.  You can also follow the log content during the execution of the test by setting the `liveLogging` member.
+
+[source, java]
+----
+@AtbashContainerTest(liveLogging = true)
+----
+
+If you don't want to change the source code, you can always set the system property `atbash.test.container.logging.live` to true and the live logging will be activated.
+
+Within your test, you can access the log content with the following statement.
+
+[source, java]
+----
+String logContent = atbash.getLogs();
+----
+
+=== Additional containers
+
+If your test needs additional resources provided by other containers, The test framework will start them also at the beginning of the test.  The _public static_ field must be annotated by `@Container` and the type must be assignable to `GenericContainer`.
+
+If you need a specific image of a container and can't use the default Testcontainers class, you can use the `DockerImageContainer` type of the framework.  The variable name indicates the name of the directory where the Docker image definition (Dockerfile and optional the other files) is located (just as with the Custom images we saw earlier)
+
+TODO: Describe how you can have multiple instances of the Atbash Runtime container to have a cluster.
+
+=== Container Ready
+
+The framework waits up to 15 secs before the containers are ready and uses the vaue of the `/health`  endpoint to determine if the process is ready. The
+
+You can enlarge the wait time by defining a value for the `atbash_test_timeout_factor` environment value. It determines the factor for the increase of the wait time. A value of _2.0_  results in a wait time of 30 secs.
