@@ -27,6 +27,10 @@ public class RuntimeCommand extends AbstractAtbashCommand {
     @CommandLine.Mixin
     private ConfigurationParameters configurationParameters;
 
+    public RuntimeCommand(ConfigurationParameters configurationParameters) {
+        this.configurationParameters = configurationParameters;
+    }
+
     @Override
     public Integer call() throws Exception {
 

@@ -65,7 +65,7 @@ public class MainRunnerHelper {
         if (LoggingUtil.isVerbose()) {
             logger.info("CLI-1001: Handling command line arguments");
         }
-        RuntimeCommand command = new RuntimeCommand();
+        RuntimeCommand command = new RuntimeCommand(null);
         CommandLine commandLine = new CommandLine(command);
 
         actualCommand = (RuntimeCommand) handleCommandLine(programArguments, commandLine);
@@ -139,7 +139,7 @@ public class MainRunnerHelper {
         } else {
             logger.warn(String.format("CLI-105: %s is not a valid directory", deploymentDirectory));
         }
-        result.sort(new AlphabeticalComparator());
+        result.sort(new AlphabeticalFileComparator());
         return result;
     }
 
@@ -280,11 +280,4 @@ public class MainRunnerHelper {
         logger.info(String.format("CLI-102: Java memory %.0fMB", mem));
     }
 
-    private static class AlphabeticalComparator implements java.util.Comparator<File> {
-
-        @Override
-        public int compare(File f1, File f2) {
-            return f1.getName().compareTo(f2.getName());
-        }
-    }
 }

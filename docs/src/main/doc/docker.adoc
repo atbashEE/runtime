@@ -1,6 +1,6 @@
 === Docker
 
-A Docker image is available to run the Atbash Runtime containerized.  It is based on JDK 11 and has several environment variables to configure its configuration.  The Runtime runs woth the stateless option, no files are created unless one confgiuration file in the temporary folder.
+A Docker image is available to run the Atbash Runtime containerized.  It is based on JDK 11 and has several environment variables to configure its configuration.  The Runtime runs with the stateless option, no files are created unless one configuration file in the temporary folder.
 
 === Basic usage
 

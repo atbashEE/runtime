@@ -110,6 +110,7 @@
         <module>remote-cli</module>
         <module>runtime-common</module>
         <module>runtime-main</module>
+        <module>embedded</module>
         <module>runtime-cli</module>
         <module>testing</module>
         <module>docs</module>

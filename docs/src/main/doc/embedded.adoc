@@ -1,0 +1,39 @@
+=== Atbash Embedded
+
+The Atbash Runtime can also be embedded in your application.  You can start the runtime with a Archive file and can respond to user requests.
+
+The Embedded Runtime is mainly created for the Arquillian Connector.
+
+=== Dependency
+
+Add the following Maven dependency to your project
+
+[source,xml]
+----
+    <dependency>
+        <groupId>be.atbash.runtime</groupId>
+        <artifactId>runtime-embedded</artifactId>
+        <version>${atbash.version}</version>
+    </dependency>
+----
+
+=== Define Configuration
+
+There is a Configuration Builder available to define the configuration for the Runtime.
+
+[source,java]
+----
+    ConfigurationParameters parameters = new EmbeddedConfigurationBuilder(new File("myservice.war"))
+            .withProfile("domain")
+            .build();
+
+----
+
+Not all options of the configuration can be set as there are several options that are fixed. The configuration has always the stateless option active, no logging to file and no JFR or JMX active.
+
+Based on the configuration, the Runtime can be started with
+
+[source,java]
+----
+    new AtbashEmbedded(parameters).start();
+----

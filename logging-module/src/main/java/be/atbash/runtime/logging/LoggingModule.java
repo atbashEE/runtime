@@ -81,7 +81,9 @@ public class LoggingModule implements Module<RuntimeConfiguration> {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
         watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-1001: Module startup", false);
 
-        LoggingManager.getInstance().configureLogging(configuration);
+        if (configuration.getConfig().getLogging().isLogToFile()) {
+            LoggingManager.getInstance().configureLogging(configuration);
+        }
 
         LoggingManager.getInstance().removeEarlyLogHandler();
 
