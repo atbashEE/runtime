@@ -1,5 +1,5 @@
-##FROM azul/zulu-openjdk:11.0.13
-FROM azul/zulu-openjdk-alpine:11.0.13-jre-headless
+##FROM azul/zulu-openjdk:17.0.1
+FROM azul/zulu-openjdk-alpine:17.0.1-jre-headless
 
 # Default ports to expose
 EXPOSE 8080

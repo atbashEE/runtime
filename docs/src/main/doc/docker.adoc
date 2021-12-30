@@ -2,7 +2,7 @@
 
 A Docker image is available to run the Atbash Runtime containerized.  It is based on JDK 11 and has several environment variables to configure its configuration.  The Runtime runs woth the stateless option, no files are created unless one confgiuration file in the temporary folder.
 
-Basic usage
+=== Basic usage
 
 [source]
 ----
@@ -11,6 +11,8 @@ COPY myservice.war $DEPLOYMENT_DIR
 ----
 
 The $DEPLOYMENT_DIR is a variable that is also passed to the start up command as the directory that is scanned for WAR applications that needs to be deployed.
+
+=== Environment variables
 
 These are the environment variables that can be used to modify the configuration:
 
@@ -25,4 +27,21 @@ This is the command that starts the instance.
 [source]
 ----
 exec java -XX:MaxRAMPercentage=${MEM_MAX_RAM_PERCENTAGE} -Xss${MEM_XSS} -XX:+UseContainerSupport ${JVM_ARGS} -jar atbash-runtime.jar --logToConsole --deploymentdirectory ${DEPLOYMENT_DIR} ${ATBASH_ARGS}
+----
+
+
+=== Examples
+
+Run a domain mode Runtime instance
+
+[source,shell script]
+----
+docker run -d --name atbash -p 8080:8080 -e ATBASH_ARGS='--profile domain' runtime-main:0.3
+----
+
+Map a directory to the deployment directory so that it can run an application without assembling a specific Docker Image.
+
+[source,shell script]
+----
+docker run -d --name atbash -p 8080:8080 -v "$PWD"/target:/opt/atbash/deployment runtime-main:0.3
 ----

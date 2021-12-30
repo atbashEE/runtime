@@ -123,7 +123,7 @@ The _<name>_ is already explained in the previous section. If not specified or `
 
 The _<version>_  determines the version of the docker image that is being used. If not specified, it is the version of the Test framework or the System property as indicated in previous section. But we can also define a version hardcoded in the string value and in that case this value is used. This version can contain a `-` itself when followed by `SNAPSHOT` or `RC`.
 
-The _<jdk>_ value indicates the JDK version of the Docker IMage. TODO  JDK17 based image will be created in the future for Atbash Runtime.
+The _<jdk>_ value indicates the JDK version of the Docker Image. When no value specified, the jdk11 image is used. There is also a JDK 17 based image available.
 
 
 === Runtime Log
