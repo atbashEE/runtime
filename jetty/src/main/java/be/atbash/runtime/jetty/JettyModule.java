@@ -27,9 +27,11 @@ import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
+import be.atbash.runtime.logging.LoggingUtil;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,11 +103,24 @@ public class JettyModule implements Module<RuntimeConfiguration> {
         } catch (Exception e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
-        // FIXME Print out a list of Servlets. This is not by default possible with Jetty.
-        // It is stored here, but not accessible
-        // System.out.println(handler.getServletHandler()._servletPathMap);
-        // FIXME So we need to get this from the ServletSniffer, including parsing the web.xml
+
+        if (LoggingUtil.isVerbose()) {
+            printServlets(handler, deployment.getDeploymentName());
+        }
         LOGGER.info("JETTY-104: End of registration of WebApp " + deployment.getDeploymentName());
+    }
+
+    private void printServlets(WebAppContext webAppContext, String deploymentName) {
+        ServletHandler servletHandler = webAppContext.getServletHandler();
+        StringBuilder servlets = new StringBuilder();
+        Arrays.stream(servletHandler.getServletMappings())
+                .filter(mapping -> !mapping.getServletName().equals("jsp")) // TODO When we add support for JSPs add it back.
+                .forEach(mapping -> servlets.append(
+                        String.format("%s\t=>\t%s%n",
+                                String.join(",", mapping.getPathSpecs()),
+                                mapping.getServletName())));
+
+        LOGGER.trace(String.format("All endpoints for Web application '%s'\n%s", deploymentName, servlets));
     }
 
     public void unregisterDeployment(ArchiveDeployment deployment) {
