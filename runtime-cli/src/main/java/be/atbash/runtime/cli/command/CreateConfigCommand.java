@@ -16,7 +16,7 @@
 package be.atbash.runtime.cli.command;
 
 import be.atbash.runtime.config.ConfigInstance;
-import be.atbash.runtime.config.ConfigInstanceUtil;
+import be.atbash.runtime.config.util.ConfigInstanceUtil;
 import be.atbash.runtime.core.data.parameter.ConfigConfigurationParameters;
 import picocli.CommandLine;
 

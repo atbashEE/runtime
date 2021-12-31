@@ -15,12 +15,13 @@
  */
 package be.atbash.runtime.demo.rest;
 
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 
-
 @Path("/request")
+@RequestScoped
 public class RequestResource {
 
     @GET

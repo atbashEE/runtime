@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.config;
+package be.atbash.runtime.config.util;
 
+import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.util.FileUtil;
 import be.atbash.runtime.core.data.util.ResourceReader;
@@ -40,13 +41,7 @@ public final class ConfigInstanceUtil {
         String rootDirectory = configInstance.getRootDirectory();
         File root = new File(rootDirectory);
 
-        try {
-            root = root.getCanonicalFile();
-        } catch (IOException e) {
-            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001
-                    , e);
-        }
-
+        // Does root directory exists?
         if (!root.exists()) {
             if (!configInstance.isReadOnlyFlag()) {
                 writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-014: The specified root directory '%s' doesn't point to an existing directory", root.getAbsolutePath()));
@@ -55,6 +50,7 @@ public final class ConfigInstanceUtil {
             return;
         }
 
+        // And is root directory a directory?
         if (!root.isDirectory()) {
             if (!configInstance.isReadOnlyFlag()) {
                 writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-015: The specified root directory '%s' is not a directory", root.getAbsolutePath()));
@@ -63,15 +59,19 @@ public final class ConfigInstanceUtil {
             return;
         }
 
+        // Construct Configratin directory.
         File configDirectory = new File(root, configInstance.getConfigName());
 
+        // Does that already exists?
         configInstance.setExistingConfigDirectory(configDirectory.exists());
 
         if (!configDirectory.exists()) {
             if (configInstance.isReadOnlyFlag()) {
+                // In readOnly (stateless) Config is not useable if not already pointing to existing directory
                 configInstance.invalidConfig();
                 return;
             }
+            // Create the Config Directory
             boolean created = configDirectory.mkdirs();
             if (!created) {
                 writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-016: Unable to create the directory '%s'", configDirectory.getAbsolutePath()));
@@ -97,12 +97,20 @@ public final class ConfigInstanceUtil {
         }
     }
 
+    /**
+     * Write the Default Configuration if file not already exists.
+     * @param configInstance Information about the configuration this instance.
+     */
     public static void storeRuntimeConfig(ConfigInstance configInstance) {
         if (!configInstance.isReadOnlyFlag()) {
             writeFile(configInstance, DEFAULT_CONFIG_FILE, CONFIG_FILE, false);
         }
     }
 
+    /**
+     * Write the default Logging configuration if file not already exists.
+     * @param configInstance Information about the configuration this instance.
+     */
     public static void storeLoggingConfig(ConfigInstance configInstance) {
         String targetFile;
 
@@ -119,7 +127,7 @@ public final class ConfigInstanceUtil {
 
     private static String writeFile(ConfigInstance configInstance, String source, String targetFile, boolean absolute) {
         if (!configInstance.isValid()) {
-            //
+            // To be on the safe side, should always be valid if correct call sequence is used.
             return null;
         }
 
@@ -134,6 +142,8 @@ public final class ConfigInstanceUtil {
             // Nothing to do since it already exists. Don't overwrite as we can overwrite users updated config
             return target.getAbsolutePath();
         }
+
+        // Read the default content
         String content;
         try {
             content = ResourceReader.readResource(source);
@@ -144,6 +154,7 @@ public final class ConfigInstanceUtil {
 
         }
 
+        // Write out the content to the file.
         byte[] strToBytes = content.getBytes();
 
         try {

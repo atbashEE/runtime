@@ -18,7 +18,7 @@ package be.atbash.runtime.config.module;
 import be.atbash.json.JSONValue;
 import be.atbash.json.TypeReference;
 import be.atbash.runtime.config.ConfigInstance;
-import be.atbash.runtime.config.ConfigInstanceUtil;
+import be.atbash.runtime.config.util.ConfigInstanceUtil;
 import be.atbash.runtime.config.module.exception.ProfileNameException;
 import be.atbash.runtime.config.module.profile.ProfileManager;
 import be.atbash.runtime.config.util.ConfigFileUtil;
