@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,15 +44,25 @@ public class AtbashContainer extends AbstractContainer<AtbashContainer> {
 
         containerConfiguration(LOGGER, liveLogging);
 
+        int appStartTimeout = Config.getAppStartTimeout();
+        if (adapterMetaData.isDebugMode()) {
+            // In debug mode, wait 2 mins so that developer has time to attach debugger to container process.
+            appStartTimeout = 120;
+        }
         if (adapterMetaData.isTestStartupFailure()) {
-            withLogEntry(Config.getAppStartTimeout());
+            withLogEntry(appStartTimeout);
         } else {
-            withReadinessPath("/health", Config.getAppStartTimeout());
+            withReadinessPath("/health", appStartTimeout);
         }
 
         withEnv("ATBASH_ARGS", String.join(" ", adapterMetaData.getStartupParameters()));
         if (System.getProperty("be.atbash.runtime.container.mutable") != null) {
             withEnv("STATELESS", "false");
+        }
+
+        if (adapterMetaData.isDebugMode()) {
+            withEnv("JVM_ARGS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005");
+            addFixedExposedPort(5005, 5005);
         }
     }
 

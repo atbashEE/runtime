@@ -157,3 +157,16 @@ TODO: Describe how you can have multiple instances of the Atbash Runtime contain
 The framework waits up to 15 secs before the containers are ready and uses the vaue of the `/health`  endpoint to determine if the process is ready. The
 
 You can enlarge the wait time by defining a value for the `atbash_test_timeout_factor` environment value. It determines the factor for the increase of the wait time. A value of _2.0_  results in a wait time of 30 secs.
+
+=== Remote Debugging
+
+The official Docker Image can be used to start the Container with debug.
+
+You can activate the debug mode for a test by using the `debug` member of the annotation.
+
+[source, java]
+----
+@AtbashContainerTest(debug = true)
+----
+
+This adds the necessary options to the _JVM_ARGS_ environment variable for the container to suspend the JVM startup until a debugger is connected.  The wait time for the container to start up is also extended to 120 secs.  Make sure you have connected the debugger to the port 5005 before this time limit.

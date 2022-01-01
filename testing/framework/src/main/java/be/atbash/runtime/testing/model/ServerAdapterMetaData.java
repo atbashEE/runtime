@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ public class ServerAdapterMetaData {
     private boolean testApplication;
     private boolean testStartupFailure;
     private String[] startupParameters;
+    private boolean debugMode;
 
     private ServerAdapterMetaData() {
     }
@@ -121,5 +122,13 @@ public class ServerAdapterMetaData {
 
     public List<String> getStartupParameters() {
         return Arrays.asList(startupParameters);
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
+    }
+
+    public boolean isDebugMode() {
+        return debugMode;
     }
 }

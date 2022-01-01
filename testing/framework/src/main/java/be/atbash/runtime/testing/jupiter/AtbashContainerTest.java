@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,4 +64,10 @@ public @interface AtbashContainerTest {
      */
     boolean testStartupFailure() default false;
 
+    /**
+     * When debug activated, the JVM option to start in debug mode (with suspended=y) is added and the timeout is increased to 120 seconds.
+     * This gives the developer the time to connect a remote debugger to the Container process.
+     * @return true when JVM needs to be started in debug mode.
+     */
+    boolean debug() default false;
 }

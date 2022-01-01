@@ -3,6 +3,8 @@ FROM azul/zulu-openjdk-alpine:17.0.1-jre-headless
 
 # Default ports to expose
 EXPOSE 8080
+# Can be used for debugging within Container.
+EXPOSE 5005
 
 ENV HOME_DIR=/opt/atbash
 ENV SCRIPT_DIR=${HOME_DIR} \
