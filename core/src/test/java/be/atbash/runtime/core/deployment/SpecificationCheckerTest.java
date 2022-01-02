@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@ package be.atbash.runtime.core.deployment;
 import be.atbash.runtime.core.data.WebAppClassLoader;
 import be.atbash.runtime.core.data.deployment.ArchiveContent;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
-import be.atbash.runtime.core.deployment.sniffer.CollectingSniffer;
-import be.atbash.runtime.core.deployment.sniffer.NeverTriggeredSniffer;
-import be.atbash.runtime.core.deployment.sniffer.SingleTriggeredSniffer;
-import be.atbash.runtime.core.deployment.sniffer.TestSniffer;
+import be.atbash.runtime.core.deployment.sniffer.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -39,9 +36,13 @@ class SpecificationCheckerTest {
 
         File root = new File(".", "../demo/demo-rest/target/demo-rest").getCanonicalFile();
 
-        List<String> files = new ArrayList<>();
-        defineArchiveContent(root, files);
-        ArchiveContent archive = new ArchiveContent(files);
+        List<String> classFiles = new ArrayList<>();
+        List<String> descriptorFiles = new ArrayList<>();
+        defineArchiveContent(root, classFiles, descriptorFiles);
+        ArchiveContent archive = new ArchiveContent.ArchiveContentBuilder()
+                .withClassesFiles(classFiles)
+                .withDescriptorFiles(descriptorFiles)
+                .build();
 
         WebAppClassLoader classLoader = new WebAppClassLoader(root, SpecificationCheckerTest.class.getClassLoader());
         List<Sniffer> sniffers = List.of(new SingleTriggeredSniffer()
@@ -56,24 +57,63 @@ class SpecificationCheckerTest {
         for (int i = 0; i < 2; i++) {
             Sniffer sniffer = triggeredSniffers.get(i);
             if (sniffer instanceof SingleTriggeredSniffer) {
-                assertThat(((TestSniffer)sniffer).getSeenClasses()).hasSize(1);
+                assertThat(((TestSniffer) sniffer).getSeenClasses()).hasSize(1);
             }
             if (sniffer instanceof NeverTriggeredSniffer) {
-                assertThat(((TestSniffer)sniffer).getSeenClasses().size()).isGreaterThan(1);
+                assertThat(((TestSniffer) sniffer).getSeenClasses().size()).isGreaterThan(1);
             }
         }
     }
 
-    public void defineArchiveContent(File directory, List<String> files) {
+    @Test
+    void perform_withDescriptor() throws IOException {
+
+        File root = new File(".", "../demo/demo-servlet/target/demo-servlet").getCanonicalFile();
+
+        List<String> classFiles = new ArrayList<>();
+        List<String> descriptorFiles = new ArrayList<>();
+        defineArchiveContent(root, classFiles, descriptorFiles);
+        ArchiveContent archive = new ArchiveContent.ArchiveContentBuilder()
+                .withClassesFiles(classFiles)
+                .withDescriptorFiles(descriptorFiles)
+                .build();
+
+        WebAppClassLoader classLoader = new WebAppClassLoader(root, SpecificationCheckerTest.class.getClassLoader());
+        List<Sniffer> sniffers = List.of(new SingleTriggeredSniffer()
+                , new CollectingSniffer()
+                , new DescriptorSniffer()
+                , new NeverTriggeredSniffer());
+        SpecificationChecker checker = new SpecificationChecker(archive, classLoader, sniffers);
+        checker.perform();
+
+        List<Sniffer> triggeredSniffers = checker.getTriggeredSniffers();
+
+        assertThat(triggeredSniffers).hasSize(3);
+        for (int i = 0; i < 2; i++) {
+            Sniffer sniffer = triggeredSniffers.get(i);
+            if (sniffer instanceof SingleTriggeredSniffer) {
+                assertThat(((TestSniffer) sniffer).getSeenClasses()).hasSize(1);
+            }
+            if (sniffer instanceof NeverTriggeredSniffer) {
+                assertThat(((TestSniffer) sniffer).getSeenClasses().size()).isGreaterThan(1);
+            }
+            if (sniffer instanceof DescriptorSniffer) {
+                assertThat(((TestSniffer) sniffer).getSeenDescriptors()).hasSize(1);
+            }
+        }
+    }
+
+    public void defineArchiveContent(File directory, List<String> classFiles, List<String> descriptorFiles) {
         // Get all files from a directory.
         File[] fList = directory.listFiles();
         if (fList != null) {
             for (File file : fList) {
                 if (file.isFile()) {
                     Optional<String> content = stripLocation(file.getAbsolutePath());
-                    content.ifPresent(files::add);
+                    content.filter(name -> name.endsWith(".class")).ifPresent(classFiles::add);
+                    content.filter(name -> name.endsWith(".xml")).ifPresent(descriptorFiles::add);
                 } else if (file.isDirectory()) {
-                    defineArchiveContent(file, files);
+                    defineArchiveContent(file, classFiles, descriptorFiles);
                 }
             }
         }
@@ -84,6 +124,12 @@ class SpecificationCheckerTest {
         int index = filePath.indexOf(Unpack.WEB_INF_CLASSES);
         if (index > 0) {
             result = Optional.of(filePath.substring(index + Unpack.WEB_INF_CLASSES.length() + 1));
+        }
+        if (result.isEmpty()) {
+            index = filePath.indexOf(Unpack.WEB_INF);
+            if (index > 0) {
+                result = Optional.of(filePath.substring(index + Unpack.WEB_INF.length() + 1));
+            }
         }
         return result;
     }

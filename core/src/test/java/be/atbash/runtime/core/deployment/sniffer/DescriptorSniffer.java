@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.demo.servlet;
+package be.atbash.runtime.core.deployment.sniffer;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-
-// This is on purpose not using annotations so that it can be used to test SpecificationChecker
-public class HelloServlet extends HttpServlet {
+public class DescriptorSniffer extends TestSniffer {
+    @Override
+    public boolean triggered(Class<?> aClass) {
+        return false;
+    }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.getOutputStream().println("Hello World");
+    public boolean isFastDetection() {
+        return true;
+    }
 
+    public boolean triggered(String descriptorName, String content) {
+        addDescriptor(descriptorName);
+        return "web.xml".equals(descriptorName);
     }
 }

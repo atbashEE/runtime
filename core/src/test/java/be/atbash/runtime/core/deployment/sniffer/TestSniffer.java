@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,22 @@ import java.util.List;
 public abstract class TestSniffer implements Sniffer {
 
     private List<Class<?>> seenClasses = new ArrayList<>();
+    private List<String> seenDescriptors = new ArrayList<>();
 
     protected void addClass(Class<?> clazz) {
         seenClasses.add(clazz);
     }
 
+    protected void addDescriptor(String descriptorFile) {
+        seenDescriptors.add(descriptorFile);
+    }
+
     public List<Class<?>> getSeenClasses() {
         return seenClasses;
+    }
+
+    public List<String> getSeenDescriptors() {
+        return seenDescriptors;
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,18 +30,37 @@ import java.net.URLClassLoader;
 public class WebAppClassLoader extends ClassLoader {
 
     private DelegatingURLClassLoader classesClassLoader;
+    private DelegatingURLClassLoader descriptorClassLoader;
     //private URLClassLoader libClassLoader;  TODO Scan also libs for Servlets, JAX-RS endpoints, ... ?
 
     public WebAppClassLoader(File rootDirectory, ClassLoader parent) {
         super("WebAppClassLoader", parent);
-        URL url = null;
+        defineClassLoader(rootDirectory, parent);
+        defineDescriptorLoader(rootDirectory, parent);
+    }
+
+    private void defineClassLoader(File rootDirectory, ClassLoader parent) {
+        URL classesURL;
         try {
             URI uri = new File(rootDirectory, "WEB-INF/classes/").toURI();
-            url = URI.create(uri + "/").toURL();
+            classesURL = URI.create(uri + "/").toURL();
+
         } catch (MalformedURLException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
-        classesClassLoader = new DelegatingURLClassLoader(new URL[]{url}, parent);
+        classesClassLoader = new DelegatingURLClassLoader(new URL[]{classesURL}, parent);
+    }
+
+    private void defineDescriptorLoader(File rootDirectory, ClassLoader parent) {
+        URL webInfURL;
+        try {
+            URI uri = new File(rootDirectory, "WEB-INF/").toURI();
+            webInfURL = URI.create(uri + "/").toURL();
+
+        } catch (MalformedURLException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        }
+        descriptorClassLoader = new DelegatingURLClassLoader(new URL[]{webInfURL}, parent);
     }
 
     public void close() {
@@ -55,6 +74,11 @@ public class WebAppClassLoader extends ClassLoader {
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         return classesClassLoader.loadClass(name, resolve);
+    }
+
+    @Override
+    protected URL findResource(String name) {
+        return descriptorClassLoader.findResource(name);
     }
 
     private static class DelegatingURLClassLoader extends URLClassLoader {

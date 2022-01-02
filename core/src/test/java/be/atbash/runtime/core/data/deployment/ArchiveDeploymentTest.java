@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.isPrepared()).isFalse();
         Assertions.assertThat(deployment.isDeployed()).isFalse();
 
-        deployment.setArchiveContent(new ArchiveContent(new ArrayList<>()));
+        deployment.setArchiveContent(new ArchiveContent.ArchiveContentBuilder().withClassesFiles(new ArrayList<>()).build());
         deployment.setClassLoader(new WebAppClassLoader(archive, this.getClass().getClassLoader()));
         deployment.setSpecifications(Collections.singletonList(Specification.HTML));
         deployment.setSniffers(Collections.singletonList(new SingleTriggeredSniffer()));
@@ -154,7 +154,7 @@ class ArchiveDeploymentTest {
         // Verification
         deployment.setDeploymentLocation(location);
 
-        deployment.setArchiveContent(new ArchiveContent(new ArrayList<>()));
+        deployment.setArchiveContent(new ArchiveContent.ArchiveContentBuilder().withClassesFiles(new ArrayList<>()).build());
         deployment.setClassLoader(new WebAppClassLoader(location, this.getClass().getClassLoader()));
         deployment.setDeploymentModule(new Module1());
 

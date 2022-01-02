@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,16 @@ package be.atbash.runtime.core.deployment;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.WebAppClassLoader;
 import be.atbash.runtime.core.data.deployment.ArchiveContent;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class SpecificationChecker {
@@ -45,6 +50,14 @@ public class SpecificationChecker {
      * Note that the Classloader used for this is closed after performing this operation.
      */
     public void perform() {
+        analyseClasses();
+        if (!sniffers.isEmpty()) {
+            analyseDescriptors();
+        }
+        classLoader.close();
+    }
+
+    private void analyseClasses() {
         try {
             for (String archiveClass : archiveContent.getArchiveClasses()) {
 
@@ -65,10 +78,46 @@ public class SpecificationChecker {
                 }
             }
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            // FIXME;
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
-        classLoader.close();
+    }
+
+    private void analyseDescriptors() {
+
+        for (String descriptorFile : archiveContent.getDescriptorFiles()) {
+            URL resource = classLoader.getResource(descriptorFile);
+            String content;
+            try {
+                content = readStringFromURL(resource);
+            } catch (IOException e) {
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+            }
+
+
+            List<Sniffer> triggeredSniffers = sniffers.stream()
+                    .filter(s -> s.triggered(descriptorFile, content))
+                    .collect(Collectors.toList());
+
+            triggeredSniffers.forEach(s ->
+                    specifications.addAll(Arrays.asList(s.detectedSpecifications())));
+
+            updateSniffers(triggeredSniffers);
+
+            if (sniffers.isEmpty()) {
+                break;
+                // No need to check the rest as all Sniffers are selected
+            }
+
+
+        }
+    }
+
+    private String readStringFromURL(URL requestURL) throws IOException {
+        try (Scanner scanner = new Scanner(requestURL.openStream(),
+                StandardCharsets.UTF_8.toString())) {
+            scanner.useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : "";
+        }
     }
 
     private void updateSniffers(List<Sniffer> triggeredSniffers) {

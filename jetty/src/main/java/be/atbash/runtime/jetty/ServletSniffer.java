@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,16 @@
 package be.atbash.runtime.jetty;
 
 import be.atbash.runtime.core.data.Specification;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Optional;
@@ -26,7 +34,7 @@ public class ServletSniffer implements Sniffer {
 
     @Override
     public Specification[] detectedSpecifications() {
-        return new  Specification[]{Specification.SERVLET, Specification.HTML};
+        return new Specification[]{Specification.SERVLET, Specification.HTML};
     }
 
     @Override
@@ -40,7 +48,34 @@ public class ServletSniffer implements Sniffer {
 
     @Override
     public boolean triggered(String descriptorName, String content) {
-        return false;
+        boolean result = false;
+        if ("web.xml".equals(descriptorName)) {
+            result = checkForServletMappings(content);
+        }
+
+        return result;
+    }
+
+    private boolean checkForServletMappings(String content) {
+        boolean result = false;
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+        try {
+            XMLEventReader reader = xmlInputFactory.createXMLEventReader(new StringReader(content));
+            while (reader.hasNext()) {
+                XMLEvent nextEvent = reader.nextEvent();
+                if (nextEvent.isStartElement()) {
+                    StartElement startElement = nextEvent.asStartElement();
+                    if (startElement.getName().getLocalPart().equals("servlet-mapping")) {
+                        result = true;
+                        break;
+                    }
+
+                }
+            }
+        } catch (XMLStreamException  e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        }
+        return result;
     }
 
     @Override

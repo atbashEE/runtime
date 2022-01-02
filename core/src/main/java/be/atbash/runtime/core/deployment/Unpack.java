@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,15 +27,22 @@ import java.util.jar.JarInputStream;
 
 public class Unpack {
 
-    public static final String WEB_INF_CLASSES = "WEB-INF" + File.separator + "classes";
+    public static final String WEB_INF = File.separator + "WEB-INF";
+    public static final String WEB_INF_CLASSES = File.separator + "WEB-INF" + File.separator + "classes";
+    public static final String WEB_INF_LIB = File.separator + "WEB-INF" + File.separator + "lib";
+    public static final String META_INF = File.separator + "META-INF";
+
     /**
      * Size of the buffer to read/write data
      */
     private static final int BUFFER_SIZE = 4096;
     private File archiveFile;
-    private File targetLocation;
+    private final File targetLocation;
 
-    private List<String> archiveFiles = new ArrayList<>();
+    private final List<String> archiveClassesFiles = new ArrayList<>();
+    private final List<String> archiveLibraryFiles = new ArrayList<>();
+    private final List<String> archiveDescriptorFiles = new ArrayList<>();
+    private final List<String> archivePageFiles = new ArrayList<>();  // like html, jsp, ...
 
     public Unpack(File archiveFile, File targetLocation) {
         this.archiveFile = archiveFile;
@@ -54,10 +61,18 @@ public class Unpack {
         } catch (IOException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
-        if (archiveFiles.isEmpty()) {
+
+        ArchiveContent content = new ArchiveContent.ArchiveContentBuilder()
+                .withClassesFiles(archiveClassesFiles)
+                .withLibraryFiles(archiveLibraryFiles)
+                .withDescriptorFiles(archiveDescriptorFiles)
+                .withPagesFiles(archivePageFiles)
+                .build();
+
+        if (content.isEmpty()) {
             return null;
         }
-        return new ArchiveContent(archiveFiles);
+        return content;
     }
 
     private void unpackArchive() throws IOException {
@@ -86,9 +101,29 @@ public class Unpack {
     }
 
     private void keepTrackOfContent(String filePath) {
-        int index = filePath.indexOf(WEB_INF_CLASSES);
-        if (index > 0) {
-            archiveFiles.add(filePath.substring(index + WEB_INF_CLASSES.length() + 1));
+        int webInfindex = filePath.indexOf(WEB_INF);
+        if (webInfindex > 0) {
+            int index = filePath.indexOf(WEB_INF_CLASSES);
+
+            if (index > 0) {
+                archiveClassesFiles.add(filePath.substring(index + WEB_INF_CLASSES.length() + 1));
+
+            } else {
+                index = filePath.indexOf(WEB_INF_LIB);
+                if (index > 0) {
+                    archiveLibraryFiles.add(filePath.substring(index + WEB_INF_LIB.length() + 1));
+                } else {
+                    if (filePath.endsWith(".xml")) {
+                        // Do we need other descriptior files.
+                        archiveDescriptorFiles.add(filePath.substring(webInfindex + WEB_INF.length() + 1));
+                    }
+                }
+            }
+
+        } else {
+            if (!filePath.contains(META_INF)) {
+                archivePageFiles.add(filePath);
+            }
         }
     }
 
@@ -119,9 +154,11 @@ public class Unpack {
     }
 
     public ArchiveContent processExpandedArchive() {
-
+        // FIXME, this should not be needed to 'load' an application.
+        // And does not take into account the Library and 'page' files.
         defineArchiveContent(targetLocation);
-        return new ArchiveContent(archiveFiles);
+        return new ArchiveContent.ArchiveContentBuilder()
+                .withClassesFiles(archiveClassesFiles).build();
 
     }
 
@@ -132,7 +169,7 @@ public class Unpack {
             for (File file : fList) {
                 if (file.isFile()) {
                     Optional<String> content = stripLocation(file.getAbsolutePath());
-                    content.ifPresent(archiveFiles::add);
+                    content.ifPresent(archiveClassesFiles::add);
                 } else if (file.isDirectory()) {
                     defineArchiveContent(file);
                 }
