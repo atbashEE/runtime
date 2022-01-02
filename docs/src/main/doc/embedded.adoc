@@ -37,3 +37,7 @@ Based on the configuration, the Runtime can be started with
 ----
     new AtbashEmbedded(parameters).start();
 ----
+
+=== Known issues
+
+It is not possible to create a shaded executable jar file since that would make the entire code base a Bean Defining Archive in terms of CDI and will results in errors.

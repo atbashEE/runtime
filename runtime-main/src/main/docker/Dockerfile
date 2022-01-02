@@ -7,8 +7,7 @@ EXPOSE 8080
 EXPOSE 5005
 
 ENV HOME_DIR=/opt/atbash
-ENV SCRIPT_DIR=${HOME_DIR} \
-    DEPLOYMENT_DIR=${HOME_DIR}/deployment \
+ENV DEPLOYMENT_DIR=${HOME_DIR}/deployment \
     JVM_ARGS="" \
     ATBASH_ARGS="" \
     STATELESS="true" \
@@ -28,7 +27,6 @@ RUN true \
 USER atbash
 WORKDIR ${HOME_DIR}
 
-COPY --chown=atbash:atbash maven/bin/* ${SCRIPT_DIR}/
-COPY --chown=atbash:atbash maven/atbash-runtime.jar .
+COPY --chown=atbash:atbash maven/expanded .
 
-ENTRYPOINT ["/bin/sh", "entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "bin/entrypoint.sh"]

@@ -22,6 +22,18 @@ Applications are internally identified by the contextroot they are available (mu
 WELD-001304: More than one context active for scope type jakarta.enterprise.context.RequestScoped
 ----
 
+== Installation
+
+Unzip the _atbash-runtime.zip_ file to a location of your choice. The archive contains an executable JAR file in the root and the dependencies in the _lib_ folder.
+
+From within the root folder, execute the command
+
+[source]
+----
+java -jar atbash_runtime.jar <options>
+----
+
+(It is not possible to create a shaded executable jar file since that would make the entire code base a Bean Defining Archive in terms of CDI and will results in errors)
 include::modules.adoc[]
 
 include::logging.adoc[]
