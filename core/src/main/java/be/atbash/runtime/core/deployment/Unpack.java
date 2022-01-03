@@ -31,7 +31,7 @@ public class Unpack {
     public static final String WEB_INF_CLASSES = File.separator + "WEB-INF" + File.separator + "classes";
     public static final String WEB_INF_LIB = File.separator + "WEB-INF" + File.separator + "lib";
     public static final String META_INF = File.separator + "META-INF";
-
+    public static final String META_INF_MAVEN = META_INF + File.separator + "maven";
     /**
      * Size of the buffer to read/write data
      */
@@ -62,6 +62,8 @@ public class Unpack {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
+        scanLibraryFiles();
+
         ArchiveContent content = new ArchiveContent.ArchiveContentBuilder()
                 .withClassesFiles(archiveClassesFiles)
                 .withLibraryFiles(archiveLibraryFiles)
@@ -73,6 +75,19 @@ public class Unpack {
             return null;
         }
         return content;
+    }
+
+    private void scanLibraryFiles() {
+
+        File parentLib = new File(targetLocation, "WEB-INF/lib");
+        for (String archiveLibraryFile : archiveLibraryFiles) {
+            File jarFile = new File(parentLib, archiveLibraryFile);
+            try {
+                scanArchive(jarFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void unpackArchive() throws IOException {
@@ -105,7 +120,7 @@ public class Unpack {
         if (webInfindex > 0) {
             int index = filePath.indexOf(WEB_INF_CLASSES);
 
-            if (index > 0) {
+            if (index > 0 && filePath.endsWith(".class")) {
                 archiveClassesFiles.add(filePath.substring(index + WEB_INF_CLASSES.length() + 1));
 
             } else {
@@ -114,7 +129,7 @@ public class Unpack {
                     archiveLibraryFiles.add(filePath.substring(index + WEB_INF_LIB.length() + 1));
                 } else {
                     if (filePath.endsWith(".xml")) {
-                        // Do we need other descriptior files.
+                        // Do we need other descriptor files?
                         archiveDescriptorFiles.add(filePath.substring(webInfindex + WEB_INF.length() + 1));
                     }
                 }
@@ -127,6 +142,41 @@ public class Unpack {
         }
     }
 
+    private void scanArchive(File jarFile) throws IOException {
+        JarInputStream jarInputStream = new JarInputStream(new FileInputStream(jarFile));
+
+        JarEntry jarEntry = jarInputStream.getNextJarEntry();
+
+        while (jarEntry != null) {
+
+            // Don't need the full path here as we are not expanding it, just keep track of it.
+            if (!jarEntry.isDirectory()) {
+                String filePath = jarFile.getName() + "!/" + jarEntry.getName();
+                // if the entry is a file, keep the name
+                keepTrackOfJarContent(filePath);
+            }
+            jarInputStream.closeEntry();
+            jarEntry = jarInputStream.getNextJarEntry();
+        }
+        jarInputStream.close();
+    }
+
+    private void keepTrackOfJarContent(String filePath) {
+        int metaInfindex = filePath.indexOf(META_INF);
+        if (metaInfindex > 0) {
+            int index = filePath.indexOf(META_INF_MAVEN);
+
+            if (index == -1 && filePath.endsWith(".xml")) {
+                archiveDescriptorFiles.add(filePath);
+
+            }
+        } else {
+            if (filePath.endsWith(".class")) {
+
+                archiveClassesFiles.add(filePath);
+            }
+        }
+    }
 
     /**
      * Extracts a Jar entry (file entry)

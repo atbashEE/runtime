@@ -52,6 +52,9 @@ public class ServletSniffer implements Sniffer {
         if ("web.xml".equals(descriptorName)) {
             result = checkForServletMappings(content);
         }
+        if (descriptorName.endsWith("!/META-INF/web-fragment.xml")) {
+            result = checkForServletMappings(content);
+        }
 
         return result;
     }

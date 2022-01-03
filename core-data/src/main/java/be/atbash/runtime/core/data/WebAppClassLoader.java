@@ -23,6 +23,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ClassLoader used by the sniffers to analyse the deployment. This loader is not used during the processing of user calls.
@@ -31,12 +34,22 @@ public class WebAppClassLoader extends ClassLoader {
 
     private DelegatingURLClassLoader classesClassLoader;
     private DelegatingURLClassLoader descriptorClassLoader;
-    //private URLClassLoader libClassLoader;  TODO Scan also libs for Servlets, JAX-RS endpoints, ... ?
+    private Map<String, DelegatingURLClassLoader> libraryClassLoaders;
 
-    public WebAppClassLoader(File rootDirectory, ClassLoader parent) {
+    public WebAppClassLoader(File rootDirectory, List<String> libraryFiles, ClassLoader parent) {
         super("WebAppClassLoader", parent);
         defineClassLoader(rootDirectory, parent);
         defineDescriptorLoader(rootDirectory, parent);
+        defineLibraryClassLoader(rootDirectory, libraryFiles, parent);
+    }
+
+    private void defineLibraryClassLoader(File rootDirectory, List<String> libraryFiles, ClassLoader parent) {
+        libraryClassLoaders = new HashMap<>();
+        // probably we can create 1 Classloader for all jars in lib directory
+        for (String libraryFile : libraryFiles) {
+            File jarFile = new File(rootDirectory, "WEB-INF/lib/" + libraryFile);
+            libraryClassLoaders.put(libraryFile, defineLibraryClassLoader(jarFile, parent));
+        }
     }
 
     private void defineClassLoader(File rootDirectory, ClassLoader parent) {
@@ -63,9 +76,29 @@ public class WebAppClassLoader extends ClassLoader {
         descriptorClassLoader = new DelegatingURLClassLoader(new URL[]{webInfURL}, parent);
     }
 
+    private DelegatingURLClassLoader defineLibraryClassLoader(File jarFile, ClassLoader parent) {
+        URL classesURL;
+        try {
+            classesURL = jarFile.toURI().toURL();
+
+        } catch (MalformedURLException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        }
+        return new DelegatingURLClassLoader(new URL[]{classesURL}, parent);
+    }
+
     public void close() {
         try {
             classesClassLoader.close();
+            descriptorClassLoader.close();
+            libraryClassLoaders.values().forEach(cl -> {
+                try {
+                    cl.close();
+                } catch (IOException e) {
+                    throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+                }
+            });
+            descriptorClassLoader.close();
         } catch (IOException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
@@ -73,12 +106,27 @@ public class WebAppClassLoader extends ClassLoader {
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        return classesClassLoader.loadClass(name, resolve);
+        int index = name.indexOf("!.");
+        if (index > 0) {
+            // !/ is converted to !. when converting the directory name to class name.
+            String jarName = name.substring(0, index);
+            String className = name.substring(index + 2);
+            return libraryClassLoaders.get(jarName).loadClass(className);
+        } else {
+            return classesClassLoader.loadClass(name, resolve);
+        }
     }
 
     @Override
     protected URL findResource(String name) {
-        return descriptorClassLoader.findResource(name);
+        int index = name.indexOf("!/");  // Here it is still !/
+        if (index > 0) {
+            String jarName = name.substring(0, index);
+            String resourceName = name.substring(index + 2);
+            return libraryClassLoaders.get(jarName).findResource(resourceName);
+        } else {
+            return descriptorClassLoader.findResource(name);
+        }
     }
 
     private static class DelegatingURLClassLoader extends URLClassLoader {

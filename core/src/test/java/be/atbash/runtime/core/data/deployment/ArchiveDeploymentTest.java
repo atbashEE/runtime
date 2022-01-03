@@ -130,7 +130,7 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.isDeployed()).isFalse();
 
         deployment.setArchiveContent(new ArchiveContent.ArchiveContentBuilder().withClassesFiles(new ArrayList<>()).build());
-        deployment.setClassLoader(new WebAppClassLoader(archive, this.getClass().getClassLoader()));
+        deployment.setClassLoader(new WebAppClassLoader(archive, deployment.getArchiveContent().getLibraryFiles(), this.getClass().getClassLoader()));
         deployment.setSpecifications(Collections.singletonList(Specification.HTML));
         deployment.setSniffers(Collections.singletonList(new SingleTriggeredSniffer()));
         deployment.setDeploymentModule(new Module1());
@@ -155,7 +155,7 @@ class ArchiveDeploymentTest {
         deployment.setDeploymentLocation(location);
 
         deployment.setArchiveContent(new ArchiveContent.ArchiveContentBuilder().withClassesFiles(new ArrayList<>()).build());
-        deployment.setClassLoader(new WebAppClassLoader(location, this.getClass().getClassLoader()));
+        deployment.setClassLoader(new WebAppClassLoader(location, deployment.getArchiveContent().getLibraryFiles(), this.getClass().getClassLoader()));
         deployment.setDeploymentModule(new Module1());
 
         Assertions.assertThat(deployment.isVerified()).isTrue();

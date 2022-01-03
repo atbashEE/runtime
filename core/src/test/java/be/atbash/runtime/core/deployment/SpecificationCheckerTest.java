@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ class SpecificationCheckerTest {
                 .withDescriptorFiles(descriptorFiles)
                 .build();
 
-        WebAppClassLoader classLoader = new WebAppClassLoader(root, SpecificationCheckerTest.class.getClassLoader());
+        WebAppClassLoader classLoader = new WebAppClassLoader(root, Collections.emptyList(), SpecificationCheckerTest.class.getClassLoader());
         List<Sniffer> sniffers = List.of(new SingleTriggeredSniffer()
                 , new CollectingSniffer()
                 , new NeverTriggeredSniffer());
@@ -78,7 +79,7 @@ class SpecificationCheckerTest {
                 .withDescriptorFiles(descriptorFiles)
                 .build();
 
-        WebAppClassLoader classLoader = new WebAppClassLoader(root, SpecificationCheckerTest.class.getClassLoader());
+        WebAppClassLoader classLoader = new WebAppClassLoader(root, Collections.emptyList(), SpecificationCheckerTest.class.getClassLoader());
         List<Sniffer> sniffers = List.of(new SingleTriggeredSniffer()
                 , new CollectingSniffer()
                 , new DescriptorSniffer()

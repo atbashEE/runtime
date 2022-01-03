@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,7 +187,7 @@ public class Deployer implements ModuleEventListener {
         ArchiveContent archiveContent = unpack.processExpandedArchive();
         deployment.setArchiveContent(archiveContent);
 
-        extractedsetClassloader(deployment);
+        setClassloaderForExtractedArchive(deployment);
 
         return true;
 
@@ -254,7 +254,7 @@ public class Deployer implements ModuleEventListener {
 
         deployment.setArchiveContent(archiveContent);
 
-        extractedsetClassloader(deployment);
+        setClassloaderForExtractedArchive(deployment);
 
         return true;
     }
@@ -275,8 +275,10 @@ public class Deployer implements ModuleEventListener {
         return targetLocation;
     }
 
-    private void extractedsetClassloader(ArchiveDeployment deployment) {
-        WebAppClassLoader appClassLoader = new WebAppClassLoader(deployment.getDeploymentLocation(), Deployer.class.getClassLoader());
+    private void setClassloaderForExtractedArchive(ArchiveDeployment deployment) {
+        WebAppClassLoader appClassLoader = new WebAppClassLoader(deployment.getDeploymentLocation()
+                , deployment.getArchiveContent().getLibraryFiles()
+                , Deployer.class.getClassLoader());
         deployment.setClassLoader(appClassLoader);
     }
 
