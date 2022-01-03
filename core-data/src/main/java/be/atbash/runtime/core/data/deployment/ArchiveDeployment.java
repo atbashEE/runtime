@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.util.StringUtil;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ArchiveDeployment {
 
@@ -45,6 +47,8 @@ public class ArchiveDeployment {
     private Module<?> deploymentModule;
     private List<Sniffer> sniffers;
 
+    private final Map<String, String> deploymentData;
+
     public ArchiveDeployment(File archiveFile) {
         this(archiveFile, StringUtil.determineDeploymentName(archiveFile));
     }
@@ -53,16 +57,18 @@ public class ArchiveDeployment {
         this.archiveFile = archiveFile;
         this.deploymentName = deploymentName;
         this.verified = true;
+        this.deploymentData = new HashMap<>();
     }
 
     public ArchiveDeployment(String deploymentLocation, String deploymentName, List<Specification> specifications,
-                             List<Sniffer> sniffers, String contextRoot) {
+                             List<Sniffer> sniffers, String contextRoot, Map<String, String> deploymentData) {
         this.deploymentLocation = new File(deploymentLocation);
         this.deploymentName = deploymentName;
         this.specifications = specifications;
         this.sniffers = sniffers;
         this.contextRoot = contextRoot;
         this.verified = false;
+        this.deploymentData = deploymentData;
     }
 
     public File getArchiveFile() {
@@ -156,6 +162,18 @@ public class ArchiveDeployment {
         if (this.contextRoot.endsWith("/")) {
             this.contextRoot = this.contextRoot.substring(0, this.contextRoot.length() - 1);
         }
+    }
+
+    public String getDeploymentData(String key) {
+        return deploymentData.get(key);
+    }
+
+    public Map<String, String> getDeploymentData() {
+        return new HashMap<>(deploymentData);
+    }
+
+    public void addDeploymentData(String key, String value) {
+        deploymentData.put(key, value);
     }
 
     // archiveDeployments are identified by context root.

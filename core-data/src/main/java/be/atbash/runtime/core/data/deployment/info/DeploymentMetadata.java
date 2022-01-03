@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +33,7 @@ public class DeploymentMetadata {
     private List<String> specifications;
     private List<String> sniffers;
     private String contextRoot;
+    private Map<String, String> deploymentData;
 
     // required for Json Processing
     public DeploymentMetadata() {
@@ -52,6 +54,7 @@ public class DeploymentMetadata {
                 .map(s -> s.getClass().getSimpleName())
                 .collect(Collectors.toList());
         contextRoot = deployment.getContextRoot();
+        deploymentData = deployment.getDeploymentData();
     }
 
     // setters are for the JSON handling
@@ -93,6 +96,15 @@ public class DeploymentMetadata {
 
     public void setContextRoot(String contextRoot) {
         this.contextRoot = contextRoot;
+    }
+
+    public Map<String, String> getDeploymentData() {
+        return deploymentData;
+    }
+
+    // required for the JSON de-serialisation.
+    public void setDeploymentData(Map<String, String> deploymentData) {
+        this.deploymentData = deploymentData;
     }
 
     // context root is the unique identifier in the system.

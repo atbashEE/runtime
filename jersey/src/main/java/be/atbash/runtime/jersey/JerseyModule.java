@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
-import be.atbash.runtime.jersey.util.ResourcePathUtil;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -32,10 +31,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class JerseyModule implements Module<RuntimeConfiguration> {
 
@@ -91,12 +87,12 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
         handler.setWar(deployment.getDeploymentLocation().getAbsolutePath());
         handler.setParentLoaderPriority(true);  // FIXME Configure
 
-        String applicationPath = ResourcePathUtil.getInstance().findApplicationPath(deployment);
+        String applicationPath = deployment.getDeploymentData(JerseyModuleConstant.APPLICATION_PATH);
 
         ServletHolder jerseyServlet = handler.addServlet(
                 org.glassfish.jersey.servlet.ServletContainer.class, applicationPath + "/*");
 
-        List<String> resourcePackages = ResourcePathUtil.getInstance().determinePackages(restSniffer);
+        List<String> resourcePackages = new ArrayList<>(Arrays.asList(deployment.getDeploymentData(JerseyModuleConstant.PACKAGE_NAMES).split(",")));
         resourcePackages.add("be.atbash.runtime.jersey");
         String packages = String.join(";", resourcePackages);
 

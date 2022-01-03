@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ public class AtbashEmbedded {
     private static ArchiveDeployment createArchiveDeployment(DeploymentMetadata metadata, EventManager eventManager) {
         List<Sniffer> sniffers = SnifferManager.getInstance().retrieveSniffers(metadata.getSniffers());
         ArchiveDeployment deployment = new ArchiveDeployment(metadata.getDeploymentLocation(), metadata.getDeploymentName()
-                , SpecificationUtil.asEnum(metadata.getSpecifications()), sniffers, metadata.getContextRoot());
+                , SpecificationUtil.asEnum(metadata.getSpecifications()), sniffers, metadata.getContextRoot(), metadata.getDeploymentData());
         eventManager.publishEvent(Events.VERIFY_DEPLOYMENT, deployment);
         if (deployment.getDeploymentLocation() == null) {
             // The Deployment location is gone

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 class DeploymentMetadataTest {
 
@@ -117,5 +118,11 @@ class DeploymentMetadataTest {
         public boolean isFastDetection() {
             return false;
         }
+
+        @Override
+        public Map<String, String> deploymentData() {
+            return Collections.EMPTY_MAP;
+        }
+
     }
 }

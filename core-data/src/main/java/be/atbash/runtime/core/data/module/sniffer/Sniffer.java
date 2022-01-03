@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package be.atbash.runtime.core.data.module.sniffer;
 
 import be.atbash.runtime.core.data.Specification;
 
+import java.util.Map;
+
 public interface Sniffer {
 
     Specification[] detectedSpecifications();
@@ -30,4 +32,11 @@ public interface Sniffer {
      * @return
      */
     boolean isFastDetection();
+
+    /**
+     * Returns the key value pairs determined by the sniffer that can be used by the Deployer or other
+     * concept.  It contains for example the mapping of the Rest Servlet defined by @ApplicationPath.
+     * @return
+     */
+    Map<String, String> deploymentData();
 }

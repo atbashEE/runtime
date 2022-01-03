@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package be.atbash.runtime.jersey;
 
 import be.atbash.runtime.core.deployment.Deployer;
-import be.atbash.runtime.jersey.util.ResourcePathUtil;
 import jakarta.ws.rs.ext.Provider;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
@@ -44,7 +43,7 @@ public class RuntimeApplicationEventListener implements ApplicationEventListener
     @Override
     public void onEvent(ApplicationEvent event) {
         if (event.getType() == ApplicationEvent.Type.INITIALIZATION_APP_FINISHED) {
-            applicationPath = ResourcePathUtil.getInstance().findApplicationPath(Deployer.getCurrentDeployment());
+            applicationPath = Deployer.getCurrentDeployment().getDeploymentData(JerseyModuleConstant.APPLICATION_PATH);
             ResourceModel resourceModel = event.getResourceModel();
             final ResourceLogDetails logDetails = new ResourceLogDetails();
             resourceModel.getResources().stream().forEach((resource) -> {

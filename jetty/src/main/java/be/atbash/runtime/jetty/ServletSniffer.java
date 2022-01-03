@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 public class ServletSniffer implements Sniffer {
@@ -85,4 +87,10 @@ public class ServletSniffer implements Sniffer {
     public boolean isFastDetection() {
         return true;
     }
+
+    @Override
+    public Map<String, String> deploymentData() {
+        return Collections.EMPTY_MAP;
+    }
+
 }

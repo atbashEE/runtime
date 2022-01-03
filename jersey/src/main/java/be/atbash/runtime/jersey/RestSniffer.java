@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,20 @@ package be.atbash.runtime.jersey;
 
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import jakarta.ws.rs.ApplicationPath;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RestSniffer implements Sniffer {
 
-    private List<Class<?>> applicationClasses = new ArrayList<>();
-    private List<Class<?>> resourceClasses = new ArrayList<>();
+    private final List<Class<?>> applicationClasses = new ArrayList<>();
+    private final List<Class<?>> resourceClasses = new ArrayList<>();
 
     @Override
     public Specification[] detectedSpecifications() {
-        return new  Specification[]{Specification.REST};
+        return new Specification[]{Specification.REST};
     }
 
     @Override
@@ -60,11 +58,37 @@ public class RestSniffer implements Sniffer {
         return false;
     }
 
-    public List<Class<?>> getApplicationClasses() {
-        return applicationClasses;
+    @Override
+    public Map<String, String> deploymentData() {
+        Map<String, String> result = new HashMap<>();
+        result.put(JerseyModuleConstant.PACKAGE_NAMES, String.join(",", determinePackages()));
+        result.put(JerseyModuleConstant.APPLICATION_PATH, findApplicationPath());
+
+        return result;
     }
 
-    public List<Class<?>> getResourceClasses() {
-        return resourceClasses;
+    private Set<String> determinePackages() {
+        // We use a set to have unique package names.
+        return resourceClasses
+                .stream()
+                .map(Class::getPackageName)
+                .collect(Collectors.toSet());
     }
+
+    private String findApplicationPath() {
+
+        String result = null;
+        // FIXME should only be 0 or 1.
+        if (!applicationClasses.isEmpty()) {
+            Optional<Annotation> annotation = Arrays.stream(applicationClasses.get(0).getAnnotations())
+                    .filter(a -> "jakarta.ws.rs.ApplicationPath".equals(a.annotationType().getName()))
+                    .findAny();
+            if (annotation.isPresent()) {
+                ApplicationPath applicationPath = (ApplicationPath) annotation.get();
+                result = applicationPath.value();
+            }
+        }
+        return result;
+    }
+
 }

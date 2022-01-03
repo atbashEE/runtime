@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import be.atbash.runtime.core.deployment.sniffer.SingleTriggeredSniffer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +35,7 @@ class ApplicationInfoTest {
         List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
 
         ArchiveDeployment deployment = new ArchiveDeployment("locationNotImportant"
-                , "name", specifications, sniffers, "/root");
+                , "name", specifications, sniffers, "/root", new HashMap<>());
 
         ApplicationInfo info = new ApplicationInfo(deployment);
         assertThat(info.getSniffers()).containsExactly("SingleTriggeredSniffer");
@@ -47,7 +48,7 @@ class ApplicationInfoTest {
         List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
 
         ArchiveDeployment deployment = new ArchiveDeployment("locationNotImportant"
-                , "name", specifications, sniffers, "/root");
+                , "name", specifications, sniffers, "/root", new HashMap<>());
 
         ApplicationInfo info = new ApplicationInfo(deployment);
         assertThat(info.toString()).isEqualTo("context root for application /root, detected specifications SERVLET, triggered sniffers SingleTriggeredSniffer");

@@ -125,7 +125,6 @@ public class Deployer implements ModuleEventListener {
             if (!loadArchive(deployment)) {
                 return;
             }
-            feedSniffers(deployment);
         } else {
             if (!unpackArchive(deployment)) {
                 // Nothing is deployed,
@@ -151,33 +150,6 @@ public class Deployer implements ModuleEventListener {
         applicationMon.registerApplication(deployment);
         watcherService.logWatcherEvent("Deployer", String.format("DEPLOY-102: End of deployment of %s", deployment.getDeploymentName()), true);
 
-    }
-
-    private void feedSniffers(ArchiveDeployment deployment) {
-        List<Sniffer> sniffers = new ArrayList<>(deployment.getSniffers());
-        WebAppClassLoader classLoader = deployment.getClassLoader();
-
-        try {
-            for (String archiveClass : deployment.getArchiveContent().getArchiveClasses()) {
-                Class<?> aClass = classLoader.loadClass(archiveClass);
-
-                List<Sniffer> triggeredSniffers = sniffers.stream()
-                        .filter(s -> s.triggered(aClass))
-                        .collect(Collectors.toList());
-
-                triggeredSniffers.stream()
-                        .filter(Sniffer::isFastDetection)
-                        .forEach(sniffers::remove);
-
-                if (sniffers.isEmpty()) {
-                    break;
-                    // No need to check the rest as all Sniffers are selected
-                }
-            }
-        } catch (ClassNotFoundException e) {
-            // FIXME
-            e.printStackTrace();
-        }
     }
 
     private boolean loadArchive(ArchiveDeployment deployment) {
@@ -225,6 +197,11 @@ public class Deployer implements ModuleEventListener {
         specificationChecker.perform();
         deployment.setSpecifications(specificationChecker.getSpecifications());
         deployment.setSniffers(specificationChecker.getTriggeredSniffers());
+        specificationChecker.getTriggeredSniffers()
+                .stream()
+                .map(Sniffer::deploymentData)
+                .flatMap(map -> map.entrySet().stream())
+                .forEach(entry -> deployment.addDeploymentData(entry.getKey(), entry.getValue()));
     }
 
     /**

@@ -19,7 +19,9 @@ import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public abstract class TestSniffer implements Sniffer {
 
@@ -52,4 +54,8 @@ public abstract class TestSniffer implements Sniffer {
         return false;
     }
 
+    @Override
+    public Map<String, String> deploymentData() {
+        return Collections.EMPTY_MAP;
+    }
 }
