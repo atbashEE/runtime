@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
+import be.atbash.runtime.core.data.util.ModuleUtil;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.deployment.Deployer;
 import be.atbash.runtime.core.deployment.SnifferManager;
@@ -68,7 +69,7 @@ public class ModuleManager {
         modules = findAllModules();
 
         // Data Module must be the first one as everything else can be dependent on it.
-        Module<?> coreModule = findModule(Module.CORE_MODULE_NAME);
+        Module<?> coreModule = ModuleUtil.findModule(modules, Module.CORE_MODULE_NAME);
         if (!startEssentialModule(coreModule, configurationParameters.getWatcher())) {
             return false;
         }
@@ -80,7 +81,7 @@ public class ModuleManager {
         EventManager.getInstance().registerListener(coreModule);
 
         // Start Config module
-        Module<?> module2 = findModule(Module.CONFIG_MODULE_NAME);
+        Module<?> module2 = ModuleUtil.findModule(modules, Module.CONFIG_MODULE_NAME);
         if (!startEssentialModule(module2, this.configurationParameters)) {
             return false;
         }
@@ -89,7 +90,7 @@ public class ModuleManager {
         RuntimeConfiguration runtimeConfiguration = module2.getRuntimeObject(RuntimeConfiguration.class);
 
         // Start Logging
-        Module<?> module3 = findModule(Module.LOGGING_MODULE_NAME);
+        Module<?> module3 = ModuleUtil.findModule(modules, Module.LOGGING_MODULE_NAME);
         if (!startEssentialModule(module3, runtimeConfiguration)) {
             return false;
         }
@@ -105,6 +106,7 @@ public class ModuleManager {
     /**
      * Starts all the non-essential modules. Return false when a module is requested that doesn't exist.
      * It can also throw an {@link AtbashStartupAbortException} when a module fails to start.
+     *
      * @return
      */
     public boolean startModules() {
@@ -161,15 +163,8 @@ public class ModuleManager {
         }
         modulesToStart
                 .stream()
-                .map(this::findModule)
+                .map(name -> ModuleUtil.findModule(modules, name))
                 .forEach(module -> startModule(module, requestedModules));
-    }
-
-    private Module<Object> findModule(String moduleName) {
-        return modules.stream()
-                .filter(m -> m.name().equals(moduleName))
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException(String.format("Can't find module %s", moduleName)));  // FIXME We need to validate the modules names to see if they exist.
     }
 
     private void startModule(Module<Object> module, String[] requestedModules) {
@@ -243,7 +238,7 @@ public class ModuleManager {
 
     private boolean canStart(String moduleName, List<String> startedModules, List<String> currentStarted) {
         // Not already started but all dependencies are started
-        Module module = findModule(moduleName);
+        Module module = ModuleUtil.findModule(modules, moduleName);
         return !startedModules.contains(moduleName)
                 && Arrays.stream(module.dependencies())
                 .allMatch(startedModules::contains);
@@ -251,6 +246,7 @@ public class ModuleManager {
 
     /**
      * Load all modules through the Service Loader mechanism
+     *
      * @return
      */
     private List<Module> findAllModules() {
@@ -283,6 +279,7 @@ public class ModuleManager {
     /**
      * Initialize the Module Manager.  This already starts the essential modules (core, Config and Logging) and
      * can result in a {@link AtbashStartupAbortException} when a module fails to start.
+     *
      * @param configurationParameters
      * @return
      */
