@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,15 +33,17 @@ import java.util.Map;
  */
 public class WebAppClassLoader extends ClassLoader {
 
-    private DelegatingURLClassLoader classesClassLoader;
+    private DelegatingURLClassLoader classesClassLoader;  // Loads all classes
     private DelegatingURLClassLoader descriptorClassLoader;
-    private Map<String, DelegatingURLClassLoader> libraryClassLoaders;
+    private Map<String, DelegatingURLClassLoader> libraryClassLoaders;  // Only used for loading resources
+    private final List<URL> urls;
 
     public WebAppClassLoader(File rootDirectory, List<String> libraryFiles, ClassLoader parent) {
         super("WebAppClassLoader", parent);
-        defineClassLoader(rootDirectory, parent);
         defineDescriptorLoader(rootDirectory, parent);
+        urls = new ArrayList<>();
         defineLibraryClassLoader(rootDirectory, libraryFiles, parent);
+        defineClassLoader(rootDirectory, parent);
     }
 
     private void defineLibraryClassLoader(File rootDirectory, List<String> libraryFiles, ClassLoader parent) {
@@ -61,7 +64,9 @@ public class WebAppClassLoader extends ClassLoader {
         } catch (MalformedURLException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
-        classesClassLoader = new DelegatingURLClassLoader(new URL[]{classesURL}, parent);
+        urls.add(classesURL);
+        URL[] allURLS = urls.toArray(new URL[0]);
+        classesClassLoader = new DelegatingURLClassLoader(allURLS, parent);
     }
 
     private void defineDescriptorLoader(File rootDirectory, ClassLoader parent) {
@@ -84,6 +89,7 @@ public class WebAppClassLoader extends ClassLoader {
         } catch (MalformedURLException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
+        urls.add(classesURL);
         return new DelegatingURLClassLoader(new URL[]{classesURL}, parent);
     }
 
@@ -107,14 +113,15 @@ public class WebAppClassLoader extends ClassLoader {
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         int index = name.indexOf("!.");
+        String className;
         if (index > 0) {
+            // When class is in Jar within lib directory
             // !/ is converted to !. when converting the directory name to class name.
-            String jarName = name.substring(0, index);
-            String className = name.substring(index + 2);
-            return libraryClassLoaders.get(jarName).loadClass(className);
+            className = name.substring(index + 2);
         } else {
-            return classesClassLoader.loadClass(name, resolve);
+            className = name;
         }
+        return classesClassLoader.loadClass(className, resolve);
     }
 
     @Override
