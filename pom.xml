@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+    Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@
             <dependency>
                 <groupId>be.atbash.json</groupId>
                 <artifactId>octopus-json-smart</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
 
         </dependencies>
@@ -107,6 +107,7 @@
         <module>jersey</module>
         <module>weld</module>
         <module>jersey-weld</module>
+        <module>mp-config</module>
         <module>remote-cli</module>
         <module>runtime-common</module>
         <module>runtime-main</module>
