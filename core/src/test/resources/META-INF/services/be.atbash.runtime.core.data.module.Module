@@ -3,3 +3,4 @@ be.atbash.runtime.core.modules.ConfigModule
 be.atbash.runtime.core.CoreModule
 be.atbash.runtime.core.modules.Module1
 be.atbash.runtime.core.modules.Module2
+be.atbash.runtime.core.modules.Module3

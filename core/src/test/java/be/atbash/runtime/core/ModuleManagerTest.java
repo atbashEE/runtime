@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,13 +91,11 @@ public class ModuleManagerTest {
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
-        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
-                configDirectory, "JUnitTest")
-                .build();
-
         ConfigurationParameters parameters = new ConfigurationParameters();
         parameters.setModules("module1,module2");
-        Assertions.assertThatThrownBy(() -> ModuleManager.initModuleManager(parameters))
+        ModuleManager manager = ModuleManager.initModuleManager(parameters);
+
+        Assertions.assertThatThrownBy(manager::startModules)
                 .isInstanceOf(AtbashStartupAbortException.class);
 
         List<String> events = ModulesLogger.getEvents();
@@ -114,13 +112,12 @@ public class ModuleManagerTest {
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
-        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
-                configDirectory, "JUnitTest")
-                .build();
-
         ConfigurationParameters parameters = new ConfigurationParameters();
         parameters.setModules("module1,module2");
-        Assertions.assertThatThrownBy(() -> ModuleManager.initModuleManager(parameters))
+
+        ModuleManager manager = ModuleManager.initModuleManager(parameters);
+
+        Assertions.assertThatThrownBy(manager::startModules)
                 .isInstanceOf(AtbashStartupAbortException.class);
 
         List<String> events = ModulesLogger.getEvents();
@@ -139,10 +136,6 @@ public class ModuleManagerTest {
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
-        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
-                configDirectory, "JUnitTest")
-                .build();
-
         ConfigurationParameters parameters = new ConfigurationParameters();
         parameters.setModules("module1,module2");
         ModuleManager moduleManager = ModuleManager.initModuleManager(parameters);
@@ -160,5 +153,120 @@ public class ModuleManagerTest {
 
     }
 
+    @Test
+    @Order(7)
+    public void retry_afterFailure() {
+        System.setProperty(FAIL_MODULE1, "true");
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
 
+        ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setModules("module1,module2");
+
+        ModuleManager moduleManager = ModuleManager.initModuleManager(parameters);
+        Assertions.assertThatThrownBy(moduleManager::startModules)
+                .isInstanceOf(AtbashStartupAbortException.class);
+
+        Assertions.assertThatThrownBy(moduleManager::startModules)
+                .isInstanceOf(AtbashStartupAbortException.class);
+
+        List<String> events = ModulesLogger.getEvents();
+
+        Assertions.assertThat(events).hasSize(5);
+        Assertions.assertThat(events.get(0)).isEqualTo("Start Config Module");
+        Assertions.assertThat(events.get(1)).isEqualTo("End Config Module");
+        Assertions.assertThat(events.get(2)).isEqualTo("Start Logging Module");
+        Assertions.assertThat(events.get(3)).isEqualTo("End Logging Module");
+        Assertions.assertThat(events.get(4)).isEqualTo("Start Module 1");
+
+    }
+
+    @Test
+    @Order(8)
+    public void startAndStopModules_twice() {
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
+
+        ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setModules("module1,module2");
+        ModuleManager manager = ModuleManager.initModuleManager(parameters);
+        manager.startModules();
+        manager.stopModules();
+        manager.startModules();
+        manager.stopModules();
+
+        List<String> events = ModulesLogger.getEvents();
+
+        Assertions.assertThat(events).hasSize(24);
+        Assertions.assertThat(events.get(0)).isEqualTo("Start Config Module");
+        Assertions.assertThat(events.get(1)).isEqualTo("End Config Module");
+        Assertions.assertThat(events.get(2)).isEqualTo("Start Logging Module");
+        Assertions.assertThat(events.get(3)).isEqualTo("End Logging Module");
+        Assertions.assertThat(events.get(4)).isEqualTo("Start Module 1");
+        Assertions.assertThat(events.get(5)).isEqualTo("End Module 1");
+        Assertions.assertThat(events.get(6)).isEqualTo("Start Module 2");
+        Assertions.assertThat(events.get(7)).isEqualTo("End Module 2");
+
+        Assertions.assertThat(events.get(8)).isEqualTo("Stop Module2");
+        Assertions.assertThat(events.get(9)).isEqualTo("Stop Module1");
+        Assertions.assertThat(events.get(10)).isEqualTo("Stop LoggingModule");
+        Assertions.assertThat(events.get(11)).isEqualTo("Stop ConfigModule");
+
+        Assertions.assertThat(events.get(12)).isEqualTo("Start Config Module");
+        Assertions.assertThat(events.get(13)).isEqualTo("End Config Module");
+        Assertions.assertThat(events.get(14)).isEqualTo("Start Logging Module");
+        Assertions.assertThat(events.get(15)).isEqualTo("End Logging Module");
+        Assertions.assertThat(events.get(16)).isEqualTo("Start Module 1");
+        Assertions.assertThat(events.get(17)).isEqualTo("End Module 1");
+        Assertions.assertThat(events.get(18)).isEqualTo("Start Module 2");
+        Assertions.assertThat(events.get(19)).isEqualTo("End Module 2");
+
+        Assertions.assertThat(events.get(20)).isEqualTo("Stop Module2");
+        Assertions.assertThat(events.get(21)).isEqualTo("Stop Module1");
+        Assertions.assertThat(events.get(22)).isEqualTo("Stop LoggingModule");
+        Assertions.assertThat(events.get(23)).isEqualTo("Stop ConfigModule");
+
+    }
+
+
+    @Test
+    @Order(9)
+    public void startAndStopModules_parallelStart() {
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
+
+        ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setModules("module1,module2,module3");
+        ModuleManager manager = ModuleManager.initModuleManager(parameters);
+        manager.startModules();
+        manager.stopModules();
+
+        List<String> events = ModulesLogger.getEvents();
+
+        Assertions.assertThat(events).hasSize(15);
+        Assertions.assertThat(events.get(0)).isEqualTo("Start Config Module");
+        Assertions.assertThat(events.get(1)).isEqualTo("End Config Module");
+        Assertions.assertThat(events.get(2)).isEqualTo("Start Logging Module");
+        Assertions.assertThat(events.get(3)).isEqualTo("End Logging Module");
+        Assertions.assertThat(events.get(4)).isEqualTo("Start Module 1");
+        Assertions.assertThat(events.get(5)).isEqualTo("Start Module 3");
+        Assertions.assertThat(events.get(6)).isEqualTo("End Module 3");
+        Assertions.assertThat(events.get(7)).isEqualTo("End Module 1");
+        Assertions.assertThat(events.get(8)).isEqualTo("Start Module 2");
+        Assertions.assertThat(events.get(9)).isEqualTo("End Module 2");
+
+        Assertions.assertThat(events.get(10)).isEqualTo("Stop Module2");
+        Assertions.assertThat(events.get(11)).isEqualTo("Stop Module1");
+        Assertions.assertThat(events.get(12)).isEqualTo("Stop Module3");
+        Assertions.assertThat(events.get(13)).isEqualTo("Stop LoggingModule");
+        Assertions.assertThat(events.get(14)).isEqualTo("Stop ConfigModule");
+    }
 }

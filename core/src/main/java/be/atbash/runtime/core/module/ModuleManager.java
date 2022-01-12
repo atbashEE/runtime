@@ -32,15 +32,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ModuleManager {
+/**
+ * The Module Manager is responsible for starting and stopping all the modules.
+ * There should never be an attempt to use the methods {@code startedModules}
+ * and {@code stopModules} in a concurrent fashion.
+ * It is allowed and possible to have multiple cycles of start and stop of all the modules (but is uses the same configuration)
+ */
+public final class ModuleManager {
 
     private static ModuleManager INSTANCE;
     private static final Logger LOGGER = LoggerFactory.getLogger(ModuleManager.class);
 
-    private ConfigurationParameters configurationParameters;
+    private final ConfigurationParameters configurationParameters;
+
+    private ExecutorService executorService = Executors.newFixedThreadPool(5);
 
     private static final Object MODULE_START_LOCK = new Object();
     // The next properties need to be thread safe and guarded by the MODULE_START_LOCK
@@ -48,9 +58,15 @@ public class ModuleManager {
     private final List<Module<?>> startedModules = new CopyOnWriteArrayList<>();
     private final List<String> installingModules = new CopyOnWriteArrayList<>();
 
+    private String[] requestedModules;
+    // A synchronizer to make sure all modules are started
+    private CountDownLatch allModulesStarted;
+    private final AtomicInteger numberOfStartsRunning = new AtomicInteger(0);
+
     private List<Module> modules;  // Only read, no need for synchronization.
 
     private boolean modulesStarted = false;
+    private boolean moduleStartFailed = false;
 
     // The core objects but used several times in various methods, so we keep a reference here.
     private RunData runData;
@@ -58,18 +74,13 @@ public class ModuleManager {
 
     private ModuleManager(ConfigurationParameters configurationParameters) {
         this.configurationParameters = configurationParameters;
-
-        if (!init(configurationParameters)) {
-            throw new AtbashStartupAbortException();
-        }
-
     }
 
     private boolean init(ConfigurationParameters configurationParameters) {
         modules = findAllModules();
 
         // Data Module must be the first one as everything else can be dependent on it.
-        Module<?> coreModule = ModuleUtil.findModule(modules, Module.CORE_MODULE_NAME);
+        Module<Object> coreModule = ModuleUtil.findModule(modules, Module.CORE_MODULE_NAME);
         if (!startEssentialModule(coreModule, configurationParameters.getWatcher())) {
             return false;
         }
@@ -81,7 +92,7 @@ public class ModuleManager {
         EventManager.getInstance().registerListener(coreModule);
 
         // Start Config module
-        Module<?> module2 = ModuleUtil.findModule(modules, Module.CONFIG_MODULE_NAME);
+        Module<Object> module2 = ModuleUtil.findModule(modules, Module.CONFIG_MODULE_NAME);
         if (!startEssentialModule(module2, this.configurationParameters)) {
             return false;
         }
@@ -90,7 +101,7 @@ public class ModuleManager {
         RuntimeConfiguration runtimeConfiguration = module2.getRuntimeObject(RuntimeConfiguration.class);
 
         // Start Logging
-        Module<?> module3 = ModuleUtil.findModule(modules, Module.LOGGING_MODULE_NAME);
+        Module<Object> module3 = ModuleUtil.findModule(modules, Module.LOGGING_MODULE_NAME);
         if (!startEssentialModule(module3, runtimeConfiguration)) {
             return false;
         }
@@ -114,27 +125,44 @@ public class ModuleManager {
             // Don't start twice
             return true;
         }
-        modulesStarted = true;
+
+        if (moduleStartFailed) {
+            LOGGER.error("MODULE-101: Tried to start all modules after a previous failed attempt");
+            throw new AtbashStartupAbortException();
+        }
+
+        if (!init(configurationParameters)) {
+            throw new AtbashStartupAbortException();
+        }
+
         RuntimeConfiguration runtimeConfiguration = RuntimeObjectsManager.getInstance().getExposedObject(RuntimeConfiguration.class);
-        String[] requestedModules = runtimeConfiguration.getRequestedModules();
-        if (validateRequestedModules(requestedModules)) {
-            findAndStartModules(requestedModules);
+        requestedModules = runtimeConfiguration.getRequestedModules();
+        if (validateRequestedModules()) {
+            try {
+                allModulesStarted = new CountDownLatch(1);  // init the synchronizer.
+                findAndStartModules();
 
-            runData.setStartedModules(startedModuleNames);
-            registerSniffers();
+                runData.setStartedModules(startedModuleNames);
+                registerSniffers();
 
-            // Register deployer as Event Listener.
-            List<Module> modulesCopy = new ArrayList<>(this.startedModules);
-            EventManager.getInstance().registerListener(new Deployer(watcherService, runtimeConfiguration, modulesCopy));
-
+                // Register deployer as Event Listener.
+                List<Module> modulesCopy = new ArrayList<>(this.startedModules);
+                EventManager.getInstance().registerListener(new Deployer(watcherService, runtimeConfiguration, modulesCopy));
+                modulesStarted = true;
+            } catch (Throwable t) {
+                moduleStartFailed = true;
+                throw t;
+            }
             return true;
         } else {
             // validateRequestedModules() has already logged the error.
+            moduleStartFailed = true;
+
             return false;
         }
     }
 
-    private boolean validateRequestedModules(String[] requestedModules) {
+    private boolean validateRequestedModules() {
         List<String> moduleNames = modules.stream()
                 .map(Module::name)
                 .collect(Collectors.toList());
@@ -148,7 +176,7 @@ public class ModuleManager {
         return unknownModules.isEmpty();
     }
 
-    private void findAndStartModules(String[] requestedModules) {
+    private void findAndStartModules() {
         List<String> modulesToStart;
         synchronized (MODULE_START_LOCK) {
             modulesToStart = Arrays.stream(requestedModules)
@@ -159,44 +187,68 @@ public class ModuleManager {
         }
 
         if (modulesToStart.isEmpty()) {
+            // All modules started, the initial method can come out of its wait.
+            // When the start of the current one is finished of course :)
+
+            while (numberOfStartsRunning.get() > 0) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+                }
+            }
+            // Now we are sure that everything is finished.
+            // Release the synchronizer so that the next steps can be performed
+            allModulesStarted.countDown();
             return;
         }
-        modulesToStart
+
+        numberOfStartsRunning.incrementAndGet();
+
+        Map<Module<Object>, Future<Boolean>> futures = modulesToStart
                 .stream()
                 .map(name -> ModuleUtil.findModule(modules, name))
-                .forEach(module -> startModule(module, requestedModules));
-    }
+                .collect(Collectors.toMap(Function.identity(), this::startModule));
 
-    private void startModule(Module<Object> module, String[] requestedModules) {
-        // ModuleStarter can keep track of a successful start of the module.
+        // Wait for the result of each started module.
+        try {
+            while (!futures.isEmpty()) {
+                Iterator<Map.Entry<Module<Object>, Future<Boolean>>> entryIterator = futures.entrySet().iterator();
+                while (entryIterator.hasNext()) {
+                    Map.Entry<Module<Object>, Future<Boolean>> entry = entryIterator.next();
+                    if (entry.getValue().isDone()) {
 
-        ModuleStarter starter = new ModuleStarter(module);
-        Thread moduleStarterThread = new Thread(starter);
-        // Does the module need configuration?
-        Class<?> moduleConfigClass = module.getModuleConfigClass();
-        if (moduleConfigClass != null) {
-            Object exposedObject = RuntimeObjectsManager.getInstance().getExposedObject(moduleConfigClass);
-            if (exposedObject == null) {
-                throw new IllegalArgumentException(String.format("ModuleConfigClass %s not found for Module %s", moduleConfigClass, module.name()));
+                        entryIterator.remove();
+                        // This finish does the necessary bookkeeping and launches another round of launches
+                        finishStartModule(entry.getKey(), entry.getValue().get());
+                    }
+                }
             }
-            // Set the configuration
-            module.setConfig(exposedObject);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
-        // Start the Thread that start the module.
-        moduleStarterThread.start();
-        Thread.yield();  // So that other modules can start in parallel
+        numberOfStartsRunning.decrementAndGet();
 
-        // Wait for the module to be started
         try {
-            moduleStarterThread.join();
+            // We wait until one of the other threads running this method says that there are no more modules to start.
+            allModulesStarted.await();
         } catch (InterruptedException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
+    }
+
+    private Future<Boolean> startModule(Module<Object> module) {
+        // ModuleStarter can keep track of a successful start of the module.
+        return executorService.submit(createModuleStarterThread(module, null));
+    }
+
+    private void finishStartModule(Module<Object> module, Boolean success) {
         // Module failed? Abort startup.
-        if (!starter.isSuccess()) {
+        if (success == null || !success) {
             throw new AtbashStartupAbortException();
         }
+
         // Some bookkeeping around modules.
         synchronized (MODULE_START_LOCK) {
             installingModules.remove(module.name());
@@ -209,23 +261,40 @@ public class ModuleManager {
         EventManager.getInstance().registerListener(module);
 
         // More modules to start?
-        if (requestedModules != null) {
-            findAndStartModules(requestedModules);
-        }
+        executorService.submit(this::findAndStartModules);
     }
 
-    private <T> boolean startEssentialModule(Module<T> module, Object configValue) {
-        ModuleStarter starter = new ModuleStarter(module);
-        Thread moduleStarterThread = new Thread(starter);
-        module.setConfig((T) configValue);
-        moduleStarterThread.start();
-        Thread.yield();  // We have a generic ModuleStarter that runs in a separate Thread.
-        // We are reusing that here so we make sure we give the change the other thread starts and we can wait for its completion.
+    private ModuleStarter createModuleStarterThread(Module<Object> module, Object configValue) {
+        ModuleStarter result = new ModuleStarter(module);
+        // is config provided ?? (for the essential modules)
+        if (configValue != null) {
+            module.setConfig(configValue);
+        } else {
+            // Does the module need configuration?
+            Class<?> moduleConfigClass = module.getModuleConfigClass();
+            if (moduleConfigClass != null) {
+                Object exposedObject = RuntimeObjectsManager.getInstance().getExposedObject(moduleConfigClass);
+                if (exposedObject == null) {
+                    throw new IllegalArgumentException(String.format("ModuleConfigClass %s not found for Module %s", moduleConfigClass, module.name()));
+                }
+                // Set the configuration
+                module.setConfig(exposedObject);
+            }
+        }
+        return result;
+    }
+
+    private <T> boolean startEssentialModule(Module<Object> module, Object configValue) {
+
+        Future<Boolean> starter = executorService.submit(createModuleStarterThread(module, configValue));
+
+        Boolean success;
         try {
-            moduleStarterThread.join();
-        } catch (InterruptedException e) {
+            success = starter.get();
+        } catch (InterruptedException | ExecutionException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
+
         synchronized (MODULE_START_LOCK) {
             installingModules.remove(module.name());
             startedModuleNames.add(module.name());
@@ -233,13 +302,14 @@ public class ModuleManager {
         }
         RuntimeObjectsManager.getInstance().register(module);
 
-        return starter.isSuccess();
+        return success;
     }
 
-    private boolean canStart(String moduleName, List<String> startedModules, List<String> currentStarted) {
+    private boolean canStart(String moduleName, List<String> startedModules, List<String> currentStarting) {
         // Not already started but all dependencies are started
         Module module = ModuleUtil.findModule(modules, moduleName);
         return !startedModules.contains(moduleName)
+                && !currentStarting.contains(moduleName)
                 && Arrays.stream(module.dependencies())
                 .allMatch(startedModules::contains);
     }
@@ -269,11 +339,15 @@ public class ModuleManager {
             // Nothing to do
             return;
         }
-        modulesStarted = false;
 
         new ArrayDeque<>(startedModules)
                 .descendingIterator()
                 .forEachRemaining(Module::stop);
+
+        modulesStarted = false;
+        // don't set moduleStartFailed to false as it doesn't make sense to try again.
+        startedModuleNames.clear();
+        startedModules.clear();
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,40 +15,37 @@
  */
 package be.atbash.runtime.core.module;
 
-import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.module.Module;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Callable;
+
 /**
  * Runnable that starts the {@link Module}.
  */
-public class ModuleStarter implements Runnable {
+public class ModuleStarter implements Callable<Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModuleStarter.class);
 
     private Module module;
-    private boolean success;
 
     public ModuleStarter(Module module) {
         this.module = module;
     }
 
     @Override
-    public void run() {
+    public Boolean call() throws Exception {
         try {
             module.run();
-            success = true;
+            return true;
         } catch (Throwable e) {
             if (!(e instanceof AtbashStartupAbortException)) {
                 LOGGER.error(e.getMessage());
             }
-            success = false;
+            return false;
         }
-    }
 
-    public boolean isSuccess() {
-        return success;
     }
 }
