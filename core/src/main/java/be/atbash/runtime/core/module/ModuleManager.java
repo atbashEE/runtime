@@ -50,7 +50,7 @@ public final class ModuleManager {
 
     private final ConfigurationParameters configurationParameters;
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(5);
+    private ExecutorService executorService;
 
     private static final Object MODULE_START_LOCK = new Object();
     // The next properties need to be thread safe and guarded by the MODULE_START_LOCK
@@ -71,16 +71,20 @@ public final class ModuleManager {
     // The core objects but used several times in various methods, so we keep a reference here.
     private RunData runData;
     private WatcherService watcherService;
+    private Deployer deployer;
+    private Module<Object> coreModule;  // TODO Can we avoid this, to keep that reference?
 
     private ModuleManager(ConfigurationParameters configurationParameters) {
         this.configurationParameters = configurationParameters;
     }
 
     private boolean init(ConfigurationParameters configurationParameters) {
+        executorService = Executors.newFixedThreadPool(5);
+
         modules = findAllModules();
 
         // Data Module must be the first one as everything else can be dependent on it.
-        Module<Object> coreModule = ModuleUtil.findModule(modules, Module.CORE_MODULE_NAME);
+        coreModule = ModuleUtil.findModule(modules, Module.CORE_MODULE_NAME);
         if (!startEssentialModule(coreModule, configurationParameters.getWatcher())) {
             return false;
         }
@@ -147,19 +151,28 @@ public final class ModuleManager {
 
                 // Register deployer as Event Listener.
                 List<Module> modulesCopy = new ArrayList<>(this.startedModules);
-                EventManager.getInstance().registerListener(new Deployer(watcherService, runtimeConfiguration, modulesCopy));
+                deployer = new Deployer(watcherService, runtimeConfiguration, modulesCopy);
+                EventManager.getInstance().registerListener(deployer);
+
                 modulesStarted = true;
             } catch (Throwable t) {
                 moduleStartFailed = true;
                 throw t;
+            } finally {
+                clearExecutorService();
             }
             return true;
         } else {
             // validateRequestedModules() has already logged the error.
             moduleStartFailed = true;
-
+            clearExecutorService();
             return false;
         }
+    }
+
+    private void clearExecutorService() {
+        executorService.shutdown();  // No tasks should be waiting or running
+        executorService = null;
     }
 
     private boolean validateRequestedModules() {
@@ -340,9 +353,15 @@ public final class ModuleManager {
             return;
         }
 
+        EventManager eventManager = EventManager.getInstance();
         new ArrayDeque<>(startedModules)
                 .descendingIterator()
-                .forEachRemaining(Module::stop);
+                .forEachRemaining(module -> {
+                    eventManager.unregisterListener(module);
+                    module.stop();
+                });
+        eventManager.unregisterListener(deployer);
+        eventManager.unregisterListener(coreModule);
 
         modulesStarted = false;
         // don't set moduleStartFailed to false as it doesn't make sense to try again.

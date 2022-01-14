@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,11 @@ public final class EventManager {
     }
 
     public void registerListener(ModuleEventListener listener) {
-        listeners.add(listener); // Fixme check for doubles.
+        listeners.add(listener); // Fixme check for doubles?
+    }
+
+    public void unregisterListener(ModuleEventListener listener) {
+        listeners.remove(listener);
     }
 
     public void publishEvent(String eventCode, Object payload) {
