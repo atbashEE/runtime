@@ -51,6 +51,7 @@ public class AtbashEmbedded {
 
     public AtbashEmbedded(ConfigurationParameters configurationParameters) {
         this.configurationParameters = configurationParameters;
+        this.configurationParameters.setEmbeddedMode();  // Always embedded mode.
     }
 
     public AtbashEmbedded() {
@@ -58,6 +59,7 @@ public class AtbashEmbedded {
         configurationParameters.setLogToFile(false);
         configurationParameters.setStateless(true);
         configurationParameters.setWatcher(WatcherType.OFF);
+        configurationParameters.setEmbeddedMode();
     }
 
     public void start() {

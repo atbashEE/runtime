@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,8 @@ public class ConfigurationParameters {
 
     @CommandLine.Parameters(index = "0..*")
     private File[] archives;
+
+    private boolean embeddedMode;
 
     public boolean isDaemon() {
         return daemon;
@@ -177,6 +179,14 @@ public class ConfigurationParameters {
 
     public void setArchives(File[] archives) {
         this.archives = archives;
+    }
+
+    public boolean isEmbeddedMode() {
+        return embeddedMode;
+    }
+
+    public void setEmbeddedMode() {
+        this.embeddedMode = true;
     }
 
     @Override

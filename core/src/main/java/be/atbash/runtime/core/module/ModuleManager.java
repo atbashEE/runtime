@@ -85,7 +85,7 @@ public final class ModuleManager {
 
         // Data Module must be the first one as everything else can be dependent on it.
         coreModule = ModuleUtil.findModule(modules, Module.CORE_MODULE_NAME);
-        if (!startEssentialModule(coreModule, configurationParameters.getWatcher())) {
+        if (!startEssentialModule(coreModule, configurationParameters)) {
             return false;
         }
 

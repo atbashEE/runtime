@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
-import be.atbash.runtime.core.data.parameter.WatcherType;
+import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.logging.LoggingUtil;
 import org.slf4j.Logger;
@@ -34,12 +34,12 @@ import static be.atbash.runtime.core.data.module.event.Events.CONFIGURATION_UPDA
  * This is a 'pseudo module' so that every other part of the runtime can access some basic information
  * on what is running at the moment.
  */
-public class CoreModule implements Module<WatcherType> {
+public class CoreModule implements Module<ConfigurationParameters> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CoreModule.class);
 
     private RunData runData;
-    private WatcherType watcherType;
+    private ConfigurationParameters configurationParameters;
     private WatcherService watcherService;
 
     @Override
@@ -62,8 +62,8 @@ public class CoreModule implements Module<WatcherType> {
         return null;
     }
 
-    public void setConfig(WatcherType watcherType) {
-        this.watcherType = watcherType;
+    public void setConfig(ConfigurationParameters configurationParameters) {
+        this.configurationParameters = configurationParameters;
     }
 
     @Override
@@ -97,7 +97,10 @@ public class CoreModule implements Module<WatcherType> {
         // The run of the module only requires that we have an empty instance
         // of this instance that can be retrieved.
         runData = new RunData();
-        watcherService = new WatcherService(watcherType);
+        if (configurationParameters.isEmbeddedMode()) {
+            runData.setEmbeddedMode();
+        }
+        watcherService = new WatcherService(configurationParameters.getWatcher());
         if (LoggingUtil.isVerbose()) {
             LOGGER.trace("CORE-1002: Module ready");
         }

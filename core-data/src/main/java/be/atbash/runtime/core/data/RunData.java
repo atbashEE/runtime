@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ public class RunData {
     private final List<ArchiveDeployment> deployments = new ArrayList<>();
     private final List<ArchiveDeploymentListener> listeners = new ArrayList<>();
     private boolean domainMode;
+    private boolean embeddedMode;
 
     public List<String> getStartedModules() {
         return startedModules;
@@ -64,6 +65,14 @@ public class RunData {
 
     public boolean isDomainMode() {
         return domainMode;
+    }
+
+    public boolean isEmbeddedMode() {
+        return embeddedMode;
+    }
+
+    public void setEmbeddedMode() {
+        this.embeddedMode = true;
     }
 
     public void undeployed(ArchiveDeployment deployment) {
