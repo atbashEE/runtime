@@ -49,6 +49,8 @@ public class ArchiveDeployment {
 
     private final Map<String, String> deploymentData;
 
+    private Exception deploymentException;
+
     public ArchiveDeployment(File archiveFile) {
         this(archiveFile, StringUtil.determineDeploymentName(archiveFile));
     }
@@ -174,6 +176,14 @@ public class ArchiveDeployment {
 
     public void addDeploymentData(String key, String value) {
         deploymentData.put(key, value);
+    }
+
+    public Exception getDeploymentException() {
+        return deploymentException;
+    }
+
+    public void setDeploymentException(Exception deploymentException) {
+        this.deploymentException = deploymentException;
     }
 
     // archiveDeployments are identified by context root.

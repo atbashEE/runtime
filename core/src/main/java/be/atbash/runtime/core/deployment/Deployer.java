@@ -141,13 +141,18 @@ public class Deployer implements ModuleEventListener {
             return;
         }
         deployment.getDeploymentModule().registerDeployment(deployment);
+        if (deployment.getDeploymentException() == null) {
+            deployment.setDeployed();
 
-        deployment.setDeployed();
-        //EventManager.getInstance().publishEvent(Events.REGISTER_DEPLOYMENT, deployment);
-        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
-        runData.deployed(deployment);
+            RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+            runData.deployed(deployment);
 
-        applicationMon.registerApplication(deployment);
+            applicationMon.registerApplication(deployment);
+        } else {
+            Logger logger = LoggingUtil.getMainLogger(Deployer.class);
+            logger.error(String.format("DEPLOY-108: During deployment of %s the following error occurred: %s", deployment.getDeploymentName(), deployment.getDeploymentException().getMessage()));
+
+        }
         watcherService.logWatcherEvent("Deployer", String.format("DEPLOY-102: End of deployment of %s", deployment.getDeploymentName()), true);
 
     }

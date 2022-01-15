@@ -78,10 +78,12 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
     @Override
     public void registerDeployment(ArchiveDeployment deployment) {
         WebAppContext handler = new WebAppContext();
+        // If an exception happens during deployment (like CDI issue) make sure we can handle the exception
+        //and deployment can be handled as failed from our code.
+        handler.setThrowUnavailableOnStartupException(true);
 
         String contextRoot = deployment.getContextRoot();
 
-        RestSniffer restSniffer = getRestSniffer(deployment);
         handler.setContextPath(contextRoot);
 
         handler.setWar(deployment.getDeploymentLocation().getAbsolutePath());
@@ -107,7 +109,8 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
         try {
             handler.start();
         } catch (Exception e) {
-            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+            deployment.setDeploymentException(e);
+            return;
         }
 
         LOGGER.info("JERSEY-104: End of registration of WebApp " + deployment.getDeploymentName());
@@ -121,7 +124,9 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
                 .findAny();
         if (handler.isPresent()) {
             try {
-                handler.get().stop();
+                Handler webAppContextHandler = handler.get();
+                webAppContextHandler.stop();
+                handlers.removeHandler(webAppContextHandler);
             } catch (Exception e) {
                 throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }

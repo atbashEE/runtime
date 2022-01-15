@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,10 @@ public class JettyModule implements Module<RuntimeConfiguration> {
         String contextRoot = deployment.getContextRoot();
 
         WebAppContext handler = new WebAppContext();
+        // If an exception happens during deployment (like CDI issue) make sure we can handle the exception
+        //and deployment can be handled as failed from our code.
+        handler.setThrowUnavailableOnStartupException(true);
+
         handler.setContextPath(contextRoot);
 
         handler.setWar(deployment.getDeploymentLocation().getAbsolutePath());
@@ -101,7 +105,8 @@ public class JettyModule implements Module<RuntimeConfiguration> {
         try {
             handler.start();
         } catch (Exception e) {
-            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+            deployment.setDeploymentException(e);
+            return;
         }
 
         if (LoggingUtil.isVerbose()) {
@@ -131,7 +136,9 @@ public class JettyModule implements Module<RuntimeConfiguration> {
                 .findAny();
         if (handler.isPresent()) {
             try {
-                handler.get().stop();
+                Handler webAppContextHandler = handler.get();
+                webAppContextHandler.stop();
+                handlers.removeHandler(webAppContextHandler);
             } catch (Exception e) {
                 throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
