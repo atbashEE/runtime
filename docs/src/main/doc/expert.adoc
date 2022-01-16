@@ -1,0 +1,7 @@
+== Expert
+
+Some expert settings and information if you want to deep dive into the code.
+
+=== System property `traceModuleStartProcessing`
+
+When setting the System property `traceModuleStartProcessing` you can trace each step in the parallel module startup by the `ModuleManager``  This can help you find out why the startup of the modules does not run as expected.

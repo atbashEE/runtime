@@ -19,6 +19,7 @@ package be.atbash.runtime.core;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.IncorrectUsageException;
+import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.module.ModuleManager;
 import be.atbash.runtime.core.modules.ModulesLogger;
@@ -26,6 +27,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -41,6 +44,7 @@ public class ModuleManagerTest {
         System.clearProperty(FAIL_CONFIG_MODULE);
         System.clearProperty(FAIL_LOGGING_MODULE);
         System.clearProperty(FAIL_MODULE1);
+        System.clearProperty("traceModuleStartProcessing");
     }
 
     @Test()
@@ -53,6 +57,7 @@ public class ModuleManagerTest {
     @Test
     @Order(3)
     public void startAndStopModules() {
+        //System.setProperty("traceModuleStartProcessing", "true");
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
@@ -61,7 +66,9 @@ public class ModuleManagerTest {
                 .build();
 
         ConfigurationParameters parameters = new ConfigurationParameters();
-        parameters.setModules("module1,module2");
+        // Since we are not using the real ConfigModule, modules need to be correctly set, including the 'default' modules.
+        setModules(parameters, "module1", "module2");
+
         ModuleManager manager = ModuleManager.initModuleManager(parameters);
         manager.startModules();
         manager.stopModules();
@@ -84,15 +91,24 @@ public class ModuleManagerTest {
         Assertions.assertThat(events.get(11)).isEqualTo("Stop ConfigModule");
     }
 
+    private void setModules(ConfigurationParameters parameters, String... moduleNames) {
+        List<String> modules = new ArrayList<>(Arrays.asList(moduleNames));
+        modules.addAll(List.of(Module.CORE_MODULE_NAME, Module.LOGGING_MODULE_NAME, Module.CONFIG_MODULE_NAME));
+        parameters.setModules(String.join(",", modules));
+    }
+
     @Test
     @Order(4)
     public void configModuleFail() {
+        //System.setProperty("traceModuleStartProcessing", "true");
         System.setProperty(FAIL_CONFIG_MODULE, "true");
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
         ConfigurationParameters parameters = new ConfigurationParameters();
-        parameters.setModules("module1,module2");
+        // Since we are not using the real ConfigModule, modules need to be correctly set, including the 'default' modules.
+        setModules(parameters, "module1", "module2");
+
         ModuleManager manager = ModuleManager.initModuleManager(parameters);
 
         Assertions.assertThatThrownBy(manager::startModules)
@@ -108,12 +124,15 @@ public class ModuleManagerTest {
     @Test
     @Order(5)
     public void loggingModuleFail() {
+        //System.setProperty("traceModuleStartProcessing", "true");
         System.setProperty(FAIL_LOGGING_MODULE, "true");
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
         ConfigurationParameters parameters = new ConfigurationParameters();
-        parameters.setModules("module1,module2");
+        // Since we are not using the real ConfigModule, modules need to be correctly set, including the 'default' modules.
+        setModules(parameters, "module1", "module2");
+
 
         ModuleManager manager = ModuleManager.initModuleManager(parameters);
 
@@ -132,12 +151,15 @@ public class ModuleManagerTest {
     @Test
     @Order(6)
     public void module1Fail() {
+        //System.setProperty("traceModuleStartProcessing", "true");
         System.setProperty(FAIL_MODULE1, "true");
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
         ConfigurationParameters parameters = new ConfigurationParameters();
-        parameters.setModules("module1,module2");
+        // Since we are not using the real ConfigModule, modules need to be correctly set, including the 'default' modules.
+        setModules(parameters, "module1", "module2");
+
         ModuleManager moduleManager = ModuleManager.initModuleManager(parameters);
         Assertions.assertThatThrownBy(moduleManager::startModules)
                 .isInstanceOf(AtbashStartupAbortException.class);
@@ -156,12 +178,15 @@ public class ModuleManagerTest {
     @Test
     @Order(7)
     public void retry_afterFailure() {
+        //System.setProperty("traceModuleStartProcessing", "true");
         System.setProperty(FAIL_MODULE1, "true");
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
         ConfigurationParameters parameters = new ConfigurationParameters();
-        parameters.setModules("module1,module2");
+        // Since we are not using the real ConfigModule, modules need to be correctly set, including the 'default' modules.
+        setModules(parameters, "module1", "module2");
+
 
         ModuleManager moduleManager = ModuleManager.initModuleManager(parameters);
         Assertions.assertThatThrownBy(moduleManager::startModules)
@@ -184,6 +209,7 @@ public class ModuleManagerTest {
     @Test
     @Order(8)
     public void startAndStopModules_twice() {
+        //System.setProperty("traceModuleStartProcessing", "true");
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
@@ -192,7 +218,9 @@ public class ModuleManagerTest {
                 .build();
 
         ConfigurationParameters parameters = new ConfigurationParameters();
-        parameters.setModules("module1,module2");
+        // Since we are not using the real ConfigModule, modules need to be correctly set, including the 'default' modules.
+        setModules(parameters, "module1", "module2");
+
         ModuleManager manager = ModuleManager.initModuleManager(parameters);
         manager.startModules();
         manager.stopModules();
@@ -236,6 +264,7 @@ public class ModuleManagerTest {
     @Test
     @Order(9)
     public void startAndStopModules_parallelStart() {
+        //System.setProperty("traceModuleStartProcessing", "true");
         File configDirectory = new File("./target/testDirectory1");
         configDirectory.mkdirs();
 
@@ -244,7 +273,9 @@ public class ModuleManagerTest {
                 .build();
 
         ConfigurationParameters parameters = new ConfigurationParameters();
-        parameters.setModules("module1,module2,module3");
+        // Since we are not using the real ConfigModule, modules need to be correctly set, including the 'default' modules.
+        setModules(parameters, "module1", "module2", "module3");
+
         ModuleManager manager = ModuleManager.initModuleManager(parameters);
         manager.startModules();
         manager.stopModules();

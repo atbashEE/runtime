@@ -74,8 +74,11 @@ public final class ModuleManager {
     private Deployer deployer;
     private Module<Object> coreModule;  // TODO Can we avoid this, to keep that reference?
 
+    private boolean traceModuleStartProcessing;
+
     private ModuleManager(ConfigurationParameters configurationParameters) {
         this.configurationParameters = configurationParameters;
+        traceModuleStartProcessing = Boolean.parseBoolean(System.getProperty("traceModuleStartProcessing", "false"));
     }
 
     private boolean init(ConfigurationParameters configurationParameters) {
@@ -144,6 +147,9 @@ public final class ModuleManager {
         if (validateRequestedModules()) {
             try {
                 allModulesStarted = new CountDownLatch(1);  // init the synchronizer.
+                if (traceModuleStartProcessing) {
+                    System.err.println(String.format("Requested Modules %s", String.join(",", requestedModules)));
+                }
                 findAndStartModules();
 
                 runData.setStartedModules(startedModuleNames);
@@ -168,6 +174,16 @@ public final class ModuleManager {
             clearExecutorService();
             return false;
         }
+    }
+
+    private void traceModuleStartProcessing(String step) {
+        String threadName = Thread.currentThread().getName();
+        System.err.println(String.format("Trace Module start [%s] - allModulesStarted %s - numberOfStartsRunning %s - %s"
+                , threadName
+                , allModulesStarted
+                , numberOfStartsRunning
+                , step));
+
     }
 
     private void clearExecutorService() {
@@ -197,27 +213,36 @@ public final class ModuleManager {
                     .collect(Collectors.toList());
             installingModules.addAll(modulesToStart);
 
-        }
-
-        if (modulesToStart.isEmpty()) {
-            // All modules started, the initial method can come out of its wait.
-            // When the start of the current one is finished of course :)
-
-            while (numberOfStartsRunning.get() > 0) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
-                }
+            if (traceModuleStartProcessing) {
+                traceModuleStartProcessing(String.format("Modules to Start %s", modulesToStart));
             }
-            // Now we are sure that everything is finished.
-            // Release the synchronizer so that the next steps can be performed
-            allModulesStarted.countDown();
-            return;
+
+            if (modulesToStart.isEmpty() &&
+                    (requestedModules.length > startedModuleNames.size()
+                            || numberOfStartsRunning.get() > 0)) {
+
+                if (traceModuleStartProcessing) {
+                    traceModuleStartProcessing("Nothing to start for the moment, end Thread");
+                }
+
+                //We can't start a module for the moment but not all modules are running yet
+                // or there is still some starter in progress.
+                // So we need to wait for another thread to finish
+                // and this thread can die.
+                return;
+            }
+
+            if (modulesToStart.isEmpty() &&
+                    requestedModules.length == startedModuleNames.size()
+                    && numberOfStartsRunning.get() == 0) {
+
+                if (traceModuleStartProcessing) {
+                    traceModuleStartProcessing("Nothing to start anymore and everything is done. Release Countdown Latch");
+                }
+
+                allModulesStarted.countDown();
+            }
         }
-
-        numberOfStartsRunning.incrementAndGet();
-
         Map<Module<Object>, Future<Boolean>> futures = modulesToStart
                 .stream()
                 .map(name -> ModuleUtil.findModule(modules, name))
@@ -241,10 +266,13 @@ public final class ModuleManager {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
-        numberOfStartsRunning.decrementAndGet();
-
         try {
             // We wait until one of the other threads running this method says that there are no more modules to start.
+
+            if (traceModuleStartProcessing) {
+                traceModuleStartProcessing("Wait for the CountdownLatch ");
+            }
+
             allModulesStarted.await();
         } catch (InterruptedException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
@@ -252,11 +280,23 @@ public final class ModuleManager {
     }
 
     private Future<Boolean> startModule(Module<Object> module) {
-        // ModuleStarter can keep track of a successful start of the module.
+        numberOfStartsRunning.incrementAndGet();
+        if (traceModuleStartProcessing) {
+            traceModuleStartProcessing("numberOfStartsRunning +1");
+        }
+
+        if (traceModuleStartProcessing) {
+            traceModuleStartProcessing(String.format("Start module %s", module.name()));
+        }
+
         return executorService.submit(createModuleStarterThread(module, null));
     }
 
     private void finishStartModule(Module<Object> module, Boolean success) {
+        if (traceModuleStartProcessing) {
+            traceModuleStartProcessing(String.format("Finish Start module %s", module.name()));
+        }
+
         // Module failed? Abort startup.
         if (success == null || !success) {
             throw new AtbashStartupAbortException();
@@ -273,11 +313,22 @@ public final class ModuleManager {
         // Register module as event listener
         EventManager.getInstance().registerListener(module);
 
+        numberOfStartsRunning.decrementAndGet();
+        if (traceModuleStartProcessing) {
+            traceModuleStartProcessing("numberOfStartsRunning -1");
+        }
+
+
+        if (traceModuleStartProcessing) {
+            traceModuleStartProcessing("Launch another start round");
+        }
+
         // More modules to start?
         executorService.submit(this::findAndStartModules);
     }
 
     private ModuleStarter createModuleStarterThread(Module<Object> module, Object configValue) {
+        // ModuleStarter can keep track of a successful start of the module.
         ModuleStarter result = new ModuleStarter(module);
         // is config provided ?? (for the essential modules)
         if (configValue != null) {

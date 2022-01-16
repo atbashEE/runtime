@@ -36,7 +36,7 @@ public interface Sniffer {
     /**
      * Returns the key value pairs determined by the sniffer that can be used by the Deployer or other
      * concept.  It contains for example the mapping of the Rest Servlet defined by @ApplicationPath.
-     * @return
+     * @return An empty map or the data that needs to be stored for the deployment in the persisted deployment info
      */
     Map<String, String> deploymentData();
 }
