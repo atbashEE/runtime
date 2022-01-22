@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,5 +87,31 @@ class ProfileManagerTest {
 
         String[] requestedModules = profileManager.getRequestedModules();
         assertThat(requestedModules).contains("Logging", "Config", "module1", "module2", "module3");
+    }
+
+    @Test
+    void getRequestedModules_filterNull() {
+        Profile profile = new Profile();
+        profile.setModules(Arrays.asList("module1", "module2", "module3"));
+        ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setModules(",+tck");
+        ProfileManager profileManager = new ProfileManager(parameters, profile);
+
+        String[] requestedModules = profileManager.getRequestedModules();
+        assertThat(requestedModules).contains("Logging", "Config", "module1", "module3", "module2", "tck");
+
+    }
+
+    @Test
+    void getRequestedModules_filterNullv2() {
+        Profile profile = new Profile();
+        profile.setModules(Arrays.asList("module1", "module2", "module3"));
+        ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setModules("null,+tck");
+        ProfileManager profileManager = new ProfileManager(parameters, profile);
+
+        String[] requestedModules = profileManager.getRequestedModules();
+        assertThat(requestedModules).contains("Logging", "Config", "module1", "module3", "module2", "tck");
+
     }
 }

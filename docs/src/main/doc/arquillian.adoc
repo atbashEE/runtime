@@ -1,0 +1,41 @@
+== Arquillian Connector
+
+With the Atbash Runtime Arquillian Connector, you can run the Arquillian tests on the Atbash embedded product. This connector is mainly developped for running the TCK tests, but can also be used to test out the your application on the Atbash Runtime implementation.
+
+In general, testing using the Atbash Testing framework, based on TestContainers will be easier and resulting in better tests as there is no need to create a specific archive with only the clases that that you want to test.
+
+=== Support
+
+The connector is compiled against JDK 11 and requires Arquillian version 1.7.0 as that is the version that is using the `jakarta` namespace just as Atbash Runtime is.
+
+The connector supports only deploying WAR files nd does not support deploying individual `Descriptor` s.
+
+=== Setup and configuration
+
+You need to add the following dependecy to your project `pom.xml` file.
+
+[source,xml]
+----
+    <dependency>
+        <groupId>be.atbash.runtime.testing</groupId>
+        <artifactId>arquillian-atbash-embedded</artifactId>
+        <version>0.3</version>
+        <scope>test</scope>
+    </dependency>
+----
+
+The selection of the connector can be done using the following snippet in the `arquillian.xml` file in your project.
+
+[source,xml]
+----
+    <container qualifier="atbash" default="true">
+        <configuration>
+            <property name="keepArchive">true</property>
+        </configuration>
+    </container>
+----
+
+The connector has one configuration property for the moment
+
+- keepArchive: parameter to indicate that the archive file in the temporary directory is not cleaned up after the test. This can be helpful if you want to inspect the contents of the wat file.
+

@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.data;
+package be.atbash.runtime.testing.arquillian;
 
-import java.util.Arrays;
-import java.util.Optional;
+import org.jboss.arquillian.container.spi.client.container.DeployableContainer;
+import org.jboss.arquillian.core.spi.LoadableExtension;
 
-public enum Specification {
+public class AtbashExtension implements LoadableExtension {
 
-    // TCK is here as specification so that we can have a Sniffer that 'detects' it
-    // and it can be used to determine the Deployer.
-    HTML, SERVLET, REST, TCK;
-
-    public static Specification fromCode(String value) {
-        Optional<Specification> specification = Arrays.stream(Specification.values())
-                .filter(s -> s.name().equalsIgnoreCase(value))
-                .findAny();
-        return specification.orElse(null);
+    @Override
+    public void register(ExtensionBuilder extensionBuilder) {
+        extensionBuilder.service(DeployableContainer.class, AtbashDeployableContainer.class);
     }
 }

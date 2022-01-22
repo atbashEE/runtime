@@ -62,6 +62,12 @@ public class AtbashEmbedded {
         configurationParameters.setEmbeddedMode();
     }
 
+    public void withTCKModule() {
+        String modules = configurationParameters.getModules();
+        modules += ",+TCK";  // we start with , so we factor in that modules might have already a value.
+        configurationParameters.setModules(modules);
+    }
+
     public void start() {
         long start = System.currentTimeMillis();
         ServerMon serverMon = new ServerMon(start);

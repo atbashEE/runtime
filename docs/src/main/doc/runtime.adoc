@@ -48,6 +48,8 @@ include::testing.adoc[]
 
 include::embedded.adoc[]
 
+include::arquillian.adoc[]
+
 include::domain-api.adoc[]
 
 include::messages.adoc[]

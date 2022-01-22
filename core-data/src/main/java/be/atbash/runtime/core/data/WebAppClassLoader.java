@@ -121,7 +121,13 @@ public class WebAppClassLoader extends ClassLoader {
         } else {
             className = name;
         }
-        return classesClassLoader.loadClass(className, resolve);
+
+        try {
+            return classesClassLoader.loadClass(className, resolve);
+        } catch (NoClassDefFoundError e) {
+            // This can be due the assembly of incorrect archive in the test case
+            return null;
+        }
     }
 
     @Override

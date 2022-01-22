@@ -62,6 +62,10 @@ public class SpecificationChecker {
             for (String archiveClass : archiveContent.getArchiveClasses()) {
 
                 Class<?> aClass = classLoader.loadClass(archiveClass);
+                if (aClass == null) {
+                    // We assume this is an exception and probably only happen with the TCK tests.
+                    continue;
+                }
 
                 List<Sniffer> triggeredSniffers = sniffers.stream()
                         .filter(s -> s.triggered(aClass))

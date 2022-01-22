@@ -20,6 +20,7 @@ import be.atbash.runtime.core.data.exception.UnexpectedException;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarEntry;
@@ -32,6 +33,9 @@ public class Unpack {
     public static final String WEB_INF_LIB = File.separator + "WEB-INF" + File.separator + "lib";
     public static final String META_INF = File.separator + "META-INF";
     public static final String META_INF_MAVEN = META_INF + File.separator + "maven";
+
+    private static final List<String> IGNORED_LIBRARIES = Arrays.asList("arquillian-core.jar", "arquillian-junit.jar", "arquillian-testng.jar");
+
     /**
      * Size of the buffer to read/write data
      */
@@ -81,6 +85,10 @@ public class Unpack {
 
         File parentLib = new File(targetLocation, "WEB-INF/lib");
         for (String archiveLibraryFile : archiveLibraryFiles) {
+            if (IGNORED_LIBRARIES.contains(archiveLibraryFile)) {
+                // No need to scan these libraries.
+                continue;
+            }
             File jarFile = new File(parentLib, archiveLibraryFile);
             try {
                 scanArchive(jarFile);

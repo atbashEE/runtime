@@ -46,6 +46,7 @@ public class ProfileManager {
 
             Map<String, List<String>> moduleActions = Arrays.stream(parameters.getModules().split(","))
                     .map(String::trim)
+                    .filter(s -> !s.isBlank() && !"null".equals(s))
                     .collect(Collectors.groupingBy(this::determineModuleAction, Collectors.mapping(this::determineModuleName, Collectors.toList())));
 
             if (moduleActions.containsKey(MODULE_ACTION_REPLACE)) {
