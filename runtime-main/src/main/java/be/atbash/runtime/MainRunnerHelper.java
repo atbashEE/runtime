@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ public class MainRunnerHelper {
 
     public void handleCommandlineArguments() {
         if (LoggingUtil.isVerbose()) {
-            logger.info("CLI-1001: Handling command line arguments");
+            logger.trace("CLI-1001: Handling command line arguments");
         }
         RuntimeCommand command = new RuntimeCommand(null);
         CommandLine commandLine = new CommandLine(command);
@@ -79,7 +79,7 @@ public class MainRunnerHelper {
         }
 
         if (LoggingUtil.isVerbose()) {
-            logger.info(String.format("CLI-1002: Command line arguments in use %s", actualCommand));
+            logger.trace(String.format("CLI-1002: Command line arguments in use %s", actualCommand));
         }
 
     }
@@ -266,18 +266,18 @@ public class MainRunnerHelper {
     }
 
     public void logEnvironmentInformation() {
-        logger.info(String.format("CLI-102: JDK Version 'JDK %s'", System.getProperty("java.vm.specification.version")));
-        logger.info(String.format("CLI-102: Full version '%s'", System.getProperty("java.vm.version")));
-        logger.info(String.format("CLI-102: JVM Vendor '%s'", System.getProperty("java.vm.vendor")));
-        logger.info(String.format("CLI-102: JVM name '%s'", System.getProperty("java.vm.name")));
+        logger.trace(String.format("CLI-102: JDK Version 'JDK %s'", System.getProperty("java.vm.specification.version")));
+        logger.trace(String.format("CLI-102: Full version '%s'", System.getProperty("java.vm.version")));
+        logger.trace(String.format("CLI-102: JVM Vendor '%s'", System.getProperty("java.vm.vendor")));
+        logger.trace(String.format("CLI-102: JVM name '%s'", System.getProperty("java.vm.name")));
 
-        logger.info(String.format("CLI-102: OS name '%s'", System.getProperty("os.name")));
+        logger.trace(String.format("CLI-102: OS name '%s'", System.getProperty("os.name")));
 
         Runtime runtime = Runtime.getRuntime();
         double mem = runtime.totalMemory() / 1024.0 / 1024.0;
 
 
-        logger.info(String.format("CLI-102: Java memory %.0fMB", mem));
+        logger.trace(String.format("CLI-102: Java memory %.0fMB", mem));
     }
 
 }
