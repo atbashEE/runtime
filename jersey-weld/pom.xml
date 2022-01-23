@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+    Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -34,16 +34,20 @@
 
     <dependencies>
 
-        <!-- FIXME This seems wrong but cannot make it work otherwise
-        Without out, I cannot inject in JAX-RS resources. But adding it
-        breaks the situation where you have a beans.xml
-        WELD-001304: More than one context active for scope type jakarta.enterprise.context.RequestScoped
+        <!-- We are now at a point where CDI injection works pretty good.  Injecting into JAX-RS resources requires that
+        the class has a CDI scope.
 
-        http://blog.supol.cz/?p=243  And when we have Jakarta EE 10?
+        And when we have Jakarta EE 10 we can try the HK2 less version of Jersey. http://blog.supol.cz/?p=243
         -->
         <dependency>
             <groupId>org.glassfish.jersey.ext.cdi</groupId>
-            <artifactId>jersey-weld2-se</artifactId>
+            <artifactId>jersey-cdi1x-servlet</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.ext.cdi</groupId>
+            <artifactId>jersey-cdi1x</artifactId>
             <version>${jersey.version}</version>
         </dependency>
 

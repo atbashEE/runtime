@@ -15,12 +15,7 @@ Applications are internally identified by the contextroot they are available (mu
 
 == Known issues
 
-- A Web application containing a _beans.xml_ file will result in
-
-[source]
-----
-WELD-001304: More than one context active for scope type jakarta.enterprise.context.RequestScoped
-----
+- In order to have CDI injection in a JAX-RS resource to be working, the JAX-RS resource requires a CDI scope annotation.
 
 == Installation
 

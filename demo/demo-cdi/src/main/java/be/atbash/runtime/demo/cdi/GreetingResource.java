@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
  */
 package be.atbash.runtime.demo.cdi;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
 
-
+@ApplicationScoped
 @Path("/greeting")
 public class GreetingResource {
 
@@ -31,6 +32,6 @@ public class GreetingResource {
     @GET
     @Path("/{name}")
     public String sayHello(@PathParam("name") String name, @QueryParam("language") String language) {
-        return greetingService.greetMessage(name, language);
+        return greetingService.greetMessage(name, language == null ? "en" : language);
     }
 }
