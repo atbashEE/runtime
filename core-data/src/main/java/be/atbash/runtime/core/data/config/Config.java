@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ public class Config {
     private List<Endpoint> endpoints;
     private Logging logging;
     private Monitoring monitoring;
+    private Modules modules;
 
     public Logging getLogging() {
         return logging;
@@ -48,5 +49,13 @@ public class Config {
 
     public void setMonitoring(Monitoring monitoring) {
         this.monitoring = monitoring;
+    }
+
+    public Modules getModules() {
+        return modules;
+    }
+
+    public void setModules(Modules modules) {
+        this.modules = modules;
     }
 }

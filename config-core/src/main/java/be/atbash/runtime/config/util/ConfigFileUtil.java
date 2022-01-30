@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,19 @@ public final class ConfigFileUtil {
             } catch (IOException e) {
                 throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
+        }
+    }
+
+    public static void writeConfigurationContent(ConfigInstance configInstance, String content) {
+        if (configInstance.isReadOnlyFlag()) {
+            // Nothing to do, we don't store anything
+            return;
+        }
+        File configFile = new File(configInstance.getConfigDirectory(), CONFIG_FILE);
+        try {
+            Files.writeString(configFile.toPath(), content);
+        } catch (IOException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }
 

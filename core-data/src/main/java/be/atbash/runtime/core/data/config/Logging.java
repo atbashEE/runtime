@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,40 @@
  */
 package be.atbash.runtime.core.data.config;
 
+import be.atbash.json.annotate.JsonIgnore;
+
 public class Logging {
 
     private boolean logToConsole;
     private boolean logToFile;
 
+    @JsonIgnore
+    private Boolean overruleLogToConsole;
+
+    @JsonIgnore
+    private Boolean overruleLogToFile;
+
     public boolean isLogToConsole() {
-        return logToConsole;
+        return overruleLogToConsole == null ? logToConsole : overruleLogToConsole;
     }
 
     public void setLogToConsole(boolean logToConsole) {
         this.logToConsole = logToConsole;
     }
 
+    public void overruleLogToConsole(boolean logToConsole) {
+        this.overruleLogToConsole = logToConsole;
+    }
+
     public boolean isLogToFile() {
-        return logToFile;
+        return overruleLogToFile == null ? logToFile : overruleLogToFile;
     }
 
     public void setLogToFile(boolean logToFile) {
         this.logToFile = logToFile;
+    }
+
+    public void overruleLogToFile(boolean logToFile) {
+        overruleLogToFile = logToFile;
     }
 }

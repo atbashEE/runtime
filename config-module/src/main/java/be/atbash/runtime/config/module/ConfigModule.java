@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@ package be.atbash.runtime.config.module;
 import be.atbash.json.JSONValue;
 import be.atbash.json.TypeReference;
 import be.atbash.runtime.config.ConfigInstance;
-import be.atbash.runtime.config.util.ConfigInstanceUtil;
 import be.atbash.runtime.config.module.exception.ProfileNameException;
 import be.atbash.runtime.config.module.profile.ProfileManager;
 import be.atbash.runtime.config.util.ConfigFileUtil;
+import be.atbash.runtime.config.util.ConfigInstanceUtil;
 import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.config.Config;
+import be.atbash.runtime.core.data.config.Modules;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
@@ -133,7 +134,9 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
         ProfileManager profileManager = new ProfileManager(parameters, profile);
         readConfiguration(configInstance);
-        overruleConfiguration();
+        updateConfiguration();
+
+        writeConfiguration(configInstance);
 
         // Handle log to file correctly
         System.setProperty(LoggingUtil.SYSTEM_PROPERTY_FILE_LOGGING, Boolean.toString(config.getLogging().isLogToFile()));
@@ -141,7 +144,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         RuntimeConfiguration.Builder builder;
         if (parameters.isStateless()) {
             if (configInstance.getConfigName() != null) {
-                builder = new RuntimeConfiguration.Builder(configInstance.getConfigDirectory(),  configInstance.getLoggingConfigurationFile(), true);
+                builder = new RuntimeConfiguration.Builder(configInstance.getConfigDirectory(), configInstance.getLoggingConfigurationFile(), true);
             } else {
                 builder = new RuntimeConfiguration.Builder(configInstance.getLoggingConfigurationFile());
             }
@@ -173,12 +176,13 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         return profile.get();
     }
 
-    private void overruleConfiguration() {
+    private void updateConfiguration() {
+        // LogToConsole and logToFile from command line only effective for current run, configuration file not updated.
         if (parameters.isLogToConsole()) {
-            config.getLogging().setLogToConsole(true);
+            config.getLogging().overruleLogToConsole(true);
         }
         if (!parameters.isLogToFile()) {
-            config.getLogging().setLogToFile(false);
+            config.getLogging().overruleLogToFile(false);
         }
         if (parameters.getWatcher() == WatcherType.JFR || parameters.getWatcher() == WatcherType.ALL) {
             config.getMonitoring().setFlightRecorder(true);
@@ -192,6 +196,14 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         String content = ConfigFileUtil.readConfigurationContent(configInstance);
 
         config = JSONValue.parse(content, Config.class);
+        if (config.getModules() == null) {
+            config.setModules(new Modules());
+        }
+    }
+
+    private void writeConfiguration(ConfigInstance configInstance) {
+        String content = JSONValue.toJSONString(config);
+        ConfigFileUtil.writeConfigurationContent(configInstance, content);
     }
 
     private void readProfiles() {
