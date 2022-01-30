@@ -15,7 +15,6 @@
  */
 package be.atbash.runtime.config.util;
 
-import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.util.ResourceReader;
@@ -36,19 +35,21 @@ public final class ConfigFileUtil {
     }
 
     /**
-     * Read the Runtime Configuration, either from the Config directory or the default when in read only (stateless mode)
-     * @param configInstance Information about the configuration of the instance.
+     * Read the Runtime Configuration, either from the Config directory or the default when in read only (stateless) mode.
+     *
+     * @param configDirectory The location of the configDirectory
+     * @param stateless       is this stateless mode.
      * @return The content (as JSON)
      */
-    public static String readConfigurationContent(ConfigInstance configInstance) {
-        if (configInstance.isReadOnlyFlag()) {
+    public static String readConfigurationContent(File configDirectory, boolean stateless) {
+        if (stateless) {
             try {
                 return ResourceReader.readResource(DEFAULT_CONFIG_FILE);
             } catch (IOException e) {
                 throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
         } else {
-            File configFile = new File(configInstance.getConfigDirectory(), CONFIG_FILE);
+            File configFile = new File(configDirectory, CONFIG_FILE);
             try {
                 return Files.readString(configFile.toPath());
             } catch (IOException e) {
@@ -57,12 +58,12 @@ public final class ConfigFileUtil {
         }
     }
 
-    public static void writeConfigurationContent(ConfigInstance configInstance, String content) {
-        if (configInstance.isReadOnlyFlag()) {
+    public static void writeConfigurationContent(File configDirectory, boolean stateless, String content) {
+        if (stateless) {
             // Nothing to do, we don't store anything
             return;
         }
-        File configFile = new File(configInstance.getConfigDirectory(), CONFIG_FILE);
+        File configFile = new File(configDirectory, CONFIG_FILE);
         try {
             Files.writeString(configFile.toPath(), content);
         } catch (IOException e) {
@@ -72,6 +73,7 @@ public final class ConfigFileUtil {
 
     /**
      * Read the information (as string) about the deployed application from a previous run (if any).
+     *
      * @param runtimeConfiguration Information about the configuration of the instance.
      * @return The content (as JSON)
      */

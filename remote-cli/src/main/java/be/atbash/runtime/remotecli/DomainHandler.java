@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ public class DomainHandler extends AbstractHandler {
         commands.put("deploy", new DeployRemoteCommand());
         commands.put("list-applications", new ListApplicationsRemoteCommand());
         commands.put("undeploy", new UndeployRemoteCommand());
+        commands.put("set", new SetRemoteCommand());
     }
 
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

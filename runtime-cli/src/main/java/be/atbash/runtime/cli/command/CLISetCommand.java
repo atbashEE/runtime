@@ -15,32 +15,22 @@
  */
 package be.atbash.runtime.cli.command;
 
-import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import picocli.CommandLine;
 
-import java.util.concurrent.Callable;
+import java.util.HashMap;
+import java.util.Map;
 
-@CommandLine.Command(subcommands =
-        {CreateConfigCommand.class,
-                StatusCommand.class,
-                DeployCommand.class,
-                ListApplicationsCommand.class,
-                UndeployCommand.class,
-                CLISetCommand.class}
-        , name = "")
-public class RuntimeCommand implements Callable<Integer> {
+@CommandLine.Command(name = "set")
+public class CLISetCommand extends AbstractRemoteAtbashCommand {
 
-    @CommandLine.Mixin
-    private ConfigurationParameters configurationParameters;
+    @CommandLine.Parameters(index = "0..*")
+    private String[] options;
 
     @Override
     public Integer call() throws Exception {
-
-        throw new UnsupportedOperationException("Need to implmeent the start of the runtime through the CLI");
-
-    }
-
-    public ConfigurationParameters getConfigurationParameters() {
-        return configurationParameters;
+        Map<String, String> options = new HashMap<>();
+        options.put("", String.join(",", this.options));
+        callRemoteCLI("GET", "set", basicRemoteCLIParameters, options);
+        return 0;
     }
 }

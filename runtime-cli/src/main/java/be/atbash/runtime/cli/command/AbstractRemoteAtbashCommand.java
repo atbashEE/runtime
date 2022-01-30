@@ -111,6 +111,7 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             CommandResponse commandResponse = mapper.readValue(data, CommandResponse.class);
             if (commandResponse.isSuccess()) {
                 writeCommandOutput(commandResponse);
+                System.out.println("Command execution successful");
             } else {
                 writeErrorMessage(commandResponse);
             }

@@ -18,6 +18,7 @@ package be.atbash.runtime.config.module;
 import be.atbash.json.JSONValue;
 import be.atbash.json.TypeReference;
 import be.atbash.runtime.config.ConfigInstance;
+import be.atbash.runtime.config.ConfigurationManager;
 import be.atbash.runtime.config.module.exception.ProfileNameException;
 import be.atbash.runtime.config.module.profile.ProfileManager;
 import be.atbash.runtime.config.util.ConfigFileUtil;
@@ -61,6 +62,8 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
     private List<Profile> profiles;
 
+    private ConfigurationManager configurationManager;
+
     @Override
     public String name() {
         return Module.CONFIG_MODULE_NAME;
@@ -88,7 +91,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
     @Override
     public List<Class<?>> getRuntimeObjectTypes() {
-        return List.of(RuntimeConfiguration.class, PersistedDeployments.class);
+        return List.of(RuntimeConfiguration.class, PersistedDeployments.class, ConfigurationManager.class);
     }
 
     @Override
@@ -98,6 +101,9 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         }
         if (exposedObjectType.equals(PersistedDeployments.class)) {
             return (T) ConfigUtil.readApplicationDeploymentsData(runtimeConfiguration);
+        }
+        if (exposedObjectType.equals(ConfigurationManager.class)) {
+            return (T) configurationManager;
         }
         return null;
     }
@@ -163,6 +169,8 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         }
 
         watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "CONFIG-1002: Module ready", false);
+
+        configurationManager = new ConfigurationManager(runtimeConfiguration);
     }
 
     private Profile findProfile() {
@@ -193,7 +201,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     }
 
     private void readConfiguration(ConfigInstance configInstance) {
-        String content = ConfigFileUtil.readConfigurationContent(configInstance);
+        String content = ConfigFileUtil.readConfigurationContent(configInstance.getConfigDirectory(), configInstance.isReadOnlyFlag());
 
         config = JSONValue.parse(content, Config.class);
         if (config.getModules() == null) {
@@ -203,7 +211,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
     private void writeConfiguration(ConfigInstance configInstance) {
         String content = JSONValue.toJSONString(config);
-        ConfigFileUtil.writeConfigurationContent(configInstance, content);
+        ConfigFileUtil.writeConfigurationContent(configInstance.getConfigDirectory(), configInstance.isReadOnlyFlag(), content);
     }
 
     private void readProfiles() {
