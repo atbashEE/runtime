@@ -45,6 +45,9 @@ The exit status of the process it
 - -1: Incorrect commandline options specified
 - -2: Runtime failed to start due to some error.
 
+*-c|--configfile* Defines the configuration file with commands that needs to be executed. after start up of the runtime but before the applications are deployed.
+The file can contain comments when the line starts with `#`. Otherwise the line need to contain a valid command as specified in the next section _CLI_
+
 === CLI
 
 java -jar atbash-cli.jar <command> <options>
@@ -93,3 +96,9 @@ List all applications running on the runtime.
 Undeploy an application
 
 `undeploy <name>`
+
+=== set (remote)
+
+Set configuration parameters for modules. The parameters must be in the form of <module>.<key>=value.  Multiple parameters can be specified one the same set command (space separated)
+
+`set mp-config.validation.disable=true`

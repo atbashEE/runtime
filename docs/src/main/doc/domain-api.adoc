@@ -21,3 +21,7 @@ List all applications running on the runtime.
 === POST - domain/undeploy
 
 Undeploy an application
+
+=== POST - domain/set
+
+Set configuration parameters for modules.

@@ -17,6 +17,7 @@ package be.atbash.runtime;
 
 import be.atbash.runtime.command.RuntimeCommand;
 import be.atbash.runtime.common.command.AbstractAtbashCommand;
+import be.atbash.runtime.config.ConfigurationManager;
 import be.atbash.runtime.core.data.CriticalThreadCount;
 import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
@@ -170,8 +171,7 @@ public class MainRunnerHelper {
 
             logger = LoggingUtil.getMainLogger(RuntimeMain.class);
 
-            logger.info("CLI-107: Atbash Runtime startup aborted due to previous errors. (See log if created for the reason of the abort)");
-            System.exit(-2);
+            abort("CLI-107: Atbash Runtime startup aborted due to previous errors. (See log if created for the reason of the abort)", -2);
         }
     }
 
@@ -229,7 +229,7 @@ public class MainRunnerHelper {
     private static ArchiveDeployment createArchiveDeployment(DeploymentMetadata metadata, EventManager eventManager) {
         List<Sniffer> sniffers = SnifferManager.getInstance().retrieveSniffers(metadata.getSniffers());
         ArchiveDeployment deployment = new ArchiveDeployment(metadata.getDeploymentLocation(), metadata.getDeploymentName()
-                , SpecificationUtil.asEnum(metadata.getSpecifications()), sniffers, metadata.getContextRoot());
+                , SpecificationUtil.asEnum(metadata.getSpecifications()), sniffers, metadata.getContextRoot(), metadata.getDeploymentData());
         eventManager.publishEvent(Events.VERIFY_DEPLOYMENT, deployment);
         if (deployment.getDeploymentLocation() == null) {
             // The Deployment location is gone
@@ -250,9 +250,9 @@ public class MainRunnerHelper {
         } else {
 
             logger.warn("CLI-105: No Applications running");
-            if (!runData.isDomainMode()) {
-                logger.info("CLI-108: Atbash Runtime stopped as there are no applications deployed and Runtime is not in domain mode.");
-                System.exit(-2);
+            if (!runData.isDomainMode() && !runData.isEmbeddedMode()) {
+                // Don't exit in embedded mode when deployment failed. This can be intended with TCK tests.
+                abort("CLI-108: Atbash Runtime stopped as there are no applications deployed and Runtime is not in domain mode.", -2);
             }
         }
     }
@@ -260,8 +260,7 @@ public class MainRunnerHelper {
     public void handleWarmup() {
         if (actualCommand.getConfigurationParameters().isWarmup()) {
             CriticalThreadCount.getInstance().waitForCriticalThreadsToFinish();
-            logger.info("CLI-106: process stop due to warmup parameter");
-            System.exit(0);  // Normal status.
+            abort("CLI-106: process stop due to warmup parameter", 0);
         }
     }
 
@@ -280,4 +279,23 @@ public class MainRunnerHelper {
         logger.trace(String.format("CLI-102: Java memory %.0fMB", mem));
     }
 
+    public void performConfiguration() {
+        File configFile = actualCommand.getConfigurationParameters().getConfigFile();
+        if (configFile != null) {
+            if (!configFile.exists() || !configFile.canRead()) {
+                // FIXME is status -3 good? what is the logic of the different exit statusses.
+                abort(String.format("CLI-112: Atbash Runtime startup aborted since the configuration file %s does not exists or cannot be read", configFile), -3);
+            }
+            try {
+                RuntimeObjectsManager.getInstance().getExposedObject(ConfigurationManager.class).executeConfigFile(configFile);
+            } catch (Throwable e) {
+                abort("CLI-107: Atbash Runtime startup aborted due to previous errors. (See log if created for the reason of the abort)", -2);
+            }
+        }
+    }
+
+    private void abort(String message, int status) {
+        logger.info(message);
+        System.exit(status);
+    }
 }

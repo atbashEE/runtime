@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ public class RuntimeMain {
         helper.performStartup();
 
         helper.logStartupTime(start);
+
+        helper.performConfiguration();
 
         // Now that all Modules are initialized, we can use the real WatcherService and the bean will
         // registered within JMX if the configuration indicates we need to do it.

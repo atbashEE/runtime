@@ -61,8 +61,11 @@ public class ConfigurationParameters {
     @CommandLine.Option(names = {"--contextroot"}, description = "The context root for the application. Comma separated list when multiple applications are deployed.")
     private String contextRoot = "";
 
-    @CommandLine.Option(names = {"--stateless"}, description = "In stateless mode, no configuration files are written and logs are places in the temp directory..")
+    @CommandLine.Option(names = {"--stateless"}, description = "In stateless mode, no configuration files are written and logs are places in the temp directory.")
     private boolean stateless = false;
+
+    @CommandLine.Option(names = {"-c","--configfile"}, description = "Configuration file that needs to be executed after startup and before applications are deployed")
+    private File configFile;
 
     @CommandLine.Parameters(index = "0..*")
     private File[] archives;
@@ -187,6 +190,14 @@ public class ConfigurationParameters {
 
     public void setEmbeddedMode() {
         this.embeddedMode = true;
+    }
+
+    public File getConfigFile() {
+        return configFile;
+    }
+
+    public void setConfigFile(File configFile) {
+        this.configFile = configFile;
     }
 
     @Override

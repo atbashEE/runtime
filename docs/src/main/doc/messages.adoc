@@ -26,6 +26,11 @@ When passing a file name on the command line.
 - CONFIG-017(ERROR): The directory for the 'domain' (configuration, logs, ...) already exists and is not allowed for the Runtime CLI tool.
 - CONFIG-018(WARN): The file _applications.json_  cannot be written. This means that the application will not start the next time
 
+- CONFIG-101(ERROR): The option specified for the _set_ command must consist of <key>=<value> pairs separated by a space.
+- CONFIG-102(ERROR): The key part of the option specified for the _set_ command must be in the format <module>.<key-parts>
+- CONFIG-103(ERROR): The line _n_ in the configuration file could not be recognized as a valid command with parameters.
+- CONFIG-104(INFO): Processing of the command on line _n_ within the configuration file failed.
+
 === Logging Module
 
 === Jetty module
