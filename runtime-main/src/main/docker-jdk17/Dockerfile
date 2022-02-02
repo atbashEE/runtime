@@ -8,6 +8,7 @@ EXPOSE 5005
 
 ENV HOME_DIR=/opt/atbash
 ENV DEPLOYMENT_DIR=${HOME_DIR}/deployment \
+    CONFIG_FILE_LOCATION=${HOME_DIR}/configfile.boot \
     JVM_ARGS="" \
     ATBASH_ARGS="" \
     STATELESS="true" \

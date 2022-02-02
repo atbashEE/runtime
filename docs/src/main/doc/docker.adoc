@@ -29,6 +29,14 @@ This is the command that starts the instance.
 exec java -XX:MaxRAMPercentage=${MEM_MAX_RAM_PERCENTAGE} -Xss${MEM_XSS} -XX:+UseContainerSupport ${JVM_ARGS} -jar atbash-runtime.jar --logToConsole --deploymentdirectory ${DEPLOYMENT_DIR} ${ATBASH_ARGS}
 ----
 
+=== Configuration file
+
+When a configuration file is required to perform the setup of the runtime after booting up, copy the file with all the commands to the location `$CONFIG_FILE_LOCATION`.
+
+[source]
+----
+COPY config.boot $CONFIG_FILE_LOCATION
+----
 
 === Examples
 
