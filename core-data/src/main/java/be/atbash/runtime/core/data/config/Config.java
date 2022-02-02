@@ -15,7 +15,9 @@
  */
 package be.atbash.runtime.core.data.config;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Root class for the Atbash Runtime configuration.
@@ -58,4 +60,9 @@ public class Config {
     public void setModules(Modules modules) {
         this.modules = modules;
     }
+
+    public Map<String, String> getModuleConfiguration(String moduleName) {
+        return modules.getConfiguration().computeIfAbsent(moduleName, k -> new HashMap<>());
+    }
+
 }

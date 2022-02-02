@@ -22,6 +22,7 @@ import be.atbash.runtime.config.util.ConfigFileUtil;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
+import be.atbash.runtime.core.data.module.event.EventManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -32,6 +33,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static be.atbash.runtime.core.data.module.event.Events.CONFIGURATION_UPDATE;
 
 /**
  * Class responsible for executing configuration commands and executing the configuration file after modules startup.
@@ -92,6 +95,7 @@ public class ConfigurationManager {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
+        LOGGER.info(String.format("CONFIG-105: Performing execution defined in %s", configFile));
         ConfigFileCommands configFileCommands = new ConfigFileCommands();
         CommandLine commandLine = new CommandLine(configFileCommands);
 
@@ -113,7 +117,10 @@ public class ConfigurationManager {
             }
 
             List<CommandLine> commandLines = parseResult.asCommandLineList();
-            AbstractConfigurationCommand currentCommand = commandLines.get(commandLines.size() - 1).getCommand();
+            CommandLine actualCommandLine = commandLines.get(commandLines.size() - 1);
+            AbstractConfigurationCommand currentCommand = actualCommandLine.getCommand();
+
+            LOGGER.info(String.format("CONFIG-106: Performing execution of command '%s' on line %s", actualCommandLine.getCommandName(), line));
 
             Integer callResult = currentCommand.call();
             // result < 0 -> Error -> abort startup.
@@ -124,5 +131,8 @@ public class ConfigurationManager {
 
             line++;
         }
+
+        LOGGER.info("CONFIG-107: All commands executed within the configuration file");
+        EventManager.getInstance().publishEvent(CONFIGURATION_UPDATE, runtimeConfiguration);
     }
 }
