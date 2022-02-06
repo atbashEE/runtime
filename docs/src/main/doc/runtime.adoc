@@ -35,6 +35,8 @@ include::logging.adoc[]
 
 include::commandlineoptions.adoc[]
 
+include::mpconfig.adoc[]
+
 include::integrations.adoc[]
 
 include::docker.adoc[]

@@ -3,4 +3,5 @@ be.atbash.runtime.logging.LoggingModule
 be.atbash.runtime.core.CoreModule
 be.atbash.runtime.jetty.JettyModule
 be.atbash.runtime.jersey.JerseyModule
+be.atbash.runtime.config.mp.module.MPConfigModule
 be.atbash.runtime.remotecli.RemoteCLIModule

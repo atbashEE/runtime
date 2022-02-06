@@ -1,0 +1,55 @@
+== MicroProfile Config
+
+
+=== Validation
+
+For some CDI validation messages, the log contains more details why a certain dependency is not found.
+
+For example
+
+----
+WELD-001408: Unsatisfied dependencies for type int with qualifiers @ConfigProperties
+at injection point [BackedAnnotatedField] @Inject @ConfigProperties private be.rubus.runtime.examples.mpconfig.properties.ConfigPropertiesResource.wrong
+----
+
+has the following clarification in the log.
+
+----
+[SEVERE] [MPCONFIG-012] [be.atbash.runtime.config.mp.ConfigExtension] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: 1643116914487] [levelValue: 1000] MPCONFIG-012: Injection point with @ConfigProperties is not supported with a primitive or array and found Type 'int' at be.rubus.runtime.examples.mpconfig.properties.ConfigPropertiesResource.wrong
+----
+
+
+=== Disable validation
+
+The MicroProfile Configuration specification requires that all injection points to be validated to make sure that all required configuration value are present.
+
+There are cases that you fo not want that this validation happens. You want to deploy the application before the source with the Configuration values are accessible for ready.
+
+You can bypass this validation by defining the Runtime setting `mp-config.validation.disable` with a value _true_. You can do this with the set command, using the `MainCLI` tool ir by defining the command in the configuration filr and specify it when start up the runtime.
+
+----
+java -jar atbash-cli.jar set mp-config.validation.disable=true
+----
+
+or
+
+----
+java -jar atbash-runtime.jar -c config.txt <path-to>/<application>.war
+----
+
+with the contents of _config.txt_ equals to
+
+----
+set mp-config.validation.disable=true
+----
+
+=== Additional Properties resources
+
+By default, only `microprofile-config.properties` file within the _META-INF_ directory is searched for configuration properties.  Atbash Runtime has the possibility to define additional locations of properties _files_ that can be added as ConfigSource.properties
+You can define the location of these additional locations by using the key `atbash.config.locations`.  You can define this within the `microprofile-config.properties` file or as System Property or Environment Variable (it must be one of the 3 default Configuration sources)
+
+The following types are supported.
+
+- URl when value starts with _http:_ or _https:_.
+- Classpath when value starts with _classpath:_.
+- Files when when value start with _file:_  but this can be omitted.

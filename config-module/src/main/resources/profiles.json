@@ -3,7 +3,8 @@
     "name": "default",
     "modules": [
       "jersey",
-      "jetty"
+      "jetty",
+      "mp-config"
     ]
   },
   {
@@ -11,6 +12,7 @@
     "modules": [
       "jersey",
       "jetty",
+      "mp-config",
       "remote-cli"
     ]
   }

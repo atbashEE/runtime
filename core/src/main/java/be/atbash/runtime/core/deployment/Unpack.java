@@ -136,7 +136,7 @@ public class Unpack {
                 if (index > 0) {
                     archiveLibraryFiles.add(filePath.substring(index + WEB_INF_LIB.length() + 1));
                 } else {
-                    if (filePath.endsWith(".xml")) {
+                    if (filePath.endsWith(".xml") || filePath.endsWith(".properties")) {
                         // Do we need other descriptor files?
                         archiveDescriptorFiles.add(filePath.substring(webInfindex + WEB_INF.length() + 1));
                     }
@@ -174,7 +174,7 @@ public class Unpack {
         if (metaInfindex > 0) {
             int index = filePath.indexOf(META_INF_MAVEN);
 
-            if (index == -1 && filePath.endsWith(".xml")) {
+            if (index == -1 && (filePath.endsWith(".xml") || filePath.endsWith(".properties"))) {
                 archiveDescriptorFiles.add(filePath);
 
             }

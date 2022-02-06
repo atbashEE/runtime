@@ -7,10 +7,14 @@ See the file LICENSE
 ------------------------------------------------------------------------
 
 
-This codebase builds on top of EPL-2 or Apache licensed code.
+This codebase builds on top of EPL-2 and Apache licensed code.
 
 Jetty: https://github.com/eclipse/jetty.project
 Jersey: https://github.com/eclipse-ee4j/jersey
 Weld: https://github.com/weld/core
 
 and others
+
+Some modules are inspired by and have snippets from other OpenSource projects
+
+MP-Config module: SmallRye Config and Payara MicroProfile Config implementation.

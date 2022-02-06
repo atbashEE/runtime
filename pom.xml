@@ -48,6 +48,7 @@
         <slf4j.version>2.0.0-alpha1</slf4j.version> <!-- So that it is aligned with the Jetty version -->
         <jersey.version>3.0.3</jersey.version>
         <jakarta.rest.api.version>3.0.0</jakarta.rest.api.version>
+        <atbash.utils-se.version>1.1.0-SNAPSHOT</atbash.utils-se.version>
     </properties>
 
     <dependencyManagement>
@@ -73,6 +74,12 @@
                 <groupId>be.atbash.json</groupId>
                 <artifactId>octopus-json-smart</artifactId>
                 <version>1.0.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>be.atbash.utils</groupId>
+                <artifactId>utils-se</artifactId>
+                <version>${atbash.utils-se.version}</version>
             </dependency>
 
         </dependencies>
