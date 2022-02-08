@@ -16,14 +16,12 @@
 package be.atbash.runtime.config.mp.sources;
 
 
-import be.atbash.runtime.config.mp.converter.Converters;
 import be.atbash.runtime.config.mp.util.StringUtil;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
-import static be.atbash.runtime.config.mp.util.ConfigSourceUtil.CONFIG_ORDINAL_KEY;
 
 /**
  *
@@ -43,7 +41,7 @@ public class EnvConfigSource extends MapBackedConfigSource {
     }
 
     public EnvConfigSource(Map<String, String> propertyMap, int ordinal) {
-        super("EnvConfigSource", propertyMap, getEnvOrdinal(propertyMap, ordinal));
+        super("EnvConfigSource", propertyMap, ordinal);
     }
 
     @Override
@@ -78,14 +76,6 @@ public class EnvConfigSource extends MapBackedConfigSource {
      */
     private static Map<String, String> getEnvProperties() {
         return Collections.unmodifiableMap(System.getenv());
-    }
-
-    private static int getEnvOrdinal(Map<String, String> properties, int ordinal) {
-        String value = getValue(CONFIG_ORDINAL_KEY, properties);
-        if (value != null) {
-            return Converters.INTEGER_CONVERTER.convert(value);
-        }
-        return ordinal;
     }
 
     Object writeReplace() {

@@ -43,8 +43,8 @@ public class SysPropConfigSource extends AbstractConfigSource {
     }
 
     @Override
-    public String getValue(String s) {
-        return System.getProperty(s);
+    public String getValue(String key) {
+        return System.getProperty(key);
     }
 
     private static Map<String, String> getSystemProperties() {

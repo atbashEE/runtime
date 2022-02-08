@@ -25,15 +25,16 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
- *
  * utilities and constants for {@link ConfigSource} implementations
- *
+ * <p>
  * Based on code from SmallRye Config.
  */
 public class ConfigSourceUtil {
-    public static final String CONFIG_ORDINAL_KEY = "config_ordinal";
+
+    private static final Logger LOGGER = Logger.getLogger(ConfigSourceUtil.class.getName());
 
     private ConfigSourceUtil() {
     }
@@ -46,13 +47,13 @@ public class ConfigSourceUtil {
      */
     @SuppressWarnings("squid:S2445")
     public static Map<String, String> propertiesToMap(Properties properties) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> result = new HashMap<>();
 
-        for (Map.Entry<Object, Object> e : properties.entrySet()) {
-            map.put(String.valueOf(e.getKey()), String.valueOf(e.getValue()));
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            result.put(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
         }
 
-        return map;
+        return result;
     }
 
     public static Map<String, String> urlToMap(URL locationOfProperties) throws IOException {
@@ -76,7 +77,12 @@ public class ConfigSourceUtil {
      * @return the ordinal value to use
      */
     public static int getOrdinalFromMap(Map<String, String> map, int defaultOrdinal) {
-        String ordStr = map.get(CONFIG_ORDINAL_KEY);
-        return ordStr == null ? defaultOrdinal : Integer.parseInt(ordStr);
+        String ordStr = map.get(ConfigSource.CONFIG_ORDINAL);
+        try {
+            return ordStr == null ? defaultOrdinal : Integer.parseInt(ordStr);
+        } catch (NumberFormatException e) {
+            LOGGER.warning(String.format("The property value for '%s' should be an integer but found '%s'", ConfigSource.CONFIG_ORDINAL, ordStr));
+            return defaultOrdinal;
+        }
     }
 }
