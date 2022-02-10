@@ -99,7 +99,9 @@ public class AtbashConfigBuilder implements ConfigBuilder {
                 String msg = String.format("MPCONFIG-112: Can not add converter %s that is not parameterized with a type", converter);
                 throw new IllegalStateException(msg);
             }
-            addConverter(type, AnnotationUtil.getPriority(converter), converter, this.converters);
+            int priority = AnnotationUtil.getPriority(converter.getClass()).orElse(ConfigSource.DEFAULT_ORDINAL);
+            // Assumed default priority 100 as default, spec 6.2
+            addConverter(type, priority, converter, this.converters);
         }
         return this;
     }
@@ -111,7 +113,9 @@ public class AtbashConfigBuilder implements ConfigBuilder {
     }
 
     private void addConverter(Type type, Converter<?> converter, Map<Type, ConverterWithPriority> converters) {
-        addConverter(type, AnnotationUtil.getPriority(converter), converter, converters);
+        int priority = AnnotationUtil.getPriority(converter.getClass()).orElse(ConfigSource.DEFAULT_ORDINAL);
+        // Assumed default priority 100 as default, spec 6.2
+        addConverter(type, priority, converter, converters);
     }
 
     private void addConverter(Type type, int priority, Converter<?> converter,

@@ -47,7 +47,7 @@ public final class AnnotationUtil {
         if (annotation == null) {
             return Optional.empty();
         }
-        final String value = annotation.prefix();
+         String value = annotation.prefix();
         if (value == null || value.equals(UNCONFIGURED_PREFIX)) {
             return Optional.empty();
         }
@@ -57,23 +57,13 @@ public final class AnnotationUtil {
         return Optional.of(value + ".");
     }
 
-    public static int getPriority(Converter<?> converter) {
-        int priority = ConfigSource.DEFAULT_ORDINAL; // Assumed 100 as default, spec 6.2
-        Priority priorityAnnotation = converter.getClass().getAnnotation(Priority.class);
-        if (priorityAnnotation != null) {
-            priority = priorityAnnotation.value();
-        }
-        return priority;
-    }
-
-    public static OptionalInt getPriority(Class<?> klass) {
-        Priority priorityAnnotation = klass.getAnnotation(Priority.class);
+    public static OptionalInt getPriority(Class<?> aClass) {
+        Priority priorityAnnotation = aClass.getAnnotation(Priority.class);
         if (priorityAnnotation != null) {
             return OptionalInt.of(priorityAnnotation.value());
         } else {
-            Class<?> parentClass = klass.getSuperclass();
-            if (ConfigSourceInterceptor.class.isAssignableFrom(parentClass)) {
-                return getPriority(parentClass);
+            if (aClass != Object.class) {
+                return getPriority(aClass.getSuperclass());
             }
             return OptionalInt.empty();
         }
