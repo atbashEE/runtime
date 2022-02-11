@@ -23,7 +23,7 @@ import java.util.*;
 
 /**
  * This interceptor actually looks up the required information from the ConfigSource.
- *
+ * <p>
  * Based on code from SmallRye Config.
  */
 public class ConfigValueRetrievalInterceptor implements ConfigSourceInterceptor {
@@ -39,7 +39,7 @@ public class ConfigValueRetrievalInterceptor implements ConfigSourceInterceptor 
     }
 
     @Override
-    public ConfigValue getValue(ConfigSourceInterceptorContext context, final String name) {
+    public ConfigValue getValue(ConfigSourceInterceptorContext context, String name) {
         for (ConfigValueConfigSource configSource : configSources) {
             ConfigValue configValue = configSource.getConfigValue(name);
 

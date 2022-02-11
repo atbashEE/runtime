@@ -27,7 +27,6 @@ import java.util.Set;
 
 
 /**
- *
  * This interceptor adds additional entries to {@link org.eclipse.microprofile.config.Config#getPropertyNames}.
  * <p>
  * The additional entries are required when a consumer relies on the list of properties to find additional

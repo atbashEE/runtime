@@ -257,8 +257,9 @@ public class ConfigExtension implements Extension {
     /**
      * Determine the prefix that needs to be used.  Injection has precedence over the prefix defined at the class level.
      * If no prefix defined at all, returns empty string
+     *
      * @param injectionPrefix Prefix config on InjectionPoint
-     * @param classPrefix Prefix config on Class.
+     * @param classPrefix     Prefix config on Class.
      * @return Prefix to use based on config on InjectionPoint or CLass.
      */
     private String determinePrefix(Optional<String> injectionPrefix, Optional<String> classPrefix) {

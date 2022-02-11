@@ -32,9 +32,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- *
  * Create a CDI bean for the specified Class that can be injected for ConfigProperty.
- *
+ * <p>
  * Based on code by Mark Struberg
  */
 public class ConfigInjectionBean<T> implements Bean<T>, PassivationCapable {

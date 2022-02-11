@@ -15,13 +15,10 @@
  */
 package be.atbash.runtime.config.mp.util;
 
-import be.atbash.runtime.config.mp.sources.interceptor.ConfigSourceInterceptor;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.inject.spi.Annotated;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
-import org.eclipse.microprofile.config.spi.ConfigSource;
-import org.eclipse.microprofile.config.spi.Converter;
 
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -47,7 +44,7 @@ public final class AnnotationUtil {
         if (annotation == null) {
             return Optional.empty();
         }
-         String value = annotation.prefix();
+        String value = annotation.prefix();
         if (value == null || value.equals(UNCONFIGURED_PREFIX)) {
             return Optional.empty();
         }

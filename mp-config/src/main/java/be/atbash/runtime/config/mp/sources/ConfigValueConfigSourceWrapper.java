@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
  * Create a wrapper for {@link ConfigSource} as a  {@link ConfigValueConfigSource}.
  */
 class ConfigValueConfigSourceWrapper implements ConfigValueConfigSource, Serializable {

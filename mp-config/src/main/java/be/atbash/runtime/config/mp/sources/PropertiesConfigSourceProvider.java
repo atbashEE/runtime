@@ -42,7 +42,7 @@ public class PropertiesConfigSourceProvider extends AbstractLocationConfigSource
     }
 
     @Override
-    protected ConfigSource loadConfigSource( URL url, final int ordinal) throws IOException {
+    protected ConfigSource loadConfigSource(URL url, int ordinal) throws IOException {
         return new PropertiesConfigSource(url, ordinal);
     }
 }

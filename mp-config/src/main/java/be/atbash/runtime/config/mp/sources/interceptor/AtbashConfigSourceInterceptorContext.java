@@ -34,7 +34,7 @@ public class AtbashConfigSourceInterceptorContext implements ConfigSourceInterce
     }
 
     @Override
-    public ConfigValue proceed( String name) {
+    public ConfigValue proceed(String name) {
         return interceptor.getValue(next, name);
     }
 

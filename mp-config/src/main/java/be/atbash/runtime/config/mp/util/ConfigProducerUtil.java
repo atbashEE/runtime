@@ -51,7 +51,11 @@ public final class ConfigProducerUtil {
      * @return the converted configuration value.
      */
     public static <T> T getValue(InjectionPoint injectionPoint, Config config) {
-        return getValue(getName(injectionPoint), injectionPoint.getType(), getDefaultValue(injectionPoint), config);
+        String name = getName(injectionPoint);
+        if (name == null) {
+            return null;
+        }
+        return getValue(name, injectionPoint.getType(), getDefaultValue(injectionPoint), config);
     }
 
     /**
@@ -59,7 +63,7 @@ public final class ConfigProducerUtil {
      *
      * @param name         the name of the configuration property.
      * @param type         the {@link Type} of the configuration value to convert.
-     * @param defaultValue the default value to use if no configuration value is found.
+     * @param defaultValue the default value to use if no configuration value is found. (null if unconfigured)
      * @param config       the current {@link Config} instance.
      * @return the converted configuration value.
      */
@@ -68,7 +72,7 @@ public final class ConfigProducerUtil {
             return null;
         }
 
-        return ConvertValueUtil.convertValue(name, resolveDefault(getRawValue(name, config), defaultValue),
+        return ConvertValueUtil.convertValue(name, resolveDefault(getResolvedValue(name, config), defaultValue),
                 resolveConverter(type, config));
     }
 
@@ -80,8 +84,9 @@ public final class ConfigProducerUtil {
 
         ConfigValue configValue = config.getConfigValue(name);
 
-        if (configValue.getRawValue() == null) {
+        if (configValue.getRawValue() == null) {  // No value found for name within a ConfigSource.
             if (configValue instanceof ConfigValueImpl) {
+                // Fall back to default value.
                 return ((ConfigValueImpl) configValue).withValue(getDefaultValue(injectionPoint));
             }
         }
@@ -89,12 +94,12 @@ public final class ConfigProducerUtil {
         return configValue;
     }
 
-    public static String getRawValue(String name, Config config) {
+    private static String getResolvedValue(String name, Config config) {
         return config.getConfigValue(name).getValue();
     }
 
-    private static String resolveDefault(String rawValue, String defaultValue) {
-        return rawValue != null ? rawValue : defaultValue;
+    private static String resolveDefault(String value, String defaultValue) {
+        return value != null ? value : defaultValue;
     }
 
     private static <T> Converter<T> resolveConverter(Type type, Config config) {
@@ -104,31 +109,36 @@ public final class ConfigProducerUtil {
             Type[] typeArgs = paramType.getActualTypeArguments();
             if (rawType == List.class) {
                 return (Converter<T>) Converters.newCollectionConverter(resolveConverter(typeArgs[0], config), ArrayList::new);
-            } else if (rawType == Set.class) {
+            }
+            if (rawType == Set.class) {
                 return (Converter<T>) Converters.newCollectionConverter(resolveConverter(typeArgs[0], config), HashSet::new);
-            } else if (rawType == Optional.class) {
+            }
+            if (rawType == Optional.class) {
                 return (Converter<T>) Converters.newOptionalConverter(resolveConverter(typeArgs[0], config));
-            } else if (rawType == Supplier.class) {
+            }
+            if (rawType == Supplier.class) {
                 return resolveConverter(typeArgs[0], config);
             }
         }
         // just try the raw type
-        return config.getConverter(rawType).orElseThrow(() -> new IllegalArgumentException("No registered Converter " + rawType)/*InjectionMessages.msg.noRegisteredConverter(rawType)*/);
+        return config.getConverter(rawType).orElseThrow(() -> new IllegalArgumentException(String.format("MPCONFIG-207: No Converter registered for %s", rawType)));
     }
 
     @SuppressWarnings("unchecked")
     public static <T> Class<T> rawTypeOf(Type type) {
         if (type instanceof Class<?>) {
             return (Class<T>) type;
-        } else if (type instanceof ParameterizedType) {
-            return rawTypeOf(((ParameterizedType) type).getRawType());
-        } else if (type instanceof GenericArrayType) {
-            return (Class<T>) Array.newInstance(rawTypeOf(((GenericArrayType) type).getGenericComponentType()), 0).getClass();
-        } else {
-
-            throw new IllegalArgumentException(String.format("MPCONFIG-038: Type has no raw type class: %s ", type));
-
         }
+        if (type instanceof ParameterizedType) {
+            return rawTypeOf(((ParameterizedType) type).getRawType());
+        }
+        if (type instanceof GenericArrayType) {
+            return (Class<T>) Array.newInstance(rawTypeOf(((GenericArrayType) type).getGenericComponentType()), 0).getClass();
+        }
+
+        throw new IllegalArgumentException(String.format("MPCONFIG-038: Type has no raw type class: %s ", type));
+
+
     }
 
     private static String getName(InjectionPoint injectionPoint) {
@@ -144,14 +154,15 @@ public final class ConfigProducerUtil {
     private static String getDefaultValue(InjectionPoint injectionPoint) {
         for (Annotation qualifier : injectionPoint.getQualifiers()) {
             if (qualifier.annotationType().equals(ConfigProperty.class)) {
-                String str = ((ConfigProperty) qualifier).defaultValue();
-                if (!ConfigProperty.UNCONFIGURED_VALUE.equals(str)) {
-                    return str;
+                String defaultString = ((ConfigProperty) qualifier).defaultValue();
+                if (!ConfigProperty.UNCONFIGURED_VALUE.equals(defaultString)) {
+                    return defaultString;
                 }
                 Class<?> rawType = rawTypeOf(injectionPoint.getType());
                 return getDefaultForType(rawType);
             }
         }
+        // But if no @ConfigProperty we can't determine key name so it is not a problem to return null here.
         return null;
     }
 
@@ -159,11 +170,12 @@ public final class ConfigProducerUtil {
         if (rawType.isPrimitive()) {
             if (rawType == char.class) {
                 return null;
-            } else if (rawType == boolean.class) {
-                return "false";
-            } else {
-                return "0";
             }
+            if (rawType == boolean.class) {
+                return "false";
+            }
+            return "0";
+
         }
         return null;
     }
@@ -199,7 +211,7 @@ public final class ConfigProducerUtil {
             }
 
         }
-        throw new IllegalStateException(String.format("MPCONFIG-202: Could not determine default name for @ConfigProperty InjectionPoint %s ", ip));
+        throw new IllegalStateException(String.format("MPCONFIG-202: Could not determine default name for @ConfigProperty InjectionPoint '%s' ", ip));
 
     }
 

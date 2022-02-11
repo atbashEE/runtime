@@ -22,7 +22,7 @@ import java.net.URL;
 
 /**
  * A properties ConfigSource loaded from a URL (can be a file)
- *
+ * <p>
  * Based on code by Jeff Mesnil (c) 2017 Red Hat inc.
  */
 public class PropertiesConfigSource extends MapBackedConfigSource {

@@ -24,8 +24,6 @@ import java.util.Map;
 
 
 /**
- *
- *
  * Based on code by Jeff Mesnil (c) 2017 Red Hat inc.
  */
 public class EnvConfigSource extends MapBackedConfigSource {

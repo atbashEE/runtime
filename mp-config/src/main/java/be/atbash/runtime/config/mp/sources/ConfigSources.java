@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 import static be.atbash.runtime.config.mp.sources.interceptor.ConfigSourceInterceptorFactory.DEFAULT_PRIORITY;
 
 /**
- *
  * This is kinda part of the ConfigBuilder, but handles all the (complex) logic around finding {@link ConfigSource}
  * and the chain for traveling the sources to find a value.
  */

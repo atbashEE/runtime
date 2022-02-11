@@ -30,6 +30,7 @@ public class CompositeNode extends Node {
         BLANK = new CompositeNode();
         BLANK.addNode(new LiteralNode(UNCONFIGURED_VALUE));
     }
+
     private final List<Node> nodes = new ArrayList<>();
 
     public void addNode(Node node) {

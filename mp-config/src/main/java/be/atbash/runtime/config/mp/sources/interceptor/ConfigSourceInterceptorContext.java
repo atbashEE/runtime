@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 /**
- *
  * Exposes contextual information about the intercepted invocation of {@link ConfigSourceInterceptor}. This allows
  * implementers to control the behavior of the invocation chain.
  */

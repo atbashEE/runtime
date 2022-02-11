@@ -22,9 +22,8 @@ import java.io.Serializable;
 import java.lang.reflect.*;
 
 /**
- *
  * Based on GERONIMO-6595 support implicit converters.
- *
+ * <p>
  * Based on code by Jeff Mesnil</a> (c) 2017 Red Hat inc.
  */
 public class ImplicitConverters {
@@ -131,7 +130,7 @@ public class ImplicitConverters {
             private final Class<?> c;
 
 
-            Serialized( Class<?> c) {
+            Serialized(Class<?> c) {
                 this.c = c;
             }
 

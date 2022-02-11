@@ -16,6 +16,8 @@
 package be.atbash.runtime.config.mp.converter;
 
 import be.atbash.runtime.config.mp.util.StringUtil;
+import be.atbash.util.reflection.ClassUtils;
+import be.atbash.util.reflection.UnknownClassException;
 import org.eclipse.microprofile.config.spi.Converter;
 
 import java.io.InvalidObjectException;
@@ -53,7 +55,7 @@ public final class Converters {
                 try {
                     return Double.valueOf(value);
                 } catch (NumberFormatException nfe) {
-                    String msg = String.format("MPCONFIG-131: Expected a double value, got \"%s\"", value);
+                    String msg = String.format("MPCONFIG-131: Expected a double value, got '%s'", value);
                     throw new NumberFormatException(msg);
                 }
             })));
@@ -63,7 +65,7 @@ public final class Converters {
                 try {
                     return Float.valueOf(value);
                 } catch (NumberFormatException nfe) {
-                    String msg = String.format("MPCONFIG-132: Expected a float value, got \"%s\"", value);
+                    String msg = String.format("MPCONFIG-132: Expected a float value, got '%s'", value);
                     throw new NumberFormatException(msg);
                 }
             })));
@@ -73,7 +75,7 @@ public final class Converters {
                 try {
                     return Long.valueOf(value);
                 } catch (NumberFormatException nfe) {
-                    String msg = String.format("MPCONFIG-130: Expected a long value, got \"%s\"", value);
+                    String msg = String.format("MPCONFIG-130: Expected a long value, got '%s'", value);
                     throw new NumberFormatException(msg);
 
                 }
@@ -84,7 +86,7 @@ public final class Converters {
                 try {
                     return Integer.valueOf(value);
                 } catch (NumberFormatException nfe) {
-                    String msg = String.format("MPCONFIG-129: Expected a integer value, got \"%s\"", value);
+                    String msg = String.format("MPCONFIG-129: Expected a integer value, got '%s'", value);
                     throw new NumberFormatException(msg);
 
                 }
@@ -93,9 +95,9 @@ public final class Converters {
     static final Converter<Class<?>> CLASS_CONVERTER = BuiltInConverter.of(6,
             newTrimmingConverter(newEmptyValueConverter(value -> {
                 try {
-                    return Class.forName(value);
-                } catch (ClassNotFoundException e) {
-                    String msg = String.format("MPCONFIG-121: Converter class %s not found", value);
+                    return ClassUtils.forName(value);
+                } catch (UnknownClassException e) {
+                    String msg = String.format("MPCONFIG-121: Converter did not find class '%s'", value);
                     throw new IllegalArgumentException(msg, e);
                 }
             })));
@@ -114,7 +116,7 @@ public final class Converters {
                 try {
                     return InetAddress.getByName(value);
                 } catch (UnknownHostException e) {
-                    throw new IllegalArgumentException(String.format("Host '%s' not found", value));
+                    throw new IllegalArgumentException(String.format("MPCONFIG-122: Host '%s' not found", value));
                 }
             })));
 
@@ -122,7 +124,7 @@ public final class Converters {
         if (value.length() == 1) {
             return value.charAt(0);
         }
-        throw new IllegalArgumentException(String.format("MPCONFIG-003: %s can not be converted to a Character", value));
+        throw new IllegalArgumentException(String.format("MPCONFIG-003: '%s' can not be converted to a Character", value));
     }));
 
     static final Converter<Short> SHORT_CONVERTER = BuiltInConverter.of(12,
@@ -136,7 +138,7 @@ public final class Converters {
                 try {
                     return UUID.fromString(s);
                 } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException(String.format("MPCONFIG-026: %s cannot be converted into a UUID", s));
+                    throw new IllegalArgumentException(String.format("MPCONFIG-026: '%s' cannot be converted into a UUID", s));
                 }
             })));
 
@@ -144,7 +146,7 @@ public final class Converters {
             newTrimmingConverter(newEmptyValueConverter(Currency::getInstance)));
 
     static final Converter<BitSet> BITSET_CONVERTER = BuiltInConverter.of(16,
-            newTrimmingConverter(newTrimmingConverter((s) -> {
+            newTrimmingConverter((s) -> {
                 int len = s.length();
                 byte[] data = new byte[len / 2];
                 for (int i = 0; i < len; i += 2) {
@@ -152,7 +154,7 @@ public final class Converters {
                             + Character.digit(s.charAt(i + 1), 16));
                 }
                 return BitSet.valueOf(data);
-            })));
+            }));
 
     static final Converter<Pattern> PATTERN_CONVERTER = BuiltInConverter.of(17,
             newTrimmingConverter(newEmptyValueConverter(Pattern::compile)));
@@ -195,21 +197,20 @@ public final class Converters {
 
         ALL_CONVERTERS.put(Pattern.class, PATTERN_CONVERTER);
 
-        Map<Class<?>, Class<?>> primitiveTypes = new HashMap<>(9);
-        primitiveTypes.put(byte.class, Byte.class);
-        primitiveTypes.put(short.class, Short.class);
-        primitiveTypes.put(int.class, Integer.class);
-        primitiveTypes.put(long.class, Long.class);
+        PRIMITIVE_TYPES = new HashMap<>(9);
+        PRIMITIVE_TYPES.put(byte.class, Byte.class);
+        PRIMITIVE_TYPES.put(short.class, Short.class);
+        PRIMITIVE_TYPES.put(int.class, Integer.class);
+        PRIMITIVE_TYPES.put(long.class, Long.class);
 
-        primitiveTypes.put(float.class, Float.class);
-        primitiveTypes.put(double.class, Double.class);
+        PRIMITIVE_TYPES.put(float.class, Float.class);
+        PRIMITIVE_TYPES.put(double.class, Double.class);
 
-        primitiveTypes.put(char.class, Character.class);
+        PRIMITIVE_TYPES.put(char.class, Character.class);
 
-        primitiveTypes.put(boolean.class, Boolean.class);
+        PRIMITIVE_TYPES.put(boolean.class, Boolean.class);
 
-        primitiveTypes.put(void.class, Void.class);
-        PRIMITIVE_TYPES = primitiveTypes;
+        PRIMITIVE_TYPES.put(void.class, Void.class);
     }
 
     public static Class<?> wrapPrimitiveType(Class<?> primitiveType) {
@@ -234,12 +235,15 @@ public final class Converters {
             if (type instanceof ParameterizedType) {
                 ParameterizedType pt = (ParameterizedType) type;
                 if (pt.getRawType().equals(Converter.class)) {
-                    Type[] typeArguments = pt.getActualTypeArguments();
-                    if (typeArguments.length != 1) {
-                        String msg = String.format("Converter %s must be parameterized with a single type", clazz.getName());
-                        throw new IllegalStateException(msg);
+                    Type actualTypeArgument = pt.getActualTypeArguments()[0];
+
+                    if (actualTypeArgument instanceof Class) {
+                        return actualTypeArgument;
                     }
-                    return typeArguments[0];
+                    if (actualTypeArgument instanceof ParameterizedType) {
+                        return ((ParameterizedType) actualTypeArgument).getRawType();
+                    }
+
                 }
             }
         }

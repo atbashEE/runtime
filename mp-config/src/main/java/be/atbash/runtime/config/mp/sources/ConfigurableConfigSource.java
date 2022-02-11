@@ -58,12 +58,12 @@ public class ConfigurableConfigSource implements ConfigSource {
         return factory;
     }
 
-    public List<ConfigSource> getConfigSources( ConfigSourceContext context) {
+    public List<ConfigSource> getConfigSources(ConfigSourceContext context) {
         return unwrap(context, new ArrayList<>());
     }
 
-    private List<ConfigSource> unwrap( ConfigSourceContext context,  List<ConfigSource> configSources) {
-        for ( ConfigSource configSource : factory.getConfigSources(context)) {
+    private List<ConfigSource> unwrap(ConfigSourceContext context, List<ConfigSource> configSources) {
+        for (ConfigSource configSource : factory.getConfigSources(context)) {
             if (configSource instanceof ConfigurableConfigSource) {
                 configSources.addAll(((ConfigurableConfigSource) configSource).getConfigSources(context));
             } else {

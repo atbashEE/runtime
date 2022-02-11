@@ -21,7 +21,6 @@ import org.eclipse.microprofile.config.ConfigValue;
 import java.util.List;
 
 /**
- *
  * Exposes contextual information on the ConfigSource initialization via {@link ConfigSourceFactory}.
  */
 public interface ConfigSourceContext {

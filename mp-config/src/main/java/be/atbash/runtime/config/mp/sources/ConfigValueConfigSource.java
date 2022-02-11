@@ -19,7 +19,6 @@ import org.eclipse.microprofile.config.ConfigValue;
 import org.eclipse.microprofile.config.spi.ConfigSource;
 
 /**
- *
  * Extends the original {@link ConfigSource} to expose methods that return a {@link ConfigValue}. The
  * {@link ConfigValue} allows to retrieve additional metadata associated with the configuration resolution.
  * <p>
@@ -47,7 +46,7 @@ public interface ConfigValueConfigSource extends ConfigSource {
      */
     @Override
     default String getValue(String propertyName) {
-         ConfigValue value = getConfigValue(propertyName);
+        ConfigValue value = getConfigValue(propertyName);
         return value != null ? value.getValue() : null;
     }
 }

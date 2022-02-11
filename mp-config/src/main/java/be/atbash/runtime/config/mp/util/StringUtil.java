@@ -20,7 +20,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * Based on code from Jeff Mesnil (c) 2017 Red Hat inc.
  */
 public class StringUtil {
@@ -36,7 +35,7 @@ public class StringUtil {
         if (text == null || text.isEmpty()) {
             return NO_STRINGS;
         }
-         Matcher matcher = ITEM_PATTERN.matcher(text);
+        Matcher matcher = ITEM_PATTERN.matcher(text);
         String item = null;
         StringBuilder b = null;
         ArrayList<String> list = new ArrayList<>(4);
@@ -88,7 +87,7 @@ public class StringUtil {
         return list.toArray(NO_STRINGS);
     }
 
-    public static String replaceNonAlphanumericByUnderscores( String name) {
+    public static String replaceNonAlphanumericByUnderscores(String name) {
         int length = name.length();
         StringBuilder sb = new StringBuilder(length);
         for (int i = 0; i < length; i++) {

@@ -31,9 +31,8 @@ import java.util.*;
 import java.util.function.Supplier;
 
 /**
- *
  * CDI producer for {@link Config} bean.
- *
+ * <p>
  * Based on code by Jeff Mesnil (c) 2017 Red Hat inc.
  */
 @ApplicationScoped

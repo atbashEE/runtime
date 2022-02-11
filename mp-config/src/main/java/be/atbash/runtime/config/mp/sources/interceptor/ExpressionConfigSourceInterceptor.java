@@ -34,7 +34,6 @@ import static org.eclipse.microprofile.config.inject.ConfigProperty.UNCONFIGURED
  * Based on code by SmallRye Config.
  */
 public class ExpressionConfigSourceInterceptor implements ConfigSourceInterceptor {
-    private static final long serialVersionUID = -539336551011916218L;
 
     private static final int MAX_DEPTH = 32;
 
@@ -76,7 +75,7 @@ public class ExpressionConfigSourceInterceptor implements ConfigSourceIntercepto
         }
 
         if (depth == MAX_DEPTH) {
-            throw new IllegalArgumentException(String.format("MPCONFIG-035: Recursive expression expansion is too deep for %s", name));
+            throw new IllegalArgumentException(String.format("MPCONFIG-035: Recursive expression expansion is too deep for '%s'", name));
         }
 
         if (expanded.contains(UNCONFIGURED_VALUE)) {
@@ -89,6 +88,7 @@ public class ExpressionConfigSourceInterceptor implements ConfigSourceIntercepto
             ConfigValueImpl value = (ConfigValueImpl) configValue;
             return value.withValue(expanded);
         }
+        // TODO Can we have the situation whe have ConfigValue that is not an Atbash one?
         return configValue;
     }
 

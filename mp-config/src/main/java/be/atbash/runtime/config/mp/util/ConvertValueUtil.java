@@ -55,7 +55,7 @@ public final class ConvertValueUtil {
             try {
                 converted = converter.convert(value);
             } catch (IllegalArgumentException ex) {
-                String msg = String.format("MPCONFIG-139: The config property %s with the config value \"%s\" threw an Exception whilst being converted %s"
+                String msg = String.format("MPCONFIG-139: The config property '%s' with the config value '%s' threw an Exception whilst being converted %s"
                         , name, value, ex.getLocalizedMessage());
                 throw new IllegalArgumentException(msg, ex);  // 1
 
@@ -78,7 +78,7 @@ public final class ConvertValueUtil {
                 String msg = String.format("MPCONFIG-140: The config property '%s' is defined as the empty String (\"\") which the following Converter considered to be null: %s", name, converter.getClass().getTypeName());
                 throw new NoSuchElementException(msg); // 3
             } else {
-                String msg = String.format("MPCONFIG-141: The config property '%s' with the config value \"%s\" was converted to null from the following Converter: %s", name, value, converter.getClass().getTypeName());
+                String msg = String.format("MPCONFIG-141: The config property '%s' with the config value '%s' was converted to null from the following Converter: %s", name, value, converter.getClass().getTypeName());
 
                 throw new NoSuchElementException(msg); // 4
             }

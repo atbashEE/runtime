@@ -25,7 +25,7 @@ import java.util.Set;
  * Does not implement getTypes to allow overriding
  * This class is used to create synthetic producer beans for each Converter registered
  * with the Config
- *
+ * <p>
  * Based on code by Steve Millidge (Payara Foundation)
  */
 public abstract class TypesBeanAttributes<T> implements BeanAttributes<T> {

@@ -40,6 +40,9 @@ public class ConfigValueImpl implements ConfigValue {
     private final int configSourceOrdinal;
 
     private ConfigValueImpl(ConfigValueBuilder builder) {
+        if (builder.name == null || builder.name.isBlank()) {
+            throw new IllegalArgumentException("Name of ConfigValue is required");
+        }
         this.name = builder.name;
         this.value = builder.value;
         this.rawValue = builder.rawValue;
@@ -69,20 +72,11 @@ public class ConfigValueImpl implements ConfigValue {
 
     @Override
     public String getSourceName() {
-        return getConfigSourceName();
+        return configSourceName;
     }
 
     @Override
     public int getSourceOrdinal() {
-        return getConfigSourceOrdinal();
-    }
-
-    public String getConfigSourceName() {
-        return configSourceName;
-    }
-
-
-    public int getConfigSourceOrdinal() {
         return configSourceOrdinal;
     }
 
@@ -98,25 +92,36 @@ public class ConfigValueImpl implements ConfigValue {
         return from().withProfile(profile).build();
     }
 
-
     @Override
-    public boolean equals(final Object o) {
+    public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof ConfigValueImpl)) {
             return false;
         }
-        final ConfigValue that = (ConfigValue) o;
-        return name.equals(that.getName()) &&
-                value.equals(that.getValue()) &&
-                rawValue.equals(that.getRawValue()) &&
-                configSourceName.equals(that.getSourceName());
+
+        ConfigValueImpl that = (ConfigValueImpl) o;
+
+        if (!name.equals(that.name)) {
+            return false;
+        }
+        if (!Objects.equals(value, that.value)) {
+            return false;
+        }
+        if (!Objects.equals(rawValue, that.rawValue)) {
+            return false;
+        }
+        return Objects.equals(configSourceName, that.configSourceName);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(name, value, configSourceName);
+    public final int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + (rawValue != null ? rawValue.hashCode() : 0);
+        result = 31 * result + (configSourceName != null ? configSourceName.hashCode() : 0);
+        return result;
     }
 
     @Override

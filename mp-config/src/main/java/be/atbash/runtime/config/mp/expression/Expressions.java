@@ -76,7 +76,7 @@ public class Expressions {
     private static boolean isEndExpression(char[] chars, int position) {
         if (chars[position] == '}') {
             if (position > 1) {
-                return chars[position - 1] != '\\' ;
+                return chars[position - 1] != '\\';
             }
         }
         return false;

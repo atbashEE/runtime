@@ -15,11 +15,14 @@
  */
 package be.atbash.runtime.config.mp;
 
+import be.atbash.runtime.config.mp.sources.ConfigSources;
 import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.spi.ConfigBuilder;
 import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
 /**
@@ -28,6 +31,8 @@ import java.util.stream.StreamSupport;
  * Based on code by Jeff Mesnil (Red Hat) and David M. Lloyd (Red Hat)
  */
 public class AtbashConfigProviderResolver extends ConfigProviderResolver {
+    private static final Logger LOGGER = Logger.getLogger(ConfigSources.class.getName());
+
     private final Map<ClassLoader, Config> configsForClassLoader = new ConcurrentHashMap<>();
 
     static final ClassLoader SYSTEM_CL = calculateSystemClassLoader();
@@ -64,9 +69,9 @@ public class AtbashConfigProviderResolver extends ConfigProviderResolver {
     }
 
     private AtbashConfig getConfigFor(ClassLoader classLoader) {
-        return getBuilder().forClassLoader(classLoader)
-                .addDefaultSources()
+        return new AtbashConfigBuilder().forClassLoader(classLoader)
                 .addDefaultInterceptors()
+                .addDefaultSources()
                 .addDiscoveredSources()
                 .addDiscoveredConverters()
                 .addDiscoveredInterceptors()
@@ -74,7 +79,7 @@ public class AtbashConfigProviderResolver extends ConfigProviderResolver {
     }
 
     @Override
-    public AtbashConfigBuilder getBuilder() {
+    public ConfigBuilder getBuilder() {
         return new AtbashConfigBuilder().addDefaultInterceptors();
     }
 
@@ -86,9 +91,8 @@ public class AtbashConfigProviderResolver extends ConfigProviderResolver {
         }
         ClassLoader realClassLoader = getRealClassLoader(classLoader);
 
-
         synchronized (configsForClassLoader) {
-            final Config existing = configsForClassLoader.putIfAbsent(realClassLoader, config);
+            Config existing = configsForClassLoader.putIfAbsent(realClassLoader, config);
             if (existing != null) {
 
                 throw new IllegalStateException("MPCONFIG-017: Configuration already registered for the given class loader");
@@ -117,6 +121,7 @@ public class AtbashConfigProviderResolver extends ConfigProviderResolver {
                     try {
                         ((AutoCloseable) c).close();
                     } catch (Exception e) {
+                        LOGGER.warning(String.format("MPCONFIG-016: Failure when closing the Converter %s : %s", c.getClass().getName(), e.getLocalizedMessage()));
                         // ignore
                     }
                 });
@@ -130,6 +135,8 @@ public class AtbashConfigProviderResolver extends ConfigProviderResolver {
                     try {
                         ((AutoCloseable) c).close();
                     } catch (Exception e) {
+                        LOGGER.warning(String.format("MPCONFIG-018: Failure when closing the ConfigSource %s : %s", c.getClass().getName(), e.getLocalizedMessage()));
+
                         // ignore
                     }
                 });

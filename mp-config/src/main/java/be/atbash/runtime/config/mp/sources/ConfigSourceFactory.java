@@ -20,22 +20,21 @@ import org.eclipse.microprofile.config.spi.ConfigSource;
 import java.util.OptionalInt;
 
 /**
- *
  * This {@code ConfigSourceFactory} allows to initialize a {@link ConfigSource}, with access to the current
  * {@link ConfigSourceContext}.
  * <p>
- *
+ * <p>
  * The provided {@link ConfigSource} is initialized in priority order and the current {@link ConfigSourceContext} has
  * access to all previous initialized {@code ConfigSources}. This allows the factory to configure the
  * {@link ConfigSource} with all other {@code ConfigSources} available, except for {@code ConfigSources} initialized by
  * another {@code ConfigSourceFactory}.
  * <p>
- *
+ * <p>
  * Instances of this interface will be discovered by {@link AtbashConfigBuilder#withSources(ConfigSourceFactory...)}
  * via the {@link java.util.ServiceLoader} mechanism and can be registered by providing a
  * {@code META-INF/services/be.atbash.runtime.config.mp.sources.ConfigSourceFactory} which contains the fully qualified class name of the
  * custom {@link ConfigSourceFactory} implementation.
- *
+ * <p>
  * Based on code from SmallRye Config.
  */
 public interface ConfigSourceFactory {

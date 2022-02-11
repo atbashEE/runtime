@@ -18,7 +18,6 @@ package be.atbash.runtime.config.mp.converter;
 import org.eclipse.microprofile.config.spi.Converter;
 
 /**
- *
  * A converter which wraps another converter (possibly of a different type). Used in the Optional and collection type converters.
  * <p/>
  * Based on code from SmallRye Config.

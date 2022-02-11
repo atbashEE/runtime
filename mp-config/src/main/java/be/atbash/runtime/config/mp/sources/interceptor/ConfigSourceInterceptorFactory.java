@@ -19,21 +19,20 @@ package be.atbash.runtime.config.mp.sources.interceptor;
 import java.util.OptionalInt;
 
 /**
- *
  * This ConfigSourceInterceptorFactory allows to initialize a {@link ConfigSourceInterceptor}, with access to the
  * current {@link ConfigSourceInterceptorContext}.
  * <p>
- *
+ * <p>
  * Interceptors in the chain are initialized in priority order and the current
  * {@link ConfigSourceInterceptorContext} contains the current interceptor, plus all other interceptors already
  * initialized.
  * <p>
- *
+ * <p>
  * Instances of this interface will be discovered by {@link AtbashConfigBuilder#addDiscoveredInterceptors()} via the
  * {@link java.util.ServiceLoader} mechanism and can be registered by providing a
  * {@code META-INF/services/be.atbash.runtime.config.mp.sources.interceptor.ConfigSourceInterceptorFactory} which contains the fully qualified class
  * name of the custom {@link ConfigSourceInterceptor} implementation.
- *
+ * <p>
  * Based on code from SmallRye Config.
  */
 public interface ConfigSourceInterceptorFactory {
@@ -49,7 +48,7 @@ public interface ConfigSourceInterceptorFactory {
      * @param context the current {@link ConfigSourceInterceptorContext} with the interceptors already initialized.
      * @return the {@link ConfigSourceInterceptor} to add to Config Interceptor Chain and initialize.
      */
-    ConfigSourceInterceptor getInterceptor( ConfigSourceInterceptorContext context);
+    ConfigSourceInterceptor getInterceptor(ConfigSourceInterceptorContext context);
 
     /**
      * Returns the interceptor priority. This is required, because the interceptor priority needs to be sorted

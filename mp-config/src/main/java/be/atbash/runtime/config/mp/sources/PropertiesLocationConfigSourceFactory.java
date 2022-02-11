@@ -26,12 +26,12 @@ import java.net.URL;
 public class PropertiesLocationConfigSourceFactory extends AbstractLocationConfigSourceFactory {
 
     @Override
-    public Iterable<ConfigSource> getConfigSources( ConfigSourceContext context) {
+    public Iterable<ConfigSource> getConfigSources(ConfigSourceContext context) {
         return super.getConfigSources(context);
     }
 
     @Override
-    protected ConfigSource loadConfigSource( URL url,  int ordinal) throws IOException {
+    protected ConfigSource loadConfigSource(URL url, int ordinal) throws IOException {
         return new PropertiesConfigSource(url, ordinal);
     }
 }
