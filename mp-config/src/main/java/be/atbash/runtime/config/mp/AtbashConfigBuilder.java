@@ -15,11 +15,9 @@
  */
 package be.atbash.runtime.config.mp;
 
-import be.atbash.runtime.config.mp.converter.ConfigValueConverter;
 import be.atbash.runtime.config.mp.converter.Converters;
 import be.atbash.runtime.config.mp.sources.ConfigSources;
 import be.atbash.runtime.config.mp.util.AnnotationUtil;
-import org.eclipse.microprofile.config.ConfigValue;
 import org.eclipse.microprofile.config.spi.ConfigBuilder;
 import org.eclipse.microprofile.config.spi.ConfigSource;
 import org.eclipse.microprofile.config.spi.Converter;
@@ -119,7 +117,7 @@ public class AtbashConfigBuilder implements ConfigBuilder {
     }
 
     private void addConverter(Type type, int priority, Converter<?> converter,
-                             Map<Type, ConverterWithPriority> converters) {
+                              Map<Type, ConverterWithPriority> converters) {
         // add the converter only if it has a higher priority than another converter for the same type
         ConverterWithPriority oldConverter = converters.get(type);
         if (oldConverter == null || priority > oldConverter.priority) {
@@ -175,7 +173,6 @@ public class AtbashConfigBuilder implements ConfigBuilder {
         for (Map.Entry<Type, AtbashConfigBuilder.ConverterWithPriority> entry : convertersToBuild.entrySet()) {
             converters.put(entry.getKey(), entry.getValue().getConverter());
         }
-        converters.put(ConfigValue.class, ConfigValueConverter.CONFIG_VALUE_CONVERTER);
 
         return converters;
     }

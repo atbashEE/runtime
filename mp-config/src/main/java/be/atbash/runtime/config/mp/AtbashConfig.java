@@ -15,7 +15,6 @@
  */
 package be.atbash.runtime.config.mp;
 
-import be.atbash.runtime.config.mp.converter.ConfigValueConverter;
 import be.atbash.runtime.config.mp.converter.Converters;
 import be.atbash.runtime.config.mp.converter.ImplicitConverters;
 import be.atbash.runtime.config.mp.sources.ConfigSources;
@@ -54,6 +53,14 @@ public class AtbashConfig implements Config, Serializable {
 
     @Override
     public <T> T getValue(String name, Class<T> aClass) {
+        if (aClass.equals(ConfigValue.class)) {
+            ConfigValue configValue = configSources.getInterceptorChain().proceed(name);
+            if (configValue == null) {
+                String msg = String.format("MPCONFIG-114: The config property '%s' is required but it could not be found in any config source", name);
+                throw new NoSuchElementException(msg);
+            }
+            return (T) configValue;
+        }
         return getValue(name, requireConverter(aClass));
     }
 
@@ -63,18 +70,6 @@ public class AtbashConfig implements Config, Serializable {
     @SuppressWarnings("unchecked")
     public <T> T getValue(String name, Converter<T> converter) {
         ConfigValue configValue = getConfigValue(name);
-
-        // FIXME See if we can handle this without the marker ConfigValueConverter.CONFIG_VALUE_CONVERTER
-        // by using null for converter? or null in delegate.
-        if (ConfigValueConverter.CONFIG_VALUE_CONVERTER.equals(converter)) {
-            return (T) configValue;
-        }
-
-        if (converter instanceof Converters.OptionalConverter<?>) {
-            if (ConfigValueConverter.CONFIG_VALUE_CONVERTER.equals(((Converters.OptionalConverter<?>) converter).getDelegate())) {
-                return (T) Optional.of(configValue);
-            }
-        }
 
         String value = configValue.getValue(); // Can return the empty String (which is not considered as null)
 
@@ -88,6 +83,10 @@ public class AtbashConfig implements Config, Serializable {
 
     @Override
     public <T> Optional<T> getOptionalValue(String name, Class<T> aClass) {
+        if (aClass.equals(ConfigValue.class)) {
+            ConfigValue configValue = configSources.getInterceptorChain().proceed(name);
+            return (Optional<T>) Optional.of(configValue);
+        }
         return (Optional<T>) getValue(name, getOptionalConverter(aClass));
     }
 
