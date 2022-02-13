@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.logging;
 
+import be.atbash.runtime.core.data.AtbashRuntimeConstant;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.logging.earlylog.EarlyLogHandler;
 import be.atbash.runtime.logging.earlylog.EarlyLogRecords;
@@ -75,14 +76,14 @@ public final class LoggingManager {
 
         // if the system property is already set, we don't need to do anything
         // FIXME Do we keep this from GF/Payara, or do we force the usage of the logging.properties.
-        if (System.getProperty("java.util.logging.config.file") != null) {
-            System.out.println("\n\n\n#!## LoggingManager.configureLogging : java.util.logging.config.file=" + System.getProperty("java.util.logging.config.file"));
+        if (System.getProperty(AtbashRuntimeConstant.LOGGING_FILE_SYSTEM_PROPERTY) != null) {
+            System.out.println("\n#!## LoggingManager.configureLogging from file" + System.getProperty(AtbashRuntimeConstant.LOGGING_FILE_SYSTEM_PROPERTY));
 
             return;
         }
 
         // logging.properties massaging.
-        final LogManager logMgr = LogManager.getLogManager();
+        LogManager logMgr = LogManager.getLogManager();
         File loggingPropertiesFile;
 
         // reset settings
@@ -92,7 +93,7 @@ public final class LoggingManager {
             } else {
                 loggingPropertiesFile = new File(configuration.getConfigDirectory(), "logging.properties");
             }
-            System.setProperty("java.util.logging.config.file", loggingPropertiesFile.getAbsolutePath());
+            System.setProperty(AtbashRuntimeConstant.LOGGING_FILE_SYSTEM_PROPERTY, loggingPropertiesFile.getAbsolutePath());
 
             logMgr.readConfiguration();
 

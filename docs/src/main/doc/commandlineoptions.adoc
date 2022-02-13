@@ -99,6 +99,11 @@ Undeploy an application
 
 === set (remote)
 
-Set configuration parameters for modules. The parameters must be in the form of <module>.<key>=value.  Multiple parameters can be specified one the same set command (space separated)
+Set configuration parameters for modules. The parameters must be in the form of <module>.<key>=value.  Multiple parameters can be specified on the same set command (space separated)
 
 `set mp-config.validation.disable=true`
+
+
+=== set-logging-configuration (remote)
+
+Sets the logging configuration parameters. The parameters must be in the form of <key>=<value>. Multiple parameters can be specified on the same command (space separated)

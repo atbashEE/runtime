@@ -26,7 +26,8 @@ import java.util.concurrent.Callable;
                 DeployCommand.class,
                 ListApplicationsCommand.class,
                 UndeployCommand.class,
-                CLISetCommand.class}
+                CLISetCommand.class,
+                CLISetLoggingConfigurationCommand.class}
         , name = "")
 public class RuntimeCommand implements Callable<Integer> {
 

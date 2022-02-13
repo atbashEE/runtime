@@ -25,3 +25,7 @@ Undeploy an application
 === POST - domain/set
 
 Set configuration parameters for modules.
+
+=== POST - domain/set-logging-configuration
+
+Set logging configuration parameters for logging module.

@@ -20,8 +20,8 @@ import picocli.CommandLine;
 import java.util.HashMap;
 import java.util.Map;
 
-@CommandLine.Command(name = "set")
-public class CLISetCommand extends AbstractRemoteAtbashCommand {
+@CommandLine.Command(name = "set-logging-configuration")
+public class CLISetLoggingConfigurationCommand extends AbstractRemoteAtbashCommand {
 
     @CommandLine.Parameters(index = "0..*")
     private String[] options;
@@ -30,7 +30,7 @@ public class CLISetCommand extends AbstractRemoteAtbashCommand {
     public Integer call() throws Exception {
         Map<String, String> commandOptions = new HashMap<>();
         commandOptions.put("", String.join(",", options));
-        callRemoteCLI("POST", "set", basicRemoteCLIParameters, commandOptions);
+        callRemoteCLI("POST", "set-logging-configuration", basicRemoteCLIParameters, commandOptions);
         // TODO or should it be PUT instead of POST?
         return 0;
     }

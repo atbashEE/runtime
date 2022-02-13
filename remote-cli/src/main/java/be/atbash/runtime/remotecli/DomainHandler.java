@@ -52,6 +52,7 @@ public class DomainHandler extends AbstractHandler {
         commands.put("list-applications", new ListApplicationsRemoteCommand());
         commands.put("undeploy", new UndeployRemoteCommand());
         commands.put("set", new SetRemoteCommand());
+        commands.put("set-logging-configuration", new SetLoggingConfigurationRemoteCommand());
     }
 
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

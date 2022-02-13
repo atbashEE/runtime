@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.cli.command;
+package be.atbash.runtime.core.data;
 
-import picocli.CommandLine;
+public final class AtbashRuntimeConstant {
 
-import java.util.HashMap;
-import java.util.Map;
+    // Used in JDK java.util.logging.LogManager.getConfigurationFileName()
+    public static final String LOGGING_FILE_SYSTEM_PROPERTY = "java.util.logging.config.file";
 
-@CommandLine.Command(name = "set")
-public class CLISetCommand extends AbstractRemoteAtbashCommand {
-
-    @CommandLine.Parameters(index = "0..*")
-    private String[] options;
-
-    @Override
-    public Integer call() throws Exception {
-        Map<String, String> commandOptions = new HashMap<>();
-        commandOptions.put("", String.join(",", options));
-        callRemoteCLI("POST", "set", basicRemoteCLIParameters, commandOptions);
-        // TODO or should it be PUT instead of POST?
-        return 0;
+    private AtbashRuntimeConstant() {
     }
 }

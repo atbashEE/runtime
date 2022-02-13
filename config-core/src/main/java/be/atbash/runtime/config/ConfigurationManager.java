@@ -19,6 +19,7 @@ import be.atbash.json.JSONValue;
 import be.atbash.runtime.config.commands.AbstractConfigurationCommand;
 import be.atbash.runtime.config.commands.ConfigFileCommands;
 import be.atbash.runtime.config.util.ConfigFileUtil;
+import be.atbash.runtime.core.data.AtbashRuntimeConstant;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
@@ -27,12 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 import static be.atbash.runtime.core.data.module.event.Events.CONFIGURATION_UPDATE;
 
@@ -42,6 +43,7 @@ import static be.atbash.runtime.core.data.module.event.Events.CONFIGURATION_UPDA
 public class ConfigurationManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
+    private static final String LOG_FILE_HANDLER_PREFIX = "be.atbash.runtime.logging.handler.LogFileHandler.";
 
     private final RuntimeConfiguration runtimeConfiguration;
 
@@ -85,6 +87,50 @@ public class ConfigurationManager {
         } else {
             return Optional.of(dottedName.substring(0, pos));
         }
+    }
+
+    public List<String> setLoggingConfigCommand(String[] options) {
+        List<String> result = new ArrayList<>();
+        Properties properties = readLoggingProperties();
+        for (String option : options) {
+            String[] parts = option.split("=");
+            if (parts.length != 2) {
+                result.add(String.format("CONFIG-101: Option must be 2 parts separated by =, received '%s'", option));
+            } else {
+                String value = parts[1];
+                if (!value.contains(".")) {
+                    value = LOG_FILE_HANDLER_PREFIX + value;
+                }
+                properties.setProperty(parts[0], value);
+            }
+        }
+
+        writeLoggingProperties(properties);
+        return result;
+    }
+
+    private void writeLoggingProperties(Properties properties) {
+        try (OutputStream out = new FileOutputStream(System.getProperty(AtbashRuntimeConstant.LOGGING_FILE_SYSTEM_PROPERTY))) {
+            properties.store(out, ""); // TODO Sorted output?
+        } catch (IOException e) {
+            // FIXME what happens when this Exception is thrown. Does runtime stop or where is it captured?
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        }
+    }
+
+    private Properties readLoggingProperties() {
+        Properties result = new Properties();
+        try (InputStream in = new FileInputStream(System.getProperty(AtbashRuntimeConstant.LOGGING_FILE_SYSTEM_PROPERTY))) {
+            result.load(in);
+
+        } catch (IOException e) {
+            // FIXME what happens when this Exception is thrown. Does runtime stop or where is it captured?
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+
+        }
+
+        return result;
+
     }
 
     public void executeConfigFile(File configFile) throws Exception {

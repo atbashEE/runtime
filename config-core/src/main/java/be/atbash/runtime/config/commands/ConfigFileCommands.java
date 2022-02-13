@@ -20,7 +20,8 @@ import picocli.CommandLine;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(subcommands =
-        {SetCommand.class}
+        {SetCommand.class
+                , SetLoggingConfigurationCommand.class}
         , name = "")
 public class ConfigFileCommands implements Callable<Integer> {
 
