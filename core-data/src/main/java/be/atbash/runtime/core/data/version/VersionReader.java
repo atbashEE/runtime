@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import java.util.Properties;
  */
 public class VersionReader {
 
-    private Logger logger = LoggerFactory.getLogger(VersionReader.class);
+    private final Logger logger = LoggerFactory.getLogger(VersionReader.class);
 
     private String releaseVersion;
     private String buildTime;
@@ -45,21 +45,29 @@ public class VersionReader {
     private void readInfo(String module) {
 
         Properties properties = new Properties();
+        InputStream resourceAsStream = null;
         try {
             URL manifestFile = findManifestFile(module);
 
             // Is the manifest file found.
             if (manifestFile != null) {
-                InputStream resourceAsStream = manifestFile.openStream();
+                resourceAsStream = manifestFile.openStream();
                 properties.load(resourceAsStream);
 
-                resourceAsStream.close();
             } else {
                 logger.warn(String.format("Unable to find manifest file %s module", module));
             }
 
         } catch (IOException e) {
             logger.warn(String.format("Exception during loading of the %s MANIFEST.MF file : %s", module, e.getMessage()));
+        } finally {
+            if (resourceAsStream != null) {
+                try {
+                    resourceAsStream.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
         }
 
         releaseVersion = properties.getProperty("Release-Version");

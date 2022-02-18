@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ public final class VersionInfo {
 
     public static final VersionInfo INSTANCE = new VersionInfo();
 
-    private VersionReader versionReader;
+    private final VersionReader versionReader;
 
     private VersionInfo() {
-        versionReader = new VersionReader("runtime-main");
+        versionReader = new VersionReader("atbash-runtime");
     }
 
     public String getReleaseVersion() {
