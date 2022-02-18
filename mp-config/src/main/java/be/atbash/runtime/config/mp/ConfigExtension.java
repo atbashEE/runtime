@@ -59,12 +59,15 @@ public class ConfigExtension implements Extension {
     private final Set<Type> configPropertiesBeanTypes = new HashSet<>();
 
     protected void beforeBeanDiscovery(@Observes BeforeBeanDiscovery event, BeanManager bm) {
+        if (MPConfigModule.configDisabled) {
+            return;
+        }
         AnnotatedType<ConfigProducer> configBean = bm.createAnnotatedType(ConfigProducer.class);
         event.addAnnotatedType(configBean, ConfigProducer.class.getName());
     }
 
     protected <T> void storeConfigPropertiesType(@Observes @WithAnnotations(ConfigProperties.class) ProcessAnnotatedType<T> event) {
-
+        // We keep this processing so that we can warn that MPConfig is disabled but annotations are found. (FIXME to implement the warning)
         AnnotatedType<?> type = event.getAnnotatedType();
 
         if (type.getJavaClass().isAnnotationPresent(ConfigProperties.class)) {
@@ -82,6 +85,7 @@ public class ConfigExtension implements Extension {
     }
 
     protected void processConfigInjectionPoints(@Observes ProcessInjectionPoint<?, ?> pip) {
+        // We keep this processing so that we can warn that MPConfig is disabled but annotations are found. (FIXME to implement the warning)
         InjectionPoint injectionPoint = pip.getInjectionPoint();
         if (injectionPoint.getAnnotated().isAnnotationPresent(ConfigProperty.class)) {
             configPropertyInjectionPoints.add(injectionPoint);
@@ -98,7 +102,12 @@ public class ConfigExtension implements Extension {
     }
 
     private boolean validTypeForConfigProperties(Type type, InjectionPoint injectionPoint) {
-        // No need to record these validations errors since the default CDI validation will already create DepoymentException
+        if (MPConfigModule.configDisabled) {
+            // Don't do the checks when validation is disabled.
+            return true;
+        }
+
+        // No need to record these validations errors since the default CDI validation will already create DeploymentException
         // and our extension doesn't get the chance to add them.
         boolean result = true;
         if (!(type instanceof Class)) {
@@ -118,6 +127,11 @@ public class ConfigExtension implements Extension {
     }
 
     protected void registerCustomBeans(@Observes AfterBeanDiscovery event, BeanManager bm) {
+        if (MPConfigModule.configDisabled) {
+            // Don't perform this since MPConfig is disabled.
+            return;
+        }
+
         Set<Class<?>> customTypes = new HashSet<>();
         for (InjectionPoint ip : configPropertyInjectionPoints) {
             Type requiredType = ip.getType();
@@ -137,7 +151,7 @@ public class ConfigExtension implements Extension {
     }
 
     private void registerConfigPropertiesBean(AfterBeanDiscovery event, BeanManager bm) {
-        final AnnotatedType<ConfigPropertiesProducer> objectProducerType = bm.createAnnotatedType(ConfigPropertiesProducer.class);
+        AnnotatedType<ConfigPropertiesProducer> objectProducerType = bm.createAnnotatedType(ConfigPropertiesProducer.class);
 
         // create a synthetic bean based on the ConfigPropertyProducer which
         // has a method we can use to create the correct objects based on
@@ -167,9 +181,8 @@ public class ConfigExtension implements Extension {
     }
 
     protected void validate(@Observes AfterDeploymentValidation event) {
-
-        if (MPConfigModule.validationDisable) {
-            // We don't want validation to happen.
+        if (MPConfigModule.validationDisable || MPConfigModule.configDisabled) {
+            // We don't want validation to happen or MPConfig is not enabled at all (sniffer or config based).
             return;
         }
         // Thread.currentThread().getContextClassLoader()  == Jetty WebAppClassLoader

@@ -54,7 +54,7 @@ public class RunData {
 
     public void registerDeploymentListener(ArchiveDeploymentListener listener) {
         // TODO I don't think there is a need for the unregister
-        if (!listeners.contains(listeners)) {
+        if (!listeners.contains(listener)) {
             listeners.add(listener);
         }
     }

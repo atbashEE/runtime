@@ -17,7 +17,8 @@ package be.atbash.runtime.config.mp;
 
 public final class MPConfigModuleConstant {
 
-    public static final String CONFIG_FILES = "mp-config.properties.files";
+    public static final String CONFIG_FILES = "mp-config.properties.files";  // Used by Sniffer to indicate of microprofile-config.properties is found
+    public static final String ENABLED_FORCED = "enabled.forced";  // Module setting to force MPConfig enabled (enabled even when deployment doesn't has microprofile-config.properties)
 
     private MPConfigModuleConstant() {
     }

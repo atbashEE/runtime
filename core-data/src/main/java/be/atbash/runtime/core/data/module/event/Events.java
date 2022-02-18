@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,11 @@ public final class Events {
     public static final String VERIFY_DEPLOYMENT = "VerifyDeployment";  // For the core to verify if PersistedDeployment is still valid.
     public static final String UNDEPLOYMENT = "Undeployment";  // For the core to remove the deployment
 
+    public static final String PRE_DEPLOYMENT = "PreDeployment";  // All modules get informed of the start of a deployment
+    public static final String POST_DEPLOYMENT = "PostDeployment";  // All modules get informed of the end of the deployment
+
     public static final String CONFIGURATION_UPDATE = "ConfigurationUpdate";  // Update of the RuntimeConfiguration
+    public static final String LOGGING_UPDATE = "LoggingUpdate";  // Update of the logging.properties file.
 
     private Events() {
     }

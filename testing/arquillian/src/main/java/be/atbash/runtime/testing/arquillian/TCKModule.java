@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.testing.arquillian;
 
+import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
@@ -22,10 +23,8 @@ import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
-import be.atbash.runtime.jersey.JerseyModuleConstant;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +34,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class TCKModule implements Module<Void> {
+import static be.atbash.runtime.config.mp.MPConfigModuleConstant.ENABLED_FORCED;
+import static be.atbash.runtime.config.mp.module.MPConfigModule.MP_CONFIG_MODULE_NAME;
+
+public class TCKModule implements Module<RuntimeConfiguration> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TCKModule.class);
+    private RuntimeConfiguration configuration;
     private HandlerCollection handlers;
 
     @Override
@@ -72,6 +75,16 @@ public class TCKModule implements Module<Void> {
     }
 
     @Override
+    public Class<RuntimeConfiguration> getModuleConfigClass() {
+        return RuntimeConfiguration.class;
+    }
+
+    @Override
+    public void setConfig(RuntimeConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
+    @Override
     public void onEvent(EventPayload eventPayload) {
 
     }
@@ -80,6 +93,8 @@ public class TCKModule implements Module<Void> {
     public void run() {
         handlers = RuntimeObjectsManager.getInstance().getExposedObject(HandlerCollection.class);
 
+        // We force that MPConfig module is always active for the TCK tests.
+        configuration.getConfig().getModules().writeConfigValue(MP_CONFIG_MODULE_NAME, ENABLED_FORCED, "true");
     }
 
     @Override

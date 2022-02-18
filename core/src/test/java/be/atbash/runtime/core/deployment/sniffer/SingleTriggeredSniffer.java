@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,17 @@
  */
 package be.atbash.runtime.core.deployment.sniffer;
 
-public class SingleTriggeredSniffer extends TestSniffer{
+import be.atbash.runtime.core.data.Specification;
+
+public class SingleTriggeredSniffer extends TestSniffer {
+
+    public SingleTriggeredSniffer() {
+    }
+
+    public SingleTriggeredSniffer(Specification[] specifications) {
+        super(specifications);
+    }
+
     @Override
     public boolean triggered(Class<?> aClass) {
         addClass(aClass);

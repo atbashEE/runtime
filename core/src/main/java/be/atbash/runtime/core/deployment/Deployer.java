@@ -22,6 +22,7 @@ import be.atbash.runtime.core.data.WebAppClassLoader;
 import be.atbash.runtime.core.data.deployment.ArchiveContent;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.module.Module;
+import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.event.ModuleEventListener;
@@ -38,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Deployer implements ModuleEventListener {
 
@@ -60,8 +60,6 @@ public class Deployer implements ModuleEventListener {
     public void onEvent(EventPayload eventPayload) {
         if (Events.DEPLOYMENT.equals(eventPayload.getEventCode())) {
             deployArchive(eventPayload.getPayload());
-
-            // FIXME Marker Rudy
         }
         if (Events.VERIFY_DEPLOYMENT.equals(eventPayload.getEventCode())) {
             verifyArchive(eventPayload.getPayload());
@@ -140,6 +138,10 @@ public class Deployer implements ModuleEventListener {
             logger.error(String.format("DEPLOY-107: No module available that can run the deployment '%s'", deployment.getDeploymentName()));
             return;
         }
+
+        EventManager eventManager = EventManager.getInstance();
+        eventManager.publishEvent(Events.PRE_DEPLOYMENT, deployment);
+
         deployment.getDeploymentModule().registerDeployment(deployment);
         if (deployment.getDeploymentException() == null) {
             deployment.setDeployed();
@@ -153,6 +155,7 @@ public class Deployer implements ModuleEventListener {
             logger.error(String.format("DEPLOY-108: During deployment of %s the following error occurred: %s", deployment.getDeploymentName(), deployment.getDeploymentException().getMessage()));
 
         }
+        eventManager.publishEvent(Events.POST_DEPLOYMENT, deployment);
         watcherService.logWatcherEvent("Deployer", String.format("DEPLOY-102: End of deployment of %s", deployment.getDeploymentName()), true);
 
     }

@@ -18,6 +18,18 @@ has the following clarification in the log.
 [SEVERE] [MPCONFIG-012] [be.atbash.runtime.config.mp.ConfigExtension] [tid: _ThreadID=1 _ThreadName=main] [timeMillis: 1643116914487] [levelValue: 1000] MPCONFIG-012: Injection point with @ConfigProperties is not supported with a primitive or array and found Type 'int' at be.rubus.runtime.examples.mpconfig.properties.ConfigPropertiesResource.wrong
 ----
 
+=== Module disabled when no `microprofile-config.properties` file
+
+The Microprofile configuration functionality is disabled when there is no `microprofile-config.properties` file detected in the Web Archive that is deployed.
+The CDI scanning of the WAR file is not performed for any Microprofile Config related artifacts. If they are present, the deployment might fail, or you may encounter issues during runtime.
+
+If you want to have the Microprofile Config functionality available without having the `microprofile-config.properties` file (because you are using other configuration sources), you can perform the following command
+
+----
+java -jar atbash-cli.jar set mp-config.enabled.forced=true
+----
+
+or define the set command within the configuration file supplied during start up.
 
 === Disable validation
 

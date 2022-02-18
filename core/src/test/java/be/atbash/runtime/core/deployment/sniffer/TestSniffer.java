@@ -25,8 +25,17 @@ import java.util.Map;
 
 public abstract class TestSniffer implements Sniffer {
 
-    private List<Class<?>> seenClasses = new ArrayList<>();
-    private List<String> seenDescriptors = new ArrayList<>();
+    private final List<Class<?>> seenClasses = new ArrayList<>();
+    private final List<String> seenDescriptors = new ArrayList<>();
+    private final Specification[] specifications;
+
+    public TestSniffer() {
+        this.specifications = new Specification[]{};
+    }
+
+    public TestSniffer(Specification[] specifications) {
+        this.specifications = specifications;
+    }
 
     protected void addClass(Class<?> clazz) {
         seenClasses.add(clazz);
@@ -46,7 +55,7 @@ public abstract class TestSniffer implements Sniffer {
 
     @Override
     public Specification[] detectedSpecifications() {
-        return new Specification[0];
+        return specifications;
     }
 
     @Override
