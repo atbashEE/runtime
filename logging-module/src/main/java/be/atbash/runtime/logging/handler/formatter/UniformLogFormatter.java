@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,15 @@
 package be.atbash.runtime.logging.handler.formatter;
 
 import be.atbash.runtime.logging.EnhancedLogRecord;
+import be.atbash.runtime.logging.util.LogUtil;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.function.Function;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.logging.ErrorManager;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -53,40 +55,23 @@ import java.util.regex.Pattern;
  */
 public class UniformLogFormatter extends AnsiColorFormatter {
 
-    private static final String RECORD_NUMBER = "RecordNumber";
+    private static final String RECORD_BEGIN_MARKER = "[#|";
+    private static final String RECORD_END_MARKER = "|#]";
+    private static final String RECORD_FIELD_SEPARATOR = "|";
+    private static final String RFC_3339_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+
     private static final String METHOD_NAME = "MethodName";
     private static final String CLASS_NAME = "ClassName";
 
     // loggerResourceBundleTable caches references to all the ResourceBundle
     // and can be searched using the LoggerName as the key
-    private HashMap loggerResourceBundleTable;
-    private LogManager logManager;
+    private final Map<String, ResourceBundle> loggerResourceBundleTable;
+    private final LogManager logManager;
     // A Dummy Container Date Object is used to format the date
     private Date date = new Date();
 
-    private static boolean LOG_SOURCE_IN_KEY_VALUE = false;
 
-    private static boolean RECORD_NUMBER_IN_KEY_VALUE = false;
     private static final Pattern MESSAGE_ID_PATTERN = Pattern.compile("(\\D+)-(\\d+):\\s(.+)");
-
-    static {
-        // FIXME
-        String logSource = System.getProperty(
-                "com.sun.aas.logging.keyvalue.logsource");
-        if ((logSource != null)
-                && (logSource.equals("true"))) {
-            LOG_SOURCE_IN_KEY_VALUE = true;
-        }
-
-        String recordCount = System.getProperty(
-                "com.sun.aas.logging.keyvalue.recordnumber");
-        if ((recordCount != null)
-                && (recordCount.equals("true"))) {
-            RECORD_NUMBER_IN_KEY_VALUE = true;
-        }
-    }
-
-    private long recordNumber = 0;
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
@@ -95,23 +80,30 @@ public class UniformLogFormatter extends AnsiColorFormatter {
     private String recordFieldSeparator;
     private String recordDateFormat;
 
-    private static final String RECORD_BEGIN_MARKER = "[#|";
-    private static final String RECORD_END_MARKER = "|#]" + LINE_SEPARATOR;
-    private static final char FIELD_SEPARATOR = '|';
     public static final char NVPAIR_SEPARATOR = ';';
     public static final char NV_SEPARATOR = '=';
 
-    private static final String RFC_3339_DATE_FORMAT =
-            "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-
-    private boolean multiLineMode;
-
-    private static final String INDENT = "  ";
-
     public UniformLogFormatter(String excludeFields) {
         super(excludeFields);
-        loggerResourceBundleTable = new HashMap();
+
+        configure();
+
+        loggerResourceBundleTable = new HashMap<>();
         logManager = LogManager.getLogManager();
+    }
+
+    private void configure() {
+        recordBeginMarker = LogUtil.getStringProperty(LogUtil.getLogPropertyKey("logFormatBeginMarker")).orElse(RECORD_BEGIN_MARKER);
+        recordEndMarker = LogUtil.getStringProperty(LogUtil.getLogPropertyKey("logFormatEndMarker")).orElse(RECORD_END_MARKER);
+        recordFieldSeparator = LogUtil.getStringProperty(LogUtil.getLogPropertyKey("logFormatFieldSeparator")).orElse(RECORD_FIELD_SEPARATOR);
+        recordDateFormat = LogUtil.getStringProperty(LogUtil.getLogPropertyKey("logFormatDateFormat")).orElse(RFC_3339_DATE_FORMAT);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(recordDateFormat);
+        try {
+            sdf.format(new Date());
+        } catch (Exception e) {
+            recordDateFormat = RFC_3339_DATE_FORMAT;
+        }
     }
 
     /**
@@ -133,64 +125,6 @@ public class UniformLogFormatter extends AnsiColorFormatter {
 
 
     /**
-     * Sun One Appserver SE/EE? can override to specify their product specific
-     * key value pairs.
-     */
-    protected void getNameValuePairs(StringBuilder buf, LogRecord record) {
-
-        Object[] parameters = record.getParameters();
-        if ((parameters == null) || (parameters.length == 0)) {
-            return;
-        }
-
-        try {
-            for (Object obj : parameters) {
-                if (obj == null) {
-                    continue;
-                }
-                if (obj instanceof Map) {
-                    for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) obj).entrySet()) {
-                        // there are implementations that allow <null> keys...
-                        if (entry.getKey() != null) {
-                            buf.append(entry.getKey().toString());
-                        } else {
-                            buf.append("null");
-                        }
-
-                        buf.append(NV_SEPARATOR);
-
-                        // also handle <null> values...
-                        if (entry.getValue() != null) {
-                            buf.append(entry.getValue().toString());
-                        } else {
-                            buf.append("null");
-                        }
-                        buf.append(NVPAIR_SEPARATOR);
-
-                    }
-                } else if (obj instanceof Collection) {
-                    for (Object entry : ((Collection) obj)) {
-                        // handle null values (remember the specs)...
-                        if (entry != null) {
-                            buf.append(entry.toString());
-                        } else {
-                            buf.append("null");
-                        }
-                        buf.append(NVPAIR_SEPARATOR);
-
-                    }
-//                } else {
-//                    buf.append(obj.toString()).append(NVPAIR_SEPARATOR);
-                }
-            }
-        } catch (Exception e) {
-            new ErrorManager().error(
-                    "Error in extracting Name Value Pairs", e,
-                    ErrorManager.FORMAT_FAILURE);
-        }
-    }
-
-    /**
      * Note: This method is not synchronized, we are assuming that the
      * synchronization will happen at the Log Handler.publish( ) method.
      */
@@ -198,9 +132,9 @@ public class UniformLogFormatter extends AnsiColorFormatter {
 
         try {
 
-            SimpleDateFormat dateFormatter = new SimpleDateFormat(getRecordDateFormat() != null ? getRecordDateFormat() : RFC_3339_DATE_FORMAT);
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(recordDateFormat);
 
-            StringBuilder recordBuffer = new StringBuilder(getRecordBeginMarker() != null ? getRecordBeginMarker() : RECORD_BEGIN_MARKER);
+            StringBuilder recordBuffer = new StringBuilder(recordBeginMarker);
             // The following operations are to format the date and time in a
             // human readable  format.
             // _REVISIT_: Use HiResolution timer to analyze the number of
@@ -211,16 +145,11 @@ public class UniformLogFormatter extends AnsiColorFormatter {
             if (color()) {
                 recordBuffer.append(getColor(record.getLevel()));
             }
-            recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+            recordBuffer.append(recordFieldSeparator);
 
-            recordBuffer.append(record.getLevel().getLocalizedName()).append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+            recordBuffer.append(record.getLevel().getLocalizedName()).append(recordFieldSeparator);
             if (color()) {
                 recordBuffer.append(getReset());
-            }
-
-            if (!isFieldExcluded(ExcludeFieldsSupport.SupplementalAttribute.VERSION)) {
-                String compId = getProductId();
-                recordBuffer.append(compId).append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
             }
 
             String loggerName = record.getLoggerName();
@@ -228,11 +157,11 @@ public class UniformLogFormatter extends AnsiColorFormatter {
             if (color()) {
                 recordBuffer.append(getLoggerColor());
             }
-            recordBuffer.append(loggerName).append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+            recordBuffer.append(loggerName).append(recordFieldSeparator);
             if (color()) {
                 recordBuffer.append(getReset());
             }
-            if (!isFieldExcluded(ExcludeFieldsSupport.SupplementalAttribute.TID)) {
+            if (isFieldIncluded(AdditionalLogFieldsSupport.SupplementalAttribute.TID)) {
                 recordBuffer.append("_ThreadID").append(NV_SEPARATOR);
                 recordBuffer.append(record.getThreadID()).append(NVPAIR_SEPARATOR);
                 recordBuffer.append("_ThreadName").append(NV_SEPARATOR);
@@ -248,14 +177,14 @@ public class UniformLogFormatter extends AnsiColorFormatter {
 
 
             // Include the raw long time stamp value in the log
-            if (!isFieldExcluded(ExcludeFieldsSupport.SupplementalAttribute.TIME_MILLIS)) {
+            if (isFieldIncluded(AdditionalLogFieldsSupport.SupplementalAttribute.TIME_MILLIS)) {
                 recordBuffer.append("_TimeMillis").append(NV_SEPARATOR);
                 recordBuffer.append(record.getMillis()).append(NVPAIR_SEPARATOR);
             }
 
             // Include the integer level value in the log
             Level level = record.getLevel();
-            if (!isFieldExcluded(ExcludeFieldsSupport.SupplementalAttribute.LEVEL_VALUE)) {
+            if (isFieldIncluded(AdditionalLogFieldsSupport.SupplementalAttribute.LEVEL_VALUE)) {
                 recordBuffer.append("_LevelValue").append(NV_SEPARATOR);
                 int levelValue = level.intValue();
                 recordBuffer.append(levelValue).append(NVPAIR_SEPARATOR);
@@ -269,8 +198,7 @@ public class UniformLogFormatter extends AnsiColorFormatter {
 
             // See 6316018. ClassName and MethodName information should be
             // included for FINER and FINEST log levels.
-            if (LOG_SOURCE_IN_KEY_VALUE ||
-                    (level.intValue() <= Level.FINE.intValue())) {
+            if (level.intValue() <= Level.FINE.intValue()) {
                 String sourceClassName = record.getSourceClassName();
                 // sourceClassName = (sourceClassName == null) ? "" : sourceClassName;
                 if (sourceClassName != null && !sourceClassName.isEmpty()) {
@@ -288,21 +216,11 @@ public class UniformLogFormatter extends AnsiColorFormatter {
                 }
             }
 
-            if (RECORD_NUMBER_IN_KEY_VALUE) {
-                recordNumber++;
-                recordBuffer.append(RECORD_NUMBER).append(NV_SEPARATOR);
-                recordBuffer.append(recordNumber).append(NVPAIR_SEPARATOR);
-            }
-
             // Not needed as per the current logging message format. Fixing bug 16849.
             // getNameValuePairs(recordBuffer, record);
 
-            recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+            recordBuffer.append(recordFieldSeparator);
 
-            if (multiLineMode) {
-                recordBuffer.append(LINE_SEPARATOR);
-                recordBuffer.append(INDENT);
-            }
             String logMessage = record.getMessage();
             // in some case no msg is passed to the logger API. We assume that either:
             // 1. A message was logged in a previous logger call and now just the exception is logged.
@@ -334,13 +252,13 @@ public class UniformLogFormatter extends AnsiColorFormatter {
                     PrintWriter pw = new PrintWriter(sw);
                     throwable.printStackTrace(pw);
                     pw.close();
-                    logMessageBuffer.append(sw.toString());
+                    logMessageBuffer.append(sw);
                     sw.close();
                 }
                 logMessage = logMessageBuffer.toString();
                 recordBuffer.append(logMessage);
             }
-            recordBuffer.append(getRecordEndMarker() != null ? getRecordEndMarker() : RECORD_END_MARKER).append(LINE_SEPARATOR).append(LINE_SEPARATOR);
+            recordBuffer.append(recordEndMarker).append(LINE_SEPARATOR).append(LINE_SEPARATOR);
             return recordBuffer.toString();
 
         } catch (Exception ex) {
@@ -353,43 +271,6 @@ public class UniformLogFormatter extends AnsiColorFormatter {
         }
     }
 
-    public static String formatLogMessage(String logMessage, LogRecord record, Function<String, ResourceBundle> rbGetter) {
-        try {
-            return formatLogMessage0(logMessage, record.getLoggerName(), record.getParameters(), rbGetter);
-        } catch (IllegalArgumentException e) {
-            // could not format string objects, try with original objects
-            if (record.getParameters() == null || record.getParameters().length < 2
-                    // not a multiple of two
-                    || (record.getParameters().length % 2) != 0) {
-                throw e;
-            }
-            Object[] parameters = new Object[record.getParameters().length / 2];
-            System.arraycopy(record.getParameters(), parameters.length,
-                    parameters, 0, parameters.length);
-            return formatLogMessage0(logMessage, record.getLoggerName(), parameters, rbGetter);
-        }
-    }
-
-    private static String formatLogMessage0(String logMessage, String loggerName, Object[] parameters,
-                                            Function<String, ResourceBundle> rbGetter) {
-        if (logMessage.contains("{0") && logMessage.contains("}") && parameters != null) {
-            // If we find {0} or {1} etc., in the message, then it's most
-            // likely finer level messages for Method Entry, Exit etc.,
-            logMessage = MessageFormat.format(logMessage, parameters);
-        } else {
-            ResourceBundle rb = rbGetter.apply(loggerName);
-            if (rb != null && rb.containsKey(logMessage)) {
-                try {
-                    logMessage = MessageFormat.format(
-                            rb.getString(logMessage), parameters);
-                } catch (MissingResourceException e) {
-                    // If we don't find an entry, then we are covered
-                    // because the logMessage is initialized already
-                }
-            }
-        }
-        return logMessage;
-    }
 
     static String getMessageId(LogRecord lr) {
         String msg = lr.getMessage();
@@ -410,8 +291,7 @@ public class UniformLogFormatter extends AnsiColorFormatter {
         if (loggerName == null) {
             return null;
         }
-        ResourceBundle rb = (ResourceBundle) loggerResourceBundleTable.get(
-                loggerName);
+        ResourceBundle rb = loggerResourceBundleTable.get(loggerName);
         /*
          * Note that logManager.getLogger(loggerName) untrusted code may create loggers with
          * any arbitrary names this method should not be relied on so added code for checking null.
@@ -422,44 +302,4 @@ public class UniformLogFormatter extends AnsiColorFormatter {
         }
         return rb;
     }
-
-    public String getRecordBeginMarker() {
-        return recordBeginMarker;
-    }
-
-    public void setRecordBeginMarker(String recordBeginMarker) {
-        this.recordBeginMarker = recordBeginMarker;
-    }
-
-    public String getRecordEndMarker() {
-        return recordEndMarker;
-    }
-
-    public void setRecordEndMarker(String recordEndMarker) {
-        this.recordEndMarker = recordEndMarker;
-    }
-
-    public String getRecordFieldSeparator() {
-        return recordFieldSeparator;
-    }
-
-    public void setRecordFieldSeparator(String recordFieldSeparator) {
-        this.recordFieldSeparator = recordFieldSeparator;
-    }
-
-    public String getRecordDateFormat() {
-        return recordDateFormat;
-    }
-
-    public void setRecordDateFormat(String recordDateFormat) {
-        this.recordDateFormat = recordDateFormat;
-    }
-
-    /**
-     * @param value if the multiLineMode has to be set
-     */
-    public void setMultiLineMode(boolean value) {
-        multiLineMode = value;
-    }
-
 }

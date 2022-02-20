@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,15 @@ import java.util.BitSet;
 /**
  * Inspired by code of Glassfish.
  */
-public class ExcludeFieldsSupport {
+public class AdditionalLogFieldsSupport {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExcludeFieldsSupport.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdditionalLogFieldsSupport.class);
 
-    public enum SupplementalAttribute {TID, TIME_MILLIS, LEVEL_VALUE, VERSION}
+    public enum SupplementalAttribute {TID, TIME_MILLIS, LEVEL_VALUE}
 
     private final BitSet excludeSuppAttrsBits = new BitSet();
 
-    public ExcludeFieldsSupport(String excludeFields) {
+    public AdditionalLogFieldsSupport(String excludeFields) {
         setExcludeFields(excludeFields);
     }
 
@@ -53,9 +53,6 @@ public class ExcludeFieldsSupport {
                         break;
                     case "levelValue":
                         excludeSuppAttrsBits.set(SupplementalAttribute.LEVEL_VALUE.ordinal());
-                        break;
-                    case "version":
-                        excludeSuppAttrsBits.set(SupplementalAttribute.VERSION.ordinal());
                         break;
                     default:
                         LOGGER.warn(String.format("LOG-011: Unknown Exclude Field provided : '%s'", field));

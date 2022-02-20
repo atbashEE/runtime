@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package be.atbash.runtime.logging.handler.formatter;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  *
@@ -47,7 +50,9 @@ public enum AnsiColor {
     BOLD_INTENSE_GREEN("\u001B[1;92m"), 
     RESET("\u001b[0m"), 
     NOTHING("");
-    
+
+    private final String colorString;
+
     AnsiColor(String color) {
         colorString = color;
     }
@@ -55,7 +60,19 @@ public enum AnsiColor {
     public String toString() {
         return colorString;
     }
-    
-    private final String colorString;
-    
+
+    /**
+     * Convert the AnsiColor name to the enum value.
+     * @param data
+     * @return
+     */
+    public static Optional<AnsiColor> parse(String data) {
+        if (data == null) {
+            return Optional.empty();
+        }
+        String upperCaseValue = data.toUpperCase();
+        return Arrays.stream(AnsiColor.values())
+                .filter(ac -> ac.name().equals(upperCaseValue))
+                .findAny();
+    }
 }

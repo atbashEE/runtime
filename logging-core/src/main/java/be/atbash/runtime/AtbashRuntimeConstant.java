@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.data;
+package be.atbash.runtime;
 
+/**
+ * The constants that can be used by all modules of Runtime.
+ */
 public final class AtbashRuntimeConstant {
 
     // Used in JDK java.util.logging.LogManager.getConfigurationFileName()
     public static final String LOGGING_FILE_SYSTEM_PROPERTY = "java.util.logging.config.file";
+    public static final String LOGFILEHANDLER = "be.atbash.runtime.logging.handler.LogFileHandler";
 
     private AtbashRuntimeConstant() {
     }
+
 }

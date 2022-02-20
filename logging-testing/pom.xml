@@ -28,19 +28,14 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>logging-core</artifactId>
+    <artifactId>logging-testing</artifactId>
     <version>0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
-
-        <!-- This is the base module for all Runtime modules (also core-date) so this cannot depend on anything Atbash -->
-        <!-- FIXME All logging from Atbash runtime itself is done through SLF4J, Special treatment for SLF4J of application logging. -->
-        <!-- find a solution for a specific application logging. -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <version>${slf4j.version}</version>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
 

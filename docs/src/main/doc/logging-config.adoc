@@ -1,0 +1,29 @@
+== Logging Configuration
+
+Following option are valid when using the logging to file.
+
+=== Log File location
+
+This can be specified using the `file` option. This should just be the file name of the log file. If using a relative location or absolute path, the log file will not be located within the configuration directory.
+
+=== Rotation at End of Day
+
+By setting the option `rotationOnDateChange` to _true_, the log file is rotated at the end of the day.  The rotation based on number of minutes is ignored in this case but it can be combined with the rotation based on size.
+
+=== Rotation every n minutes
+
+A rotation every _n_ minutes can be achieved by setting the option `rotationTimelimitInMinutes=n`.  This option is ignored when a rotation at end of day is requested but can be combined with rotation of the log file based on his size.
+
+=== Rotation based on file size
+
+A rotation based on the size of the log file can be achieved by setting the required size in the `rotationLimitInBytes` option. A valid smaller than 500000 (bytes) is considered as too small and rejected.  A valid of 0 disables the rotation based on file size.
+
+=== Maximum number of history files
+
+To reduce the number of old server log files that are kept in the directory, set the maximum number through the `maxHistoryFiles` option.  The default value is _10_ and this value is also used when an invalid value is defined for the option (like a negative number or not a number at all). When you specify the value _0_, no file is deleted and the user is responsible himself to delete files as otherwise the disk might get full of log files.
+
+This maximum number does not work correctly when the log file location is changed at runtime when.
+
+=== Compression of rotated file
+
+After the log file is rotated, a compression can be performed to reduce the amount of disk space it takes.  Set the `compressOnRotation` option to true to perform a GZIP compression of the file.

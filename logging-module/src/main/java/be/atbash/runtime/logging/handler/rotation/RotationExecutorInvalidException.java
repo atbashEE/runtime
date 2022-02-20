@@ -13,30 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.logging.earlylog;
+package be.atbash.runtime.logging.handler.rotation;
 
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.LogRecord;
-
-/**
- *
- */
-public class EarlyLogRecords {
-    private final static List<LogRecord> messages =  new CopyOnWriteArrayList<>();
-
-    private EarlyLogRecords() {
-        // no instances allowed...
+public class RotationExecutorInvalidException extends RuntimeException {
+    public RotationExecutorInvalidException(String message) {
+        super(message);
     }
-
-    public static void add(LogRecord logRecord) {
-        messages.add(logRecord);
-
-    }
-
-    public static List<LogRecord> getEarlyMessages() {
-        return messages;
-    }
-
 }

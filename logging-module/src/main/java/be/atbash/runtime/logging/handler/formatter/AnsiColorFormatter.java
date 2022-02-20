@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,82 +15,61 @@
  */
 package be.atbash.runtime.logging.handler.formatter;
 
+import be.atbash.runtime.logging.util.LogUtil;
+
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
 /**
- *
- *  Inspired by code of Payara.
+ * Inspired by code of Payara.
  */
 public abstract class AnsiColorFormatter extends CommonFormatter {
-    
-    private boolean ansiColor;
-    private HashMap<Level,AnsiColor> colors;
-    private AnsiColor loggerColor;
-    
+
+    private final boolean ansiColor;
+    private final HashMap<Level, AnsiColor> colors = new HashMap<>();
+    private AnsiColor loggerColor = AnsiColor.NOTHING;
+
     public AnsiColorFormatter(String excludeFields) {
         super(excludeFields);
-        LogManager manager = LogManager.getLogManager();
-        String color = manager.getProperty(this.getClass().getCanonicalName() + ".ansiColor");
-        if ("true".equals(color)) {
-            ansiColor = true;
+
+        String formatterClassName = this.getClass().getCanonicalName();
+        Optional<String> colorActive = LogUtil.getStringProperty(formatterClassName + ".ansiColor");
+
+        ansiColor = colorActive.map(Boolean::parseBoolean).orElse(Boolean.FALSE);
+        if (!ansiColor) {
+            // No ansiColoring so no need to continue.
+            return;
         }
-        colors = new HashMap<>();
+
         colors.put(Level.INFO, AnsiColor.BOLD_INTENSE_GREEN);
         colors.put(Level.WARNING, AnsiColor.BOLD_INTENSE_YELLOW);
         colors.put(Level.SEVERE, AnsiColor.BOLD_INTENSE_RED);
         loggerColor = AnsiColor.BOLD_INTENSE_BLUE;
-        String infoColor = manager.getProperty(this.getClass().getCanonicalName()+".infoColor");
-        if (infoColor != null) {
-            try {
-                colors.put(Level.INFO, AnsiColor.valueOf(infoColor));
-            }catch (IllegalArgumentException iae) {
-                colors.put(Level.INFO, AnsiColor.BOLD_INTENSE_GREEN);
-            }
-        }
-        String colorProp = manager.getProperty(this.getClass().getCanonicalName()+".warnColor");
-        if (colorProp != null) {
-            try {
-                colors.put(Level.WARNING, AnsiColor.valueOf(colorProp));
-            }catch (IllegalArgumentException iae) {
-                colors.put(Level.WARNING, AnsiColor.BOLD_INTENSE_YELLOW);
-            }
-        }
-        colorProp = manager.getProperty(this.getClass().getCanonicalName()+".severeColor");
-        if (colorProp != null) {
-            try {
-                colors.put(Level.SEVERE, AnsiColor.valueOf(colorProp));
-            }catch (IllegalArgumentException iae) {
-                colors.put(Level.SEVERE, AnsiColor.BOLD_INTENSE_RED);
-            }
-        }
-        
-        colorProp = manager.getProperty(this.getClass().getCanonicalName()+".loggerColor");
-        if (colorProp != null) {
-            try {
-                loggerColor = AnsiColor.valueOf(colorProp);
-            }catch (IllegalArgumentException iae) {
-                loggerColor = AnsiColor.BOLD_INTENSE_BLUE;
-            }
-        }
-        
+
+        Optional<String> infoColor = LogUtil.getStringProperty(formatterClassName + ".infoColor");
+        infoColor.ifPresent(s -> colors.put(Level.INFO, AnsiColor.parse(s).orElse(AnsiColor.BOLD_INTENSE_GREEN)));
+
+        Optional<String> warnColor = LogUtil.getStringProperty(formatterClassName + ".warnColor");
+        warnColor.ifPresent(s -> colors.put(Level.WARNING, AnsiColor.parse(s).orElse(AnsiColor.BOLD_INTENSE_YELLOW)));
+
+        Optional<String> severeColor = LogUtil.getStringProperty(formatterClassName + ".severeColor");
+        severeColor.ifPresent(s -> colors.put(Level.SEVERE, AnsiColor.parse(s).orElse(AnsiColor.BOLD_INTENSE_RED)));
+
+        Optional<String> loggerColorValue = LogUtil.getStringProperty(formatterClassName + ".loggerColor");
+        loggerColorValue.ifPresent(s -> loggerColor = AnsiColor.parse(s).orElse(AnsiColor.BOLD_INTENSE_BLUE));
+
     }
 
     public AnsiColor getLoggerColor() {
         return loggerColor;
     }
-    
-    
-    
+
     protected boolean color() {
         return ansiColor;
     }
-    
-    public void noAnsi(){
-        ansiColor = false;
-    }
-    
+
     protected AnsiColor getColor(Level level) {
         AnsiColor result = colors.get(level);
         if (result == null) {
@@ -98,9 +77,9 @@ public abstract class AnsiColorFormatter extends CommonFormatter {
         }
         return result;
     }
-    
+
     protected AnsiColor getReset() {
         return AnsiColor.RESET;
     }
-    
+
 }

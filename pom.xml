@@ -108,6 +108,7 @@
         <module>core</module>
         <module>config-core</module>
         <module>config-module</module>
+        <module>logging-testing</module>
         <module>logging-core</module>
         <module>logging-module</module>
         <module>jetty</module>

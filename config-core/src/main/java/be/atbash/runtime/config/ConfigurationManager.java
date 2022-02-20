@@ -19,7 +19,7 @@ import be.atbash.json.JSONValue;
 import be.atbash.runtime.config.commands.AbstractConfigurationCommand;
 import be.atbash.runtime.config.commands.ConfigFileCommands;
 import be.atbash.runtime.config.util.ConfigFileUtil;
-import be.atbash.runtime.core.data.AtbashRuntimeConstant;
+import be.atbash.runtime.AtbashRuntimeConstant;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
@@ -36,6 +36,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 import static be.atbash.runtime.core.data.module.event.Events.CONFIGURATION_UPDATE;
+import static be.atbash.runtime.core.data.module.event.Events.LOGGING_UPDATE;
 
 /**
  * Class responsible for executing configuration commands and executing the configuration file after modules startup.
@@ -43,7 +44,7 @@ import static be.atbash.runtime.core.data.module.event.Events.CONFIGURATION_UPDA
 public class ConfigurationManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
-    private static final String LOG_FILE_HANDLER_PREFIX = "be.atbash.runtime.logging.handler.LogFileHandler.";
+    private static final String LOG_FILE_HANDLER_PREFIX = AtbashRuntimeConstant.LOGFILEHANDLER+ ".";
 
     private final RuntimeConfiguration runtimeConfiguration;
 
@@ -97,15 +98,19 @@ public class ConfigurationManager {
             if (parts.length != 2) {
                 result.add(String.format("CONFIG-101: Option must be 2 parts separated by =, received '%s'", option));
             } else {
-                String value = parts[1];
-                if (!value.contains(".")) {
-                    value = LOG_FILE_HANDLER_PREFIX + value;
+                String key = parts[0];
+                // We can't use be.atbash.runtime.logging.util.LogUtil.getLogPropertyKey Logging depends on Config
+                if (!key.contains(".")) {
+                    key = LOG_FILE_HANDLER_PREFIX + key;
                 }
-                properties.setProperty(parts[0], value);
+                properties.setProperty(key, parts[1]);
             }
         }
 
-        writeLoggingProperties(properties);
+        if (result.isEmpty()) {
+            writeLoggingProperties(properties);
+            EventManager.getInstance().publishEvent(LOGGING_UPDATE, new Object());
+        }
         return result;
     }
 

@@ -15,10 +15,11 @@
  */
 package be.atbash.runtime.logging;
 
-import be.atbash.runtime.core.data.AtbashRuntimeConstant;
+import be.atbash.runtime.AtbashRuntimeConstant;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.logging.earlylog.EarlyLogHandler;
 import be.atbash.runtime.logging.earlylog.EarlyLogRecords;
+import be.atbash.runtime.logging.handler.LogFileHandler;
 import be.atbash.runtime.logging.handler.RuntimeConsoleHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,16 +103,19 @@ public final class LoggingManager {
             LOGGER.error("Cannot read logging configuration file.", e);
         }
 
-
-        // force the ConsoleHandler to use GF formatter
-        // FIXME
-
-        // finally, listen to changes to the loggingPropertiesFile.properties file
-        //listenToChangesOnloggingPropsFile(loggingPropertiesFile, logMgr);
-        // FIXME
-
     }
 
+    public void stopLogger() {
+        java.util.logging.Logger rootLogger = getRootLogger();
+        Handler[] originalHandlers = rootLogger.getHandlers();
+
+        for (Handler h : originalHandlers) {
+            if (h.getClass().equals(LogFileHandler.class)) {
+                ((LogFileHandler)h).preDestroy();
+            }
+        }
+
+    }
 
     public static LoggingManager getInstance() {
         return INSTANCE;

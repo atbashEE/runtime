@@ -13,30 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.logging.earlylog;
-
+package be.atbash.runtime.logging.testing;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
-/**
- *
- */
-public class EarlyLogRecords {
-    private final static List<LogRecord> messages =  new CopyOnWriteArrayList<>();
+public class TestLogHandler extends Handler {
 
-    private EarlyLogRecords() {
-        // no instances allowed...
+    private final List<LoggingEvent> logEvents = new CopyOnWriteArrayList<>();
+
+    @Override
+    public void publish(LogRecord record) {
+        logEvents.add(new LoggingEvent(record));
     }
 
-    public static void add(LogRecord logRecord) {
-        messages.add(logRecord);
+    @Override
+    public void flush() {
 
     }
 
-    public static List<LogRecord> getEarlyMessages() {
-        return messages;
+    @Override
+    public void close() throws SecurityException {
+
     }
 
+    public List<LoggingEvent> getLogEvents() {
+        return logEvents;
+    }
+
+    public void clearEvents() {
+        logEvents.clear();
+    }
 }

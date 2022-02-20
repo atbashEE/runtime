@@ -107,3 +107,10 @@ Set configuration parameters for modules. The parameters must be in the form of 
 === set-logging-configuration (remote)
 
 Sets the logging configuration parameters. The parameters must be in the form of <key>=<value>. Multiple parameters can be specified on the same command (space separated)
+
+- set-logging-configuration file=<log-file>
+- set-logging-configuration rotationOnDateChange=true|false
+- set-logging-configuration rotationTimelimitInMinutes=0
+- set-logging-configuration rotationLimitInBytes=
+- set-logging-configuration maxHistoryFiles=
+- set-logging-configuration compressOnRotation=

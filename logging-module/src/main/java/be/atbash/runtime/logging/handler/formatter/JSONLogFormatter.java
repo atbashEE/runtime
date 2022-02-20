@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,100 +25,48 @@ import java.util.*;
 import java.util.logging.*;
 
 /**
- * Class for converting a {@link LogRecord} to Json format
+ * Class for converting a {@link LogRecord} to Json format.
  *
- * @author savage
- * @since 4.1.1.164
+ * Based on Payara code.
  */
-// Removed HK2 service annotations as never used as such, only plain Java instantiation.
+
 public class JSONLogFormatter extends CommonFormatter {
 
-    private static final String RECORD_NUMBER = "RecordNumber";
     private static final String METHOD_NAME = "MethodName";
     private static final String CLASS_NAME = "ClassName";
 
-    private Map<String, ResourceBundle> loggerResourceBundleTable;
-    private LogManager logManager;
+    private final Map<String, ResourceBundle> loggerResourceBundleTable;
+    private final LogManager logManager;
 
     private final Date date = new Date();
-
-    private static boolean LOG_SOURCE_IN_KEY_VALUE = false;
-
-    private static boolean RECORD_NUMBER_IN_KEY_VALUE = false;
-
-    // Static Initialiser Block
-    static {
-        String logSource = System.getProperty(
-                "com.sun.aas.logging.keyvalue.logsource");
-        if ((logSource != null)
-                && (logSource.equals("true"))) {
-            LOG_SOURCE_IN_KEY_VALUE = true;
-        }
-
-        String recordCount = System.getProperty("com.sun.aas.logging.keyvalue.recordnumber");
-        if ((recordCount != null)
-                && (recordCount.equals("true"))) {
-            RECORD_NUMBER_IN_KEY_VALUE = true;
-        }
-    }
-
-    private long recordNumber = 0;
-    private String recordDateFormat;
 
     // Event separator
     private static final String LINE_SEPARATOR = System.lineSeparator();
 
     // String values for field keys
-    private String TIMESTAMP_KEY = "Timestamp";
-    private String LOG_LEVEL_KEY = "Level";
-    private String PRODUCT_ID_KEY = "Version";
-    private String LOGGER_NAME_KEY = "LoggerName";
+    private static final String TIMESTAMP_KEY = "Timestamp";
+    private static final String LOG_LEVEL_KEY = "Level";
+    private static final String LOGGER_NAME_KEY = "LoggerName";
     // String values for exception keys
-    private String EXCEPTION_KEY = "Exception";
-    private String STACK_TRACE_KEY = "StackTrace";
+    private static final String EXCEPTION_KEY = "Exception";
+    private static final String STACK_TRACE_KEY = "StackTrace";
     // String values for thread excludable keys
-    private String THREAD_ID_KEY = "ThreadID";
-    private String THREAD_NAME_KEY = "ThreadName";
-    private String LEVEL_VALUE_KEY = "LevelValue";
-    private String TIME_MILLIS_KEY = "TimeMillis";
-    private String MESSAGE_ID_KEY = "MessageID";
-    private String LOG_MESSAGE_KEY = "LogMessage";
-    private String THROWABLE_KEY = "Throwable";
+    private static final String THREAD_ID_KEY = "ThreadID";
+    private static final String THREAD_NAME_KEY = "ThreadName";
+    private static final String LEVEL_VALUE_KEY = "LevelValue";
+    private static final String TIME_MILLIS_KEY = "TimeMillis";
+    private static final String MESSAGE_ID_KEY = "MessageID";
+    private static final String LOG_MESSAGE_KEY = "LogMessage";
+    private static final String THROWABLE_KEY = "Throwable";
 
     private static final String RFC3339_DATE_FORMAT =
             "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
-    /**
-     * For backwards compatibility with log format for pre-182
-     *
-     * @deprecated
-     */
-    @Deprecated
-    private static final String PAYARA_JSONLOGFORMATTER_UNDERSCORE = "fish.payara.deprecated.jsonlogformatter.underscoreprefix";
-    // FIXME remove
 
     public JSONLogFormatter(String excludeFields) {
         super(excludeFields);
         loggerResourceBundleTable = new HashMap<>();
         logManager = LogManager.getLogManager();
-
-        String underscorePrefix = logManager.getProperty(PAYARA_JSONLOGFORMATTER_UNDERSCORE);
-        if (Boolean.parseBoolean(underscorePrefix)) {
-            TIMESTAMP_KEY = "_" + TIMESTAMP_KEY;
-            LOG_LEVEL_KEY = "_" + LOG_LEVEL_KEY;
-            PRODUCT_ID_KEY = "_" + PRODUCT_ID_KEY;
-            LOGGER_NAME_KEY = "_" + LOGGER_NAME_KEY;
-            EXCEPTION_KEY = "_" + EXCEPTION_KEY;
-            STACK_TRACE_KEY = "_" + STACK_TRACE_KEY;
-            // String values for thread excludable keys
-            THREAD_ID_KEY = "_" + THREAD_ID_KEY;
-            THREAD_NAME_KEY = "_" + THREAD_NAME_KEY;
-            LEVEL_VALUE_KEY = "_" + LEVEL_VALUE_KEY;
-            TIME_MILLIS_KEY = "_" + TIME_MILLIS_KEY;
-            MESSAGE_ID_KEY = "_" + MESSAGE_ID_KEY;
-            LOG_MESSAGE_KEY = "_" + LOG_MESSAGE_KEY;
-            THROWABLE_KEY = "_" + THROWABLE_KEY;
-        }
     }
 
     @Override
@@ -142,13 +90,7 @@ public class JSONLogFormatter extends CommonFormatter {
             /*
              * Create the timestamp field and append to object.
              */
-            SimpleDateFormat dateFormatter;
-
-            if (null != getRecordDateFormat()) {
-                dateFormatter = new SimpleDateFormat(getRecordDateFormat());
-            } else {
-                dateFormatter = new SimpleDateFormat(RFC3339_DATE_FORMAT);
-            }
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(RFC3339_DATE_FORMAT);
 
             date.setTime(record.getMillis());
             String timestampValue = dateFormatter.format(date);
@@ -160,15 +102,6 @@ public class JSONLogFormatter extends CommonFormatter {
             Level eventLevel = record.getLevel();
             eventObject.put(LOG_LEVEL_KEY, eventLevel.getLocalizedName());
 
-            /*
-             * Get the product id and append to object.
-             */
-            if (!isFieldExcluded(ExcludeFieldsSupport
-                    .SupplementalAttribute.VERSION)) {
-
-                String productId = getProductId();
-                eventObject.put(PRODUCT_ID_KEY, productId);
-            }
             /*
              * Get the logger name and append to object.
              */
@@ -183,8 +116,7 @@ public class JSONLogFormatter extends CommonFormatter {
             /*
              * Get thread information and append to object if not excluded.
              */
-            if (!isFieldExcluded(ExcludeFieldsSupport
-                    .SupplementalAttribute.TID)) {
+            if (isFieldIncluded(AdditionalLogFieldsSupport.SupplementalAttribute.TID)) {
                 // Thread ID
                 int threadId = record.getThreadID();
                 eventObject.put(THREAD_ID_KEY, String.valueOf(threadId));
@@ -205,8 +137,7 @@ public class JSONLogFormatter extends CommonFormatter {
             /*
              * Get millis time for log entry timestamp
              */
-            if (!isFieldExcluded(ExcludeFieldsSupport
-                    .SupplementalAttribute.TIME_MILLIS)) {
+            if (isFieldIncluded(AdditionalLogFieldsSupport.SupplementalAttribute.TIME_MILLIS)) {
                 long timestamp = record.getMillis();
                 eventObject.put(TIME_MILLIS_KEY, String.valueOf(timestamp));
             }
@@ -215,8 +146,7 @@ public class JSONLogFormatter extends CommonFormatter {
              * Include the integer value for log level
              */
             Level level = record.getLevel();
-            if (!isFieldExcluded(ExcludeFieldsSupport
-                    .SupplementalAttribute.LEVEL_VALUE)) {
+            if (isFieldIncluded(AdditionalLogFieldsSupport.SupplementalAttribute.LEVEL_VALUE)) {
                 int levelValue = level.intValue();
                 eventObject.put(LEVEL_VALUE_KEY, String.valueOf(levelValue));
             }
@@ -232,8 +162,7 @@ public class JSONLogFormatter extends CommonFormatter {
             /*
              * Include ClassName and MethodName for FINER and FINEST log levels.
              */
-            if (LOG_SOURCE_IN_KEY_VALUE ||
-                    level.intValue() <= Level.FINE.intValue()) {
+            if (level.intValue() <= Level.FINE.intValue()) {
                 String sourceClassName = record.getSourceClassName();
 
                 if (null != sourceClassName && !sourceClassName.isEmpty()) {
@@ -245,14 +174,6 @@ public class JSONLogFormatter extends CommonFormatter {
                 if (null != sourceMethodName && !sourceMethodName.isEmpty()) {
                     eventObject.put(METHOD_NAME, sourceMethodName);
                 }
-            }
-
-            /*
-             * Add the record number to the entry.
-             */
-            if (RECORD_NUMBER_IN_KEY_VALUE) {
-                recordNumber++;
-                eventObject.put(RECORD_NUMBER, String.valueOf(recordNumber));
             }
 
             Object[] parameters = record.getParameters();
@@ -299,7 +220,7 @@ public class JSONLogFormatter extends CommonFormatter {
                     }
                 }
             } else {
-                logMessage = UniformLogFormatter.formatLogMessage(logMessage, record, this::getResourceBundle);
+                logMessage = formatLogMessage(logMessage, record, this::getResourceBundle);
                 StringBuilder logMessageBuilder = new StringBuilder();
                 logMessageBuilder.append(logMessage);
 
@@ -382,19 +303,4 @@ public class JSONLogFormatter extends CommonFormatter {
 
         return bundle;
     }
-
-    /**
-     * @return The date format for the record.
-     */
-    public String getRecordDateFormat() {
-        return recordDateFormat;
-    }
-
-    /**
-     * @param recordDateFormat The date format to set for records.
-     */
-    public void setRecordDateFormat(String recordDateFormat) {
-        this.recordDateFormat = recordDateFormat;
-    }
-
 }

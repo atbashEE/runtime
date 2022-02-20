@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,5 +89,10 @@ public class LoggingModule implements Module<RuntimeConfiguration> {
 
         watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-1002: Module ready", false);
 
+    }
+
+    @Override
+    public void stop() {
+        LoggingManager.getInstance().stopLogger();
     }
 }

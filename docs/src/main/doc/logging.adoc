@@ -2,11 +2,34 @@
 
 The Runtime controls the entire logging subsystem.
 
-The configuration is performed through a properties file that configures the Java Util Logging system.  The file is expected at  `<instance>/logging.properties` and is created from a default when not found.
+The configuration is performed through a properties file that configures the Java Util Logging system.  The file is expected at  `<instance>/logging.properties` and is created from a default file when not found.
 
 Within the Runtime itself, the logging is performed through SLF4J API.  A bridge to Java Util Logging is included.  The `be.atbash.runtime.logging.handler.LogFileHandler` handles the logging to file.
 
-By default, no messages are written to the console and if needed, the `--logToConsole` is required to view logging entries also on the console.
+By default, only some important messages are written to the console and if needed, the `--logToConsole` is required to view logging entries also on the console.
+
+=== Features
+
+When the runtime starts, a rotation of the log file happens (if the instance has already a log file from the previous run).
+
+The rotation of the log file is recommended (to avoid log files that become too large and can't be opened anymore)
+
+There are several options for rotation.
+
+. Size based: This is the default that is active. When the file becomes larger that the configured size (2 MB by default), a rotation happens.
+. Daily: A rotation can be requested at the start of the day (based on the clock of the server running the process).
+. Time based: A rotation every x minutes can be requested.
+
+The size based option is combined with the time based options. So unless you disable the size based rotation, you might so rotation happening of the log file in between the time based one.
+
+Time based rotation (including the daily one) has a granularity of 1 minute. So the rotation can happen at macimum 1 minute before or after the intended moment.
+
+Daily rotation has precedence over the time based rotation.
+
+
+
+
+== Logging - Technical
 
 === Early logging
 

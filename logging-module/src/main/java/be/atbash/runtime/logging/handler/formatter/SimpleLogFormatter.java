@@ -1,0 +1,82 @@
+/*
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package be.atbash.runtime.logging.handler.formatter;
+
+import be.atbash.runtime.logging.util.LogUtil;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
+
+public class SimpleLogFormatter extends Formatter {
+
+    private final String DEFAULT_FORMAT = "%1$tb %1$td, %1$tY %1$tT %2$s %4$s: %5$s%6$s%n";
+
+    private final String format;
+
+    public SimpleLogFormatter() {
+        format = LogUtil.getStringProperty(this.getClass().getName() + ".format").orElse(DEFAULT_FORMAT);
+    }
+
+    /**
+     * Format the given LogRecord.
+     * <p>
+     * The formatting can be customized by specifying the format string</a>
+     * <pre>
+     *    {@link String#format String.format}(format, date, source, logger, level, message, thrown);
+     * </pre>
+     *
+     * @param record the log record to be formatted.
+     * @return a formatted log record
+     */
+    @Override
+    public String format(LogRecord record) {
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
+        String source;
+
+        if (record.getSourceClassName() != null) {
+            source = record.getSourceClassName();
+            if (record.getSourceMethodName() != null) {
+                source += "#" + record.getSourceMethodName();
+            }
+        } else {
+            source = record.getLoggerName();
+        }
+
+        String message = formatMessage(record);
+
+        String throwable = "";
+        if (record.getThrown() != null) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            pw.println();
+            record.getThrown().printStackTrace(pw);
+            pw.close();
+            throwable = sw.toString();
+        }
+
+        return String.format(format,
+                zdt,
+                source,
+                record.getLoggerName(),
+                record.getLevel().getName(),
+                message,
+                throwable);
+    }
+}

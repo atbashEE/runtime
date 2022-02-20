@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.logging.ErrorManager;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -31,56 +34,27 @@ import java.util.logging.LogRecord;
  * ODLLogFormatter conforms to the logging format defined by the
  * Log Working Group in Oracle.
  * The specified format is
- * "[[timestamp] [organization ID] [Message Type/Level] [Message ID] [Logger
- * Name] [Thread ID] [User ID] [ECID] [Extra Attributes] [Message]]\n"
- *
- * @author Naman Mehta
+ * "[timestamp] [Message Type/Level] [Message ID] [Logger
+ * Name] [Thread ID] [Extra Attributes] Message\n"
+ * <p>
+ * Adapted from Glassfish
  */
-// Removed HK2 service annotations as never used as such, only plain Java instantiation.
 public class ODLLogFormatter extends AnsiColorFormatter {
-
-    // loggerResourceBundleTable caches references to all the ResourceBundle
-    // and can be searched using the LoggerName as the key
-    private Map<String, ResourceBundle> loggerResourceBundleTable;
-
-    private LogManager logManager;
-
-    private static boolean LOG_SOURCE_IN_KEY_VALUE = false;
-
-    private static boolean RECORD_NUMBER_IN_KEY_VALUE = false;
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-    static {
-        // FIXME
-        String logSource = System.getProperty(
-                "com.sun.aas.logging.keyvalue.logsource");
-        if ((logSource != null) && (logSource.equals("true"))) {
-            LOG_SOURCE_IN_KEY_VALUE = true;
-        }
+    // loggerResourceBundleTable caches references to all the ResourceBundle
+    // and can be searched using the LoggerName as the key
+    private final Map<String, ResourceBundle> loggerResourceBundleTable;
 
-        String recordCount = System.getProperty("com.sun.aas.logging.keyvalue.recordnumber");
-        if ((recordCount != null) && (recordCount.equals("true"))) {
-            RECORD_NUMBER_IN_KEY_VALUE = true;
-        }
-    }
+    private final LogManager logManager;
 
-    private long recordNumber = 0;
-
-    private String recordFieldSeparator;
-    private String recordDateFormat;
-
-    private boolean multiLineMode;
 
     private static final String FIELD_BEGIN_MARKER = "[";
     private static final String FIELD_END_MARKER = "]";
-
     private static final char FIELD_SEPARATOR = ' ';
 
-    private static final String RFC_3339_DATE_FORMAT =
-            "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-
-    private static final String INDENT = "  ";
+    private static final String RFC_3339_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     public ODLLogFormatter(String excludeFields) {
         super(excludeFields);
@@ -93,7 +67,6 @@ public class ODLLogFormatter extends AnsiColorFormatter {
      * benchmark to determine whether StringCat is faster or Hashlookup for
      * the template is faster.
      */
-
 
     @Override
     public String format(LogRecord record) {
@@ -118,7 +91,6 @@ public class ODLLogFormatter extends AnsiColorFormatter {
             if (message == null || message.isEmpty()) {
                 return "";
             }
-            boolean multiLine = multiLineMode || isMultiLine(message);
 
             // Starting formatting message
             // Adding record begin marker
@@ -128,23 +100,13 @@ public class ODLLogFormatter extends AnsiColorFormatter {
             Date date = new Date();
 
             // Adding timestamp
-            SimpleDateFormat dateFormatter = new SimpleDateFormat(getRecordDateFormat() != null ? getRecordDateFormat() : RFC_3339_DATE_FORMAT);
+            SimpleDateFormat dateFormatter = new SimpleDateFormat(RFC_3339_DATE_FORMAT);
             date.setTime(record.getMillis());
             recordBuffer.append(FIELD_BEGIN_MARKER);
             String timestamp = dateFormatter.format(date);
             recordBuffer.append(timestamp);
             recordBuffer.append(FIELD_END_MARKER);
-            recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
-
-            // Adding organization ID
-            if (!isFieldExcluded(ExcludeFieldsSupport.SupplementalAttribute.VERSION)) {
-
-                recordBuffer.append(FIELD_BEGIN_MARKER);
-                String productId = getProductId();
-                recordBuffer.append(productId);
-                recordBuffer.append(FIELD_END_MARKER);
-                recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
-            }
+            recordBuffer.append(FIELD_SEPARATOR);
 
             // Adding messageType
             Level logLevel = record.getLevel();
@@ -158,14 +120,14 @@ public class ODLLogFormatter extends AnsiColorFormatter {
                 recordBuffer.append(getReset());
             }
             recordBuffer.append(FIELD_END_MARKER);
-            recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+            recordBuffer.append(FIELD_SEPARATOR);
 
             // Adding message ID
             recordBuffer.append(FIELD_BEGIN_MARKER);
             String msgId = UniformLogFormatter.getMessageId(record);
             recordBuffer.append((msgId == null) ? "" : msgId);
             recordBuffer.append(FIELD_END_MARKER);
-            recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+            recordBuffer.append(FIELD_SEPARATOR);
 
             // Adding logger Name / module Name
             recordBuffer.append(FIELD_BEGIN_MARKER);
@@ -179,10 +141,10 @@ public class ODLLogFormatter extends AnsiColorFormatter {
                 recordBuffer.append(getReset());
             }
             recordBuffer.append(FIELD_END_MARKER);
-            recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+            recordBuffer.append(FIELD_SEPARATOR);
 
             // Adding thread ID
-            if (!isFieldExcluded(ExcludeFieldsSupport.SupplementalAttribute.TID)) {
+            if (isFieldIncluded(AdditionalLogFieldsSupport.SupplementalAttribute.TID)) {
                 recordBuffer.append(FIELD_BEGIN_MARKER);
                 recordBuffer.append("tid: _ThreadID=");
                 recordBuffer.append(record.getThreadID());
@@ -195,48 +157,37 @@ public class ODLLogFormatter extends AnsiColorFormatter {
                 recordBuffer.append(" _ThreadName=");
                 recordBuffer.append(threadName);
                 recordBuffer.append(FIELD_END_MARKER);
-                recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+                recordBuffer.append(FIELD_SEPARATOR);
             }
 
             // Include the raw time stamp
-            if (!isFieldExcluded(ExcludeFieldsSupport.SupplementalAttribute.TIME_MILLIS)) {
+            if (isFieldIncluded(AdditionalLogFieldsSupport.SupplementalAttribute.TIME_MILLIS)) {
                 recordBuffer.append(FIELD_BEGIN_MARKER);
                 recordBuffer.append("timeMillis: ");
                 recordBuffer.append(record.getMillis());
                 recordBuffer.append(FIELD_END_MARKER);
-                recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+                recordBuffer.append(FIELD_SEPARATOR);
             }
 
             // Include the level value
-            if (!isFieldExcluded(ExcludeFieldsSupport.SupplementalAttribute.LEVEL_VALUE)) {
+            if (isFieldIncluded(AdditionalLogFieldsSupport.SupplementalAttribute.LEVEL_VALUE)) {
                 recordBuffer.append(FIELD_BEGIN_MARKER);
                 recordBuffer.append("levelValue: ");
                 recordBuffer.append(logLevel.intValue());
                 recordBuffer.append(FIELD_END_MARKER);
-                recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
-            }
-
-            // Adding extra Attributes - record number
-            if (RECORD_NUMBER_IN_KEY_VALUE) {
-                recordBuffer.append(FIELD_BEGIN_MARKER);
-                recordNumber++;
-                recordBuffer.append("RECORDNUMBER: ");
-                recordBuffer.append(recordNumber);
-                recordBuffer.append(FIELD_END_MARKER);
-                recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+                recordBuffer.append(FIELD_SEPARATOR);
             }
 
             // Adding extra Attributes - class name and method name for FINE and higher level messages
             Level level = record.getLevel();
-            if (LOG_SOURCE_IN_KEY_VALUE ||
-                    (level.intValue() <= Level.FINE.intValue())) {
+            if (level.intValue() <= Level.FINE.intValue()) {
                 String sourceClassName = record.getSourceClassName();
                 if (sourceClassName != null && !sourceClassName.isEmpty()) {
                     recordBuffer.append(FIELD_BEGIN_MARKER);
                     recordBuffer.append("CLASSNAME: ");
                     recordBuffer.append(sourceClassName);
                     recordBuffer.append(FIELD_END_MARKER);
-                    recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+                    recordBuffer.append(FIELD_SEPARATOR);
                 }
                 String sourceMethodName = record.getSourceMethodName();
                 if (sourceMethodName != null && !sourceMethodName.isEmpty()) {
@@ -244,19 +195,11 @@ public class ODLLogFormatter extends AnsiColorFormatter {
                     recordBuffer.append("METHODNAME: ");
                     recordBuffer.append(sourceMethodName);
                     recordBuffer.append(FIELD_END_MARKER);
-                    recordBuffer.append(getRecordFieldSeparator() != null ? getRecordFieldSeparator() : FIELD_SEPARATOR);
+                    recordBuffer.append(FIELD_SEPARATOR);
                 }
             }
 
-            if (multiLine) {
-                recordBuffer.append(FIELD_BEGIN_MARKER).append(FIELD_BEGIN_MARKER);
-                recordBuffer.append(LINE_SEPARATOR);
-                recordBuffer.append(INDENT);
-            }
             recordBuffer.append(message);
-            if (multiLine) {
-                recordBuffer.append(FIELD_END_MARKER).append(FIELD_END_MARKER);
-            }
             recordBuffer.append(LINE_SEPARATOR);
             return recordBuffer.toString();
         } catch (Exception ex) {
@@ -269,20 +212,12 @@ public class ODLLogFormatter extends AnsiColorFormatter {
         }
     }
 
-    private boolean isMultiLine(String message) {
-        if (message == null || message.isEmpty()) {
-            return false;
-        }
-        String[] lines = message.split(LINE_SEPARATOR);
-        return (lines.length > 1);
-    }
-
     private String getLogMessage(LogRecord record) throws IOException {
         String logMessage = record.getMessage();
         if (logMessage == null) {
             logMessage = "";
         }
-        logMessage = UniformLogFormatter.formatLogMessage(logMessage, record, this::getResourceBundle);
+        logMessage = formatLogMessage(logMessage, record, this::getResourceBundle);
         Throwable throwable = UniformLogFormatter.getThrowable(record);
         if (throwable != null) {
             StringBuilder buffer = new StringBuilder();
@@ -292,7 +227,7 @@ public class ODLLogFormatter extends AnsiColorFormatter {
             PrintWriter pw = new PrintWriter(sw);
             throwable.printStackTrace(pw);
             pw.close();
-            buffer.append(sw.toString());
+            buffer.append(sw);
             logMessage = buffer.toString();
             sw.close();
         }
@@ -316,45 +251,5 @@ public class ODLLogFormatter extends AnsiColorFormatter {
         return rb;
     }
 
-    public String getRecordFieldSeparator() {
-        return recordFieldSeparator;
-    }
-
-    public void setRecordFieldSeparator(String recordFieldSeparator) {
-        this.recordFieldSeparator = recordFieldSeparator;
-    }
-
-    public String getRecordDateFormat() {
-        return recordDateFormat;
-    }
-
-    public void setRecordDateFormat(String recordDateFormat) {
-        this.recordDateFormat = recordDateFormat;
-    }
-
-    public String getMessageWithoutMessageID(String message) {
-        String messageID = "";
-        if (message.contains(": ")) {
-            StringTokenizer st = new StringTokenizer(message, ":");
-            messageID = st.nextToken();
-            if (messageID.contains(" ")) {
-                // here message ID is not proper value so returning original message only
-                return message;
-            } else {
-                // removing message Id and returning message
-                message = st.nextToken();
-                return message.substring(1, message.length());
-            }
-        }
-        return message;
-    }
-
-
-    /**
-     * @param value the multiLineMode to set
-     */
-    public void setMultiLineMode(boolean value) {
-        this.multiLineMode = value;
-    }
 
 }

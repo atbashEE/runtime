@@ -29,9 +29,12 @@ java -jar atbash_runtime.jar <options>
 ----
 
 (It is not possible to create a shaded executable jar file since that would make the entire code base a Bean Defining Archive in terms of CDI and will results in errors)
+
 include::modules.adoc[]
 
 include::logging.adoc[]
+
+include::logging-config.adoc[]
 
 include::commandlineoptions.adoc[]
 

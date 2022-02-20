@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.logging;
 
+import be.atbash.runtime.AtbashRuntimeConstant;
 import be.atbash.runtime.logging.handler.RuntimeConsoleHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +26,8 @@ import java.util.logging.Handler;
 
 public final class LoggingUtil {
 
-    public static final String LOGTOCONSOLE_PROPERTY = "be.atbash.runtime.logging.handler.LogFileHandler.logtoConsole";
-    public static final String LOGTOFILE_PROPERTY = "be.atbash.runtime.logging.handler.LogFileHandler.logToFile";
+    public static final String LOGTOCONSOLE_PROPERTY = AtbashRuntimeConstant.LOGFILEHANDLER + ".logtoConsole";
+    public static final String LOGTOFILE_PROPERTY = AtbashRuntimeConstant.LOGFILEHANDLER + ".logToFile";
     public static final String SYSTEM_PROPERTY_LOGGING_CONSOLE = "runtime.logging.console";
     public static final String SYSTEM_PROPERTY_FILE_LOGGING = "runtime.logging.file";
     public static final String SYSTEM_PROPERTY_LOGGING_VERBOSE = "runtime.logging.verbose";
@@ -35,7 +36,6 @@ public final class LoggingUtil {
     public static final PrintStream oStdOutBackup = System.out;
 
     private static final String HANDLERS = "handlers";
-    private static final String LOGFILEHANDLER = "be.atbash.runtime.logging.handler.LogFileHandler";
 
     private LoggingUtil() {
     }
@@ -48,7 +48,7 @@ public final class LoggingUtil {
             loggingProperties.setProperty(HANDLERS, handlers + "," + RuntimeConsoleHandler.class.getName());
         }
         if (!logToConsole && handlers.contains(RuntimeConsoleHandler.class.getName())) {
-            loggingProperties.setProperty(HANDLERS, removeHandler(handlers , RuntimeConsoleHandler.class.getName()));
+            loggingProperties.setProperty(HANDLERS, removeHandler(handlers, RuntimeConsoleHandler.class.getName()));
         }
 
         loggingProperties.put(LOGTOCONSOLE_PROPERTY, Boolean.toString(logToConsole));
@@ -58,8 +58,8 @@ public final class LoggingUtil {
         boolean logToFile = isLogToFile();
 
         String handlers = loggingProperties.getProperty(HANDLERS);
-        if (!logToFile && handlers.contains(LOGFILEHANDLER)) {
-            loggingProperties.setProperty(HANDLERS, removeHandler(handlers, LOGFILEHANDLER));
+        if (!logToFile && handlers.contains(AtbashRuntimeConstant.LOGFILEHANDLER)) {
+            loggingProperties.setProperty(HANDLERS, removeHandler(handlers, AtbashRuntimeConstant.LOGFILEHANDLER));
         }
 
         loggingProperties.put(LOGTOFILE_PROPERTY, Boolean.toString(logToFile));
