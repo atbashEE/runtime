@@ -93,34 +93,34 @@ public class Unpack {
             try {
                 scanArchive(jarFile);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
         }
     }
 
     private void unpackArchive() throws IOException {
-        JarInputStream jarInputStream = new JarInputStream(new FileInputStream(archiveFile));
+        try (JarInputStream jarInputStream = new JarInputStream(new FileInputStream(archiveFile))) {
 
-        targetLocation.mkdirs();
+            targetLocation.mkdirs();
 
-        JarEntry jarEntry = jarInputStream.getNextJarEntry();
+            JarEntry jarEntry = jarInputStream.getNextJarEntry();
 
-        while (jarEntry != null) {
+            while (jarEntry != null) {
 
-            String filePath = targetLocation + File.separator + jarEntry.getName();
-            if (!jarEntry.isDirectory()) {
-                // if the entry is a file, extracts it
-                extractFile(jarInputStream, filePath);
-                keepTrackOfContent(filePath);
-            } else {
-                // if the entry is a directory, make the directory
-                File dir = new File(filePath);
-                dir.mkdirs();
+                String filePath = targetLocation + File.separator + jarEntry.getName();
+                if (!jarEntry.isDirectory()) {
+                    // if the entry is a file, extracts it
+                    extractFile(jarInputStream, filePath);
+                    keepTrackOfContent(filePath);
+                } else {
+                    // if the entry is a directory, make the directory
+                    File dir = new File(filePath);
+                    dir.mkdirs();
+                }
+                jarInputStream.closeEntry();
+                jarEntry = jarInputStream.getNextJarEntry();
             }
-            jarInputStream.closeEntry();
-            jarEntry = jarInputStream.getNextJarEntry();
         }
-        jarInputStream.close();
     }
 
     private void keepTrackOfContent(String filePath) {
@@ -151,22 +151,22 @@ public class Unpack {
     }
 
     private void scanArchive(File jarFile) throws IOException {
-        JarInputStream jarInputStream = new JarInputStream(new FileInputStream(jarFile));
+        try (JarInputStream jarInputStream = new JarInputStream(new FileInputStream(jarFile))) {
 
-        JarEntry jarEntry = jarInputStream.getNextJarEntry();
+            JarEntry jarEntry = jarInputStream.getNextJarEntry();
 
-        while (jarEntry != null) {
+            while (jarEntry != null) {
 
-            // Don't need the full path here as we are not expanding it, just keep track of it.
-            if (!jarEntry.isDirectory()) {
-                String filePath = jarFile.getName() + "!/" + jarEntry.getName();
-                // if the entry is a file, keep the name
-                keepTrackOfJarContent(filePath);
+                // Don't need the full path here as we are not expanding it, just keep track of it.
+                if (!jarEntry.isDirectory()) {
+                    String filePath = jarFile.getName() + "!/" + jarEntry.getName();
+                    // if the entry is a file, keep the name
+                    keepTrackOfJarContent(filePath);
+                }
+                jarInputStream.closeEntry();
+                jarEntry = jarInputStream.getNextJarEntry();
             }
-            jarInputStream.closeEntry();
-            jarEntry = jarInputStream.getNextJarEntry();
         }
-        jarInputStream.close();
     }
 
     private void keepTrackOfJarContent(String filePath) {
@@ -195,13 +195,13 @@ public class Unpack {
      */
     private static void extractFile(JarInputStream jarInputStream, String filePath) throws IOException {
         ensureDirectoryExists(filePath);
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
-        byte[] bytesIn = new byte[BUFFER_SIZE];
-        int read = 0;
-        while ((read = jarInputStream.read(bytesIn)) != -1) {
-            bos.write(bytesIn, 0, read);
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {
+            byte[] bytesIn = new byte[BUFFER_SIZE];
+            int read = 0;
+            while ((read = jarInputStream.read(bytesIn)) != -1) {
+                bos.write(bytesIn, 0, read);
+            }
         }
-        bos.close();
     }
 
     private static void ensureDirectoryExists(String filePath) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Some code on top of the GenericContainer to get the correct Adapter (responsible for defining the correct Docker image)
@@ -146,11 +147,16 @@ public abstract class AbstractContainer<T extends GenericContainer<T>> extends G
         File dir = new File(path);
         if (dir.exists() && dir.isDirectory()) {
             try {
-                return Files.walk(dir.toPath())
-                        .filter(Files::isRegularFile)
-                        .filter(p -> p.toString().toLowerCase().endsWith(".war"))
-                        .map(Path::toFile)
-                        .collect(Collectors.toSet());
+                Set<File> result;
+                try (Stream<Path> pathStream = Files.walk(dir.toPath())) {
+                    result = pathStream
+                            .filter(Files::isRegularFile)
+                            .filter(p -> p.toString().toLowerCase().endsWith(".war"))
+                            .map(Path::toFile)
+                            .collect(Collectors.toSet());
+                }
+                return result;
+                //https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html#walk-java.nio.file.Path-java.nio.file.FileVisitOption...-
             } catch (IOException ignore) {
             }
         }

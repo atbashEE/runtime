@@ -25,6 +25,7 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -100,11 +101,13 @@ public class FileCopyHelper {
     public void copyDependentFiles() {
 
         try {
-            Files.find(Paths.get(resource.toURI()),
-                            Integer.MAX_VALUE,
-                            (filePath, fileAttr) -> fileAttr.isRegularFile()
-                                    && !filePath.getFileName().endsWith("Dockerfile"))
-                    .forEach(p -> copyToTemp(p, tempDir));
+            try (Stream<Path> pathStream = Files.find(Paths.get(resource.toURI()),
+                    Integer.MAX_VALUE,
+                    (filePath, fileAttr) -> fileAttr.isRegularFile()
+                            && !filePath.getFileName().endsWith("Dockerfile"))) {
+                // For each of the found files, copy it to the temporary directory.
+                pathStream.forEach(p -> copyToTemp(p, tempDir));
+            }
         } catch (IOException | URISyntaxException e) {
             Assertions.fail(e.getMessage());
         }
