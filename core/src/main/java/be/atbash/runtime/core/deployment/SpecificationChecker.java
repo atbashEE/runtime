@@ -20,14 +20,13 @@ import be.atbash.runtime.core.data.WebAppClassLoader;
 import be.atbash.runtime.core.data.deployment.ArchiveContent;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.data.util.ResourceReader;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class SpecificationChecker {
@@ -92,7 +91,7 @@ public class SpecificationChecker {
             URL resource = classLoader.getResource(descriptorFile);
             String content;
             try {
-                content = readStringFromURL(resource);
+                content = ResourceReader.readStringFromURL(resource);
             } catch (IOException e) {
                 throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
@@ -113,14 +112,6 @@ public class SpecificationChecker {
             }
 
 
-        }
-    }
-
-    private String readStringFromURL(URL requestURL) throws IOException {
-        try (Scanner scanner = new Scanner(requestURL.openStream(),
-                StandardCharsets.UTF_8.toString())) {
-            scanner.useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : "";
         }
     }
 

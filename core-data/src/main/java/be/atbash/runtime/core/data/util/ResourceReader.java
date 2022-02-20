@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package be.atbash.runtime.core.data.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public final class ResourceReader {
 
@@ -35,4 +37,13 @@ public final class ResourceReader {
         profilesJSONStream.close();
         return result.toString(StandardCharsets.UTF_8.name());
     }
+
+    public static String readStringFromURL(URL requestURL) throws IOException {
+        try (Scanner scanner = new Scanner(requestURL.openStream(),
+                StandardCharsets.UTF_8.toString())) {
+            scanner.useDelimiter("\\A");
+            return scanner.hasNext() ? scanner.next() : "";
+        }
+    }
+
 }
