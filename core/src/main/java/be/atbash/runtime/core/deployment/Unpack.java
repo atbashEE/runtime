@@ -210,37 +210,4 @@ public class Unpack {
             parentFile.mkdirs();
         }
     }
-
-    public ArchiveContent processExpandedArchive() {
-        // FIXME, this should not be needed to 'load' an application.
-        // And does not take into account the Library and 'page' files.
-        defineArchiveContent(targetLocation);
-        return new ArchiveContent.ArchiveContentBuilder()
-                .withClassesFiles(archiveClassesFiles).build();
-
-    }
-
-    private void defineArchiveContent(File directory) {
-        // Get all files from a directory.
-        File[] fList = directory.listFiles();
-        if (fList != null) {
-            for (File file : fList) {
-                if (file.isFile()) {
-                    Optional<String> content = stripLocation(file.getAbsolutePath());
-                    content.ifPresent(archiveClassesFiles::add);
-                } else if (file.isDirectory()) {
-                    defineArchiveContent(file);
-                }
-            }
-        }
-    }
-
-    private Optional<String> stripLocation(String filePath) {
-        Optional<String> result = Optional.empty();
-        int index = filePath.indexOf(Unpack.WEB_INF_CLASSES);
-        if (index > 0) {
-            result = Optional.of(filePath.substring(index + Unpack.WEB_INF_CLASSES.length() + 1));
-        }
-        return result;
-    }
 }

@@ -120,9 +120,8 @@ public class Deployer implements ModuleEventListener {
         currentArchiveDeployment = deployment;
 
         if (deployment.getArchiveFile() == null) {
-            if (!loadArchive(deployment)) {
-                return;
-            }
+            // Deploy an application that was deployed during a previous run.
+            LOGGER.info(String.format("Loading application %s", deployment.getDeploymentName()));
         } else {
             if (!unpackArchive(deployment)) {
                 // Nothing is deployed,
@@ -157,19 +156,6 @@ public class Deployer implements ModuleEventListener {
         }
         eventManager.publishEvent(Events.POST_DEPLOYMENT, deployment);
         watcherService.logWatcherEvent("Deployer", String.format("DEPLOY-102: End of deployment of %s", deployment.getDeploymentName()), true);
-
-    }
-
-    private boolean loadArchive(ArchiveDeployment deployment) {
-        LOGGER.info(String.format("Loading application %s", deployment.getDeploymentName()));
-
-        Unpack unpack = new Unpack(deployment.getDeploymentLocation());
-        ArchiveContent archiveContent = unpack.processExpandedArchive();
-        deployment.setArchiveContent(archiveContent);
-
-        setClassloaderForExtractedArchive(deployment);
-
-        return true;
 
     }
 
