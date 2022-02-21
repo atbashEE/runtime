@@ -12,9 +12,35 @@ Details:
 - Extensible
 - DevOps in mind (configure, monitor, ...)
 - Runtime and Domain mode
+- Running on JDK 11 and JDK 17
+
 
 Current status
 
+**version 0.3**
+
+
+Powered By
+
+- Jetty : 11.0.8
+- Jersey : 3.0.4
+- Weld : 4.0.3
+- Picocli : 4.6.3
+- Jackson Databind : 2.13.1
+
+- Testcontainers : 1.16.3
+
+Added Features
+
+- Testing framework (based on top of testcontainers)
+- Runtime Embedded version
+- Arquillian Connector
+- Custom MicroProfile Config implementation (passes TCK)
+- Improved CDI support
+- Major rework of Logging module
+- Running configuration commands at startup
+- Changed packaging (no more fat jar)
+- (internal) Module Manager improvements
 
 **version 0.2**
 

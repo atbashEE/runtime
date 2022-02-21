@@ -44,9 +44,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
-        <assertj.version>3.21.0</assertj.version>
+        <assertj.version>3.22.0</assertj.version>
         <slf4j.version>2.0.0-alpha1</slf4j.version> <!-- So that it is aligned with the Jetty version -->
-        <jersey.version>3.0.3</jersey.version>
+        <jersey.version>3.0.4</jersey.version>
+        <jetty.version>11.0.8</jetty.version>
         <jakarta.rest.api.version>3.0.0</jakarta.rest.api.version>
         <atbash.utils-se.version>1.1.0-SNAPSHOT</atbash.utils-se.version>
     </properties>
@@ -56,7 +57,7 @@
             <dependency>
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli</artifactId>
-                <version>4.6.1</version>
+                <version>4.6.3</version>
             </dependency>
 
             <dependency>
@@ -68,7 +69,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.12.4</version>
+                <version>2.13.1</version>
             </dependency>
             <dependency>
                 <groupId>be.atbash.json</groupId>
@@ -80,6 +81,25 @@
                 <groupId>be.atbash.utils</groupId>
                 <artifactId>utils-se</artifactId>
                 <version>${atbash.utils-se.version}</version>
+            </dependency>
+
+            <!-- enforce versions -->
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>2.13.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>3.0.1</version>
             </dependency>
 
         </dependencies>
