@@ -21,6 +21,7 @@ import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +31,7 @@ public class DeploymentMetadata {
 
     private String deploymentName;
     private String deploymentLocation;
-    private List<String> specifications;
+    private Set<String> specifications;
     private List<String> sniffers;
     private String contextRoot;
     private Map<String, String> deploymentData;
@@ -49,7 +50,7 @@ public class DeploymentMetadata {
         }
         specifications = deployment.getSpecifications().stream()
                 .map(Specification::name)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         sniffers = deployment.getSniffers().stream()
                 .map(s -> s.getClass().getSimpleName())
                 .collect(Collectors.toList());
@@ -74,11 +75,11 @@ public class DeploymentMetadata {
         this.deploymentLocation = deploymentLocation;
     }
 
-    public List<String> getSpecifications() {
+    public Set<String> getSpecifications() {
         return specifications;
     }
 
-    public void setSpecifications(List<String> specifications) {
+    public void setSpecifications(Set<String> specifications) {
         this.specifications = specifications;
     }
 

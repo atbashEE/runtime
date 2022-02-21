@@ -24,9 +24,7 @@ import be.atbash.runtime.core.data.util.ResourceReader;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SpecificationChecker {
@@ -35,7 +33,7 @@ public class SpecificationChecker {
     private final WebAppClassLoader classLoader;
     private final List<Sniffer> sniffers;
     private final List<Sniffer> triggeredSniffers;
-    private final List<Specification> specifications = new ArrayList<>();
+    private final Set<Specification> specifications = new HashSet<>();
 
     public SpecificationChecker(ArchiveContent archiveContent, WebAppClassLoader classLoader, List<Sniffer> sniffers) {
         this.archiveContent = archiveContent;
@@ -101,9 +99,6 @@ public class SpecificationChecker {
                     .filter(s -> s.triggered(descriptorFile, content))
                     .collect(Collectors.toList());
 
-            triggeredSniffers.forEach(s ->
-                    specifications.addAll(Arrays.asList(s.detectedSpecifications())));
-
             updateSniffers(triggeredSniffers);
 
             if (sniffers.isEmpty()) {
@@ -113,6 +108,10 @@ public class SpecificationChecker {
 
 
         }
+
+        triggeredSniffers.forEach(s ->
+                specifications.addAll(Arrays.asList(s.detectedSpecifications())));
+
     }
 
     private void updateSniffers(List<Sniffer> triggeredSniffers) {
@@ -126,7 +125,7 @@ public class SpecificationChecker {
         }
     }
 
-    public List<Specification> getSpecifications() {
+    public Set<Specification> getSpecifications() {
         return specifications;
     }
 

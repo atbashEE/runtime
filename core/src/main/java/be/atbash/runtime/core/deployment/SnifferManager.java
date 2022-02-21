@@ -27,7 +27,7 @@ public final class SnifferManager {
 
     private static final SnifferManager INSTANCE = new SnifferManager();
 
-    private List<Sniffer> sniffers = new ArrayList<>();
+    private final List<Sniffer> sniffers = new ArrayList<>();
 
     private SnifferManager() {
     }

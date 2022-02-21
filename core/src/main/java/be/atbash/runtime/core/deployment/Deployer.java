@@ -176,7 +176,7 @@ public class Deployer implements ModuleEventListener {
     private void determineDeploymentModule(ArchiveDeployment deployment) {
         Module<?> deployerModule = null;
 
-        List<Specification> specifications = deployment.getSpecifications();
+        Set<Specification> specifications = deployment.getSpecifications();
         for (Module<?> module : modules) {
             // Loop over the modules as they are started as this reflects the
 
@@ -192,7 +192,7 @@ public class Deployer implements ModuleEventListener {
         deployment.setDeploymentModule(deployerModule);
     }
 
-    private boolean matchesSpecification(Module<?> module, List<Specification> specifications) {
+    private boolean matchesSpecification(Module<?> module, Set<Specification> specifications) {
         List<Specification> moduleSpecifications = Arrays.asList(module.provideSpecifications());
         Optional<Specification> matchingSpec = specifications.stream()
                 .filter(moduleSpecifications::contains)

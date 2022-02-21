@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package be.atbash.runtime.core.data.util;
 import be.atbash.runtime.core.data.Specification;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,16 +26,16 @@ class SpecificationUtilTest {
 
     @Test
     public void testAsEnum() {
-        List<String> values = Arrays.asList("HtMl", "SERVLET", "Something");
-        List<Specification> specifications = SpecificationUtil.asEnum(values);
+        Set<String> values = new HashSet<>(Arrays.asList("HtMl", "SERVLET", "Something"));
+        Set<Specification> specifications = SpecificationUtil.asEnum(values);
 
         assertThat(specifications).containsExactly(Specification.HTML, Specification.SERVLET);
     }
 
     @Test
     public void testAsEnum_empty() {
-        List<String> values = new ArrayList<>();
-        List<Specification> specifications = SpecificationUtil.asEnum(values);
+        Set<String> values = new HashSet<>();
+        Set<Specification> specifications = SpecificationUtil.asEnum(values);
 
         assertThat(specifications).isEmpty();
     }

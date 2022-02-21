@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import be.atbash.runtime.core.data.Specification;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SpecificationUtil {
@@ -26,10 +27,10 @@ public class SpecificationUtil {
     private SpecificationUtil() {
     }
 
-    public static List<Specification> asEnum(List<String> codes) {
+    public static Set<Specification> asEnum(Set<String> codes) {
         return codes.stream()
                 .map(Specification::fromCode)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 }

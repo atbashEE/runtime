@@ -24,10 +24,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 class ArchiveDeploymentTest {
 
@@ -78,7 +75,7 @@ class ArchiveDeploymentTest {
         String strTmp = System.getProperty("java.io.tmpdir");
         File location = new File(strTmp, "junit.war");
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
-        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
         ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit", new HashMap<>());
         Assertions.assertThat(deployment.isDeployed()).isFalse();
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("customName");
@@ -91,7 +88,7 @@ class ArchiveDeploymentTest {
         String strTmp = System.getProperty("java.io.tmpdir");
         File location = new File(strTmp, "junit.war");
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
-        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
         ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit", new HashMap<>());
         Assertions.assertThat(deployment.isVerified()).isFalse();
         Assertions.assertThat(deployment.isPrepared()).isFalse();
@@ -108,7 +105,7 @@ class ArchiveDeploymentTest {
         String strTmp = System.getProperty("java.io.tmpdir");
         File location = new File(strTmp, "junit.war");
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
-        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
         ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit", new HashMap<>());
         Assertions.assertThat(deployment.isVerified()).isFalse();
         Assertions.assertThat(deployment.isPrepared()).isFalse();
@@ -132,7 +129,7 @@ class ArchiveDeploymentTest {
 
         deployment.setArchiveContent(new ArchiveContent.ArchiveContentBuilder().withClassesFiles(new ArrayList<>()).build());
         deployment.setClassLoader(new WebAppClassLoader(archive, deployment.getArchiveContent().getLibraryFiles(), this.getClass().getClassLoader()));
-        deployment.setSpecifications(Collections.singletonList(Specification.HTML));
+        deployment.setSpecifications(Collections.singleton(Specification.HTML));
         deployment.setSniffers(Collections.singletonList(new SingleTriggeredSniffer()));
         deployment.setDeploymentModule(new Module1());
 
@@ -146,7 +143,7 @@ class ArchiveDeploymentTest {
         String strTmp = System.getProperty("java.io.tmpdir");
         File location = new File(strTmp, "junit.war");
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
-        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
         ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit", new HashMap<>());
         Assertions.assertThat(deployment.isPrepared()).isFalse();
         Assertions.assertThat(deployment.isVerified()).isFalse();

@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ArchiveDeployment {
 
@@ -43,7 +44,7 @@ public class ArchiveDeployment {
     // This is about preparation.
     private ArchiveContent archiveContent;
     private WebAppClassLoader classLoader;
-    private List<Specification> specifications;
+    private Set<Specification> specifications;
     private Module<?> deploymentModule;
     private List<Sniffer> sniffers;
 
@@ -62,7 +63,7 @@ public class ArchiveDeployment {
         this.deploymentData = new HashMap<>();
     }
 
-    public ArchiveDeployment(String deploymentLocation, String deploymentName, List<Specification> specifications,
+    public ArchiveDeployment(String deploymentLocation, String deploymentName, Set<Specification> specifications,
                              List<Sniffer> sniffers, String contextRoot, Map<String, String> deploymentData) {
         this.deploymentLocation = new File(deploymentLocation);
         this.deploymentName = deploymentName;
@@ -128,11 +129,11 @@ public class ArchiveDeployment {
         return classLoader;
     }
 
-    public void setSpecifications(List<Specification> specifications) {
+    public void setSpecifications(Set<Specification> specifications) {
         this.specifications = specifications;
     }
 
-    public List<Specification> getSpecifications() {
+    public Set<Specification> getSpecifications() {
         return specifications;
     }
 

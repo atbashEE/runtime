@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import static be.atbash.runtime.config.RuntimeConfigConstants.APPLICATIONS_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +46,7 @@ class ArchiveDeploymentStorageTest {
         ArchiveDeployment deployment = new ArchiveDeployment(new File("./applications/test.war"));
         File targetLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getArchiveFile().getName());
         deployment.setDeploymentLocation(targetLocation);
-        deployment.setSpecifications(Arrays.asList(Specification.REST, Specification.HTML));
+        deployment.setSpecifications(newSet(Specification.REST, Specification.HTML));
         deployment.setSniffers(Collections.singletonList(new TestSniffer1()));
         archiveDeploymentStorage.archiveDeploymentDone(deployment);
 
@@ -55,6 +57,12 @@ class ArchiveDeploymentStorageTest {
         assertThat(content).contains("\"specifications\":[\"REST\",\"HTML\"]");
         assertThat(content).contains("\"sniffers\":[\"TestSniffer1\"]");
         assertThat(content).contains("\"contextRoot\":\"\\/test\"");
+    }
+
+    private Set<Specification> newSet(Specification... specifications) {
+        Set<Specification> result = new HashSet<>();
+        Collections.addAll(result, specifications);
+        return result;
     }
 
     @Test
@@ -73,7 +81,7 @@ class ArchiveDeploymentStorageTest {
         ArchiveDeployment deployment = new ArchiveDeployment(new File("./applications/test2.war"));
         File targetLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getArchiveFile().getName());
         deployment.setDeploymentLocation(targetLocation);
-        deployment.setSpecifications(Arrays.asList(Specification.SERVLET));
+        deployment.setSpecifications(newSet(Specification.SERVLET));
         deployment.setSniffers(Collections.singletonList(new TestSniffer2()));
         archiveDeploymentStorage.archiveDeploymentDone(deployment);
 
@@ -102,7 +110,7 @@ class ArchiveDeploymentStorageTest {
         ArchiveDeployment deployment = new ArchiveDeployment(new File("./applications/test.war"));
         File targetLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getArchiveFile().getName());
         deployment.setDeploymentLocation(targetLocation);
-        deployment.setSpecifications(Arrays.asList(Specification.SERVLET));
+        deployment.setSpecifications(newSet(Specification.SERVLET));
         deployment.setSniffers(Collections.singletonList(new TestSniffer2()));
         archiveDeploymentStorage.archiveDeploymentDone(deployment);
 
@@ -131,7 +139,7 @@ class ArchiveDeploymentStorageTest {
         ArchiveDeployment deployment = new ArchiveDeployment(new File("./applications/test.war"));
         File targetLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getArchiveFile().getName());
         deployment.setDeploymentLocation(targetLocation);
-        deployment.setSpecifications(Arrays.asList(Specification.SERVLET));
+        deployment.setSpecifications(newSet(Specification.SERVLET));
         deployment.setSniffers(Collections.singletonList(new TestSniffer2()));
         deployment.setContextRoot("/test");  // Important for test, internally identity is determined based on contextroot
 

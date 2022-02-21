@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@ import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ApplicationInfo {
 
     private String name;
     private String contextRoot;
-    private List<Specification> specifications;
+    private Set<Specification> specifications;
     private List<String> sniffers;
 
     public ApplicationInfo(ArchiveDeployment deployment) {
@@ -55,11 +56,11 @@ public class ApplicationInfo {
         this.contextRoot = contextRoot;
     }
 
-    public List<Specification> getSpecifications() {
+    public Set<Specification> getSpecifications() {
         return specifications;
     }
 
-    public void setSpecifications(List<Specification> specifications) {
+    public void setSpecifications(Set<Specification> specifications) {
         this.specifications = specifications;
     }
 

@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class DeploymentMetadataTest {
 
@@ -39,7 +40,7 @@ class DeploymentMetadataTest {
                 .build();
 
         List<Sniffer> sniffers = Collections.singletonList(new TestSniffer());
-        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
 
 
         ArchiveDeployment deployment1 = new ArchiveDeployment(new File("./applications/test1.war"));
@@ -73,7 +74,7 @@ class DeploymentMetadataTest {
                 .build();
 
         List<Sniffer> sniffers = Collections.singletonList(new TestSniffer());
-        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
 
 
         ArchiveDeployment deployment1 = new ArchiveDeployment(new File("./applications/test1.war"));

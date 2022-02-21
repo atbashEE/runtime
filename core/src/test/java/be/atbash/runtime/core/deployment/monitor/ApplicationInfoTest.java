@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +33,7 @@ class ApplicationInfoTest {
     @Test
     void testConstructor() {
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
-        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
 
         ArchiveDeployment deployment = new ArchiveDeployment("locationNotImportant"
                 , "name", specifications, sniffers, "/root", new HashMap<>());
@@ -45,7 +46,7 @@ class ApplicationInfoTest {
     @Test
     void testToString() {
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
-        List<Specification> specifications = Collections.singletonList(Specification.SERVLET);
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
 
         ArchiveDeployment deployment = new ArchiveDeployment("locationNotImportant"
                 , "name", specifications, sniffers, "/root", new HashMap<>());
