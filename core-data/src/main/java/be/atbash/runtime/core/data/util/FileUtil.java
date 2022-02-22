@@ -15,10 +15,7 @@
  */
 package be.atbash.runtime.core.data.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.logging.ErrorManager;
 import java.util.zip.GZIPOutputStream;
 
@@ -31,6 +28,15 @@ public final class FileUtil {
 
     public static String getTempDirectory() {
         return System.getProperty("java.io.tmpdir");
+    }
+
+    public static File storeStreamToTempFile(InputStream in) throws IOException {
+        final File tempFile = File.createTempFile("tmp_deploy_", ".war");
+        tempFile.deleteOnExit();
+        try (FileOutputStream out = new FileOutputStream(tempFile)) {
+            in.transferTo(out);
+        }
+        return tempFile;
     }
 
     public static boolean gzipFile(File infile) {

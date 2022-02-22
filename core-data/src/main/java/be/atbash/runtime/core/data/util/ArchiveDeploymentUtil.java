@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ public final class ArchiveDeploymentUtil {
             archives.get(i).setContextRoot(rootValues[i]);
         }
     }
-    public static boolean testOnArchive(File archiveFile) {
+    public static boolean testOnArchive(File archiveFile, boolean isWar) {
         boolean result = archiveFile.exists();
         if (!result) {
-            LOGGER.warn(String.format("DEPLOY-105: Archive file %s not found", archiveFile));
+            LOGGER.warn(String.format("DEPLOY-105: file %s not found", archiveFile));
         }
-        if (result) {
+        if (result && isWar) {
             try {
                 result = archiveFile.getCanonicalPath().endsWith(".war");
                 if (!result) {

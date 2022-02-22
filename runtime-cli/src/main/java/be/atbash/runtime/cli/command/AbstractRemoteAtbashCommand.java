@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,14 +171,14 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
                 command;
     }
 
-    void callRemoteCLI(String command, BasicRemoteCLIParameters remoteCLIParameters, Map<String, String> options, File[] archives) {
+    void callRemoteCLI(String command, BasicRemoteCLIParameters remoteCLIParameters, Map<String, String> options, boolean isWar, File[] archives) {
 
         if (archives == null) {
             LOGGER.warn("RC-108: The command is missing one or more file arguments.");
             return;
         }
         for (File file : archives) {
-            if (!ArchiveDeploymentUtil.testOnArchive(file)) {
+            if (!ArchiveDeploymentUtil.testOnArchive(file, isWar)) {
                 return;
             }
         }

@@ -207,7 +207,7 @@ public class Deployer implements ModuleEventListener {
     private boolean unpackArchive(ArchiveDeployment deployment) {
         LOGGER.info(String.format("Deploying application %s", deployment.getArchiveFile()));
 
-        if (!ArchiveDeploymentUtil.testOnArchive(deployment.getArchiveFile())) {
+        if (!ArchiveDeploymentUtil.testOnArchive(deployment.getArchiveFile(), true)) {
             return false;
         }
 

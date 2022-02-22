@@ -114,3 +114,8 @@ Sets the logging configuration parameters. The parameters must be in the form of
 - set-logging-configuration rotationLimitInBytes=
 - set-logging-configuration maxHistoryFiles=
 - set-logging-configuration compressOnRotation=
+
+You can also specify, in addition to the above parameters, a new logging properties file that must be used (in stead of sending individual properties)
+If you combine a file and parameters, the parameters are applied _after_ the file is used. There
+
+- set-logging-configuration --file <logging.properties.file>

@@ -50,6 +50,7 @@
         <jetty.version>11.0.8</jetty.version>
         <jakarta.rest.api.version>3.0.0</jakarta.rest.api.version>
         <atbash.utils-se.version>1.1.0-SNAPSHOT</atbash.utils-se.version>
+        <mockito.version>4.3.1</mockito.version>
     </properties>
 
     <dependencyManagement>

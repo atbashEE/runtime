@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.util.ArchiveDeploymentUtil;
+import be.atbash.runtime.core.data.util.FileUtil;
 import be.atbash.runtime.core.data.util.StringUtil;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
 public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUpload {
 
 
-    private final List<UploadData> uploadedFiles = new ArrayList<>();
+    private final List<UploadedFile> uploadedFiles = new ArrayList<>();
 
     @Override
     public CommandResponse handleCommand(Map<String, String> options) {
@@ -96,7 +97,7 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
 
     }
 
-    private ArchiveDeployment buildArchiveDeployment(UploadData data) {
+    private ArchiveDeployment buildArchiveDeployment(UploadedFile data) {
         String name = StringUtil.determineDeploymentName(data.getName());
         return new ArchiveDeployment(data.getTempFileLocation(), name);
     }
@@ -105,19 +106,10 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
     public void uploadedFile(String name, InputStream inputStream) {
 
         try {
-            uploadedFiles.add(new UploadData(name, storeStreamToTempFile(inputStream)));
+            uploadedFiles.add(new UploadedFile(name, FileUtil.storeStreamToTempFile(inputStream)));
         } catch (IOException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
-    }
-
-    public static File storeStreamToTempFile(InputStream in) throws IOException {
-        final File tempFile = File.createTempFile("tmp_deploy_", ".war");
-        tempFile.deleteOnExit();
-        try (FileOutputStream out = new FileOutputStream(tempFile)) {
-            in.transferTo(out);
-        }
-        return tempFile;
     }
 
     private static boolean validateCommandLine(List<ArchiveDeployment> deployments, String contextRoots) {
@@ -130,21 +122,4 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
         return deployments.size() == parts.length;
     }
 
-    private static class UploadData {
-        private String name;
-        private File tempFileLocation;
-
-        public UploadData(String name, File tempFileLocation) {
-            this.name = name;
-            this.tempFileLocation = tempFileLocation;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public File getTempFileLocation() {
-            return tempFileLocation;
-        }
-    }
 }

@@ -17,11 +17,15 @@ package be.atbash.runtime.cli.command;
 
 import picocli.CommandLine;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 @CommandLine.Command(name = "set-logging-configuration")
 public class CLISetLoggingConfigurationCommand extends AbstractRemoteAtbashCommand {
+
+    @CommandLine.Option(names = {"--file"}, description = "Points to the properties files for the logging configuration.")
+    private File propertiesFile;
 
     @CommandLine.Parameters(index = "0..*")
     private String[] options;
@@ -29,8 +33,9 @@ public class CLISetLoggingConfigurationCommand extends AbstractRemoteAtbashComma
     @Override
     public Integer call() throws Exception {
         Map<String, String> commandOptions = new HashMap<>();
-        commandOptions.put("", String.join(",", options));
-        callRemoteCLI("POST", "set-logging-configuration", basicRemoteCLIParameters, commandOptions);
+        String data = options == null ? "":String.join(",", options);
+        commandOptions.put("", data);
+        callRemoteCLI("set-logging-configuration", basicRemoteCLIParameters, commandOptions, false, new File[]{propertiesFile});
         // TODO or should it be PUT instead of POST?
         return 0;
     }

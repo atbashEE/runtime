@@ -90,6 +90,19 @@ public class ConfigurationManager {
         }
     }
 
+    public void setLoggingConfigCommand(File propertiesFile) {
+        Properties uploadedProperties = new Properties();
+        try (InputStream in = new FileInputStream(propertiesFile)) {
+            uploadedProperties.load(in);
+
+        } catch (IOException e) {
+            // FIXME what happens when this Exception is thrown. Does runtime stop or where is it captured?
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+
+        }
+        writeLoggingProperties(uploadedProperties);
+    }
+
     public List<String> setLoggingConfigCommand(String[] options) {
         List<String> result = new ArrayList<>();
         Properties properties = readLoggingProperties();
@@ -109,7 +122,6 @@ public class ConfigurationManager {
 
         if (result.isEmpty()) {
             writeLoggingProperties(properties);
-            EventManager.getInstance().publishEvent(LOGGING_UPDATE, new Object());
         }
         return result;
     }
