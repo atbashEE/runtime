@@ -32,11 +32,19 @@ public class CLISetLoggingConfigurationCommand extends AbstractRemoteAtbashComma
 
     @Override
     public Integer call() throws Exception {
+        if (options == null && propertiesFile == null) {
+            LOGGER.warn("RCLI-011: No options specified to change the logging configuration; use either --file or key=value option to define some values.");
+            return -1;
+        }
         Map<String, String> commandOptions = new HashMap<>();
-        String data = options == null ? "":String.join(",", options);
+        String data = options == null ? "" : String.join(",", options);
         commandOptions.put("", data);
-        callRemoteCLI("set-logging-configuration", basicRemoteCLIParameters, commandOptions, false, new File[]{propertiesFile});
-        // TODO or should it be PUT instead of POST?
+        if (propertiesFile == null) {
+            callRemoteCLI("POST", "set-logging-configuration", basicRemoteCLIParameters, commandOptions);
+            // TODO or should it be PUT instead of POST?
+        } else {
+            callRemoteCLI("set-logging-configuration", basicRemoteCLIParameters, commandOptions, false, new File[]{propertiesFile});
+        }
         return 0;
     }
 }

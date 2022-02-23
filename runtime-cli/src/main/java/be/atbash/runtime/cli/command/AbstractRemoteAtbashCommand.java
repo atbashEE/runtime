@@ -50,7 +50,7 @@ import static be.atbash.runtime.common.command.RuntimeCommonConstant.CLASS_INFO_
  */
 public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     @CommandLine.Mixin
     protected BasicRemoteCLIParameters basicRemoteCLIParameters;
@@ -84,16 +84,15 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             try {
                 response = client.send(request, HttpResponse.BodyHandlers.ofString());
             } catch (ConnectException e) {
-                // FIXME  is System.out the best
 
-                System.out.println("CLI-210: Unable to contact Runtime domain endpoint.");
+                LOGGER.error("CLI-210: Unable to contact Runtime domain endpoint.");
                 throw new DomainConnectException("Unable to contact Runtime domain endpoint.", e);
             }
 
             String data = response.body();
             int statusCode = response.statusCode();
             if (statusCode != 200) {
-                System.out.printf("CLI-211: Calling Runtime domain endpoint resulted in status %s (message '%s')%n", statusCode, data);
+                LOGGER.error("CLI-211: Calling Runtime domain endpoint resulted in status {} (message '{}')", statusCode, data);
                 throw new DomainConnectException("Call to Runtime domain endpoint resulted in a failure.", null);
             }
             writeCommandResult(remoteCLIParameters, data);
@@ -105,13 +104,13 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
 
     private void writeCommandResult(BasicRemoteCLIParameters remoteCLIParameters, String data) throws JsonProcessingException {
         if (remoteCLIParameters.getFormat() == RemoteCLIOutputFormat.JSON) {
-            System.out.println(data);  // FIXME  System.out or Logger?
+            LOGGER.info(data);
         } else {
             ObjectMapper mapper = new ObjectMapper();
             CommandResponse commandResponse = mapper.readValue(data, CommandResponse.class);
             if (commandResponse.isSuccess()) {
                 writeCommandOutput(commandResponse);
-                System.out.println("Command execution successful");
+                LOGGER.info("Command execution successful");
             } else {
                 writeErrorMessage(commandResponse);
             }
@@ -120,9 +119,9 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
     }
 
     private void writeErrorMessage(CommandResponse commandResponse) {
-        // FIXME System.out of Logger?
-        System.out.println("Command execution failed with the following message");
-        System.out.println(commandResponse.getErrorMessage());
+
+        LOGGER.error("Command execution failed with the following message");
+        LOGGER.error(commandResponse.getErrorMessage());
     }
 
     private void writeCommandOutput(CommandResponse commandResponse) {
@@ -130,8 +129,8 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             writeOutputCommandWithComplexData(commandResponse);
         } else {
             for (Map.Entry<String, String> entry : commandResponse.getData().entrySet()) {
-                // FIXME System.out of Logger?
-                System.out.println(entry.getKey() + ": " + entry.getValue());
+
+                LOGGER.info(entry.getKey() + ": " + entry.getValue());
             }
         }
     }
@@ -145,8 +144,8 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
                     continue;
                 }
                 Object value = mapper.readValue(entry.getValue(), infoClass);
-                // FIXME System.out of Logger?
-                System.out.println(entry.getKey() + ": " + value.toString());
+
+                LOGGER.info(entry.getKey() + ": " + value.toString());
             }
         } catch (ClassNotFoundException | JsonProcessingException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
@@ -204,10 +203,13 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            int status = response.statusCode();
-            // FIXME check on status
-
             String data = response.body();
+
+            int statusCode = response.statusCode();
+            if (statusCode != 200) {
+                LOGGER.error("CLI-211: Calling Runtime domain endpoint resulted in status {} (message '{}')", statusCode, data);
+                throw new DomainConnectException("Call to Runtime domain endpoint resulted in a failure.", null);
+            }
             writeCommandResult(remoteCLIParameters, data);
 
         } catch (IOException | InterruptedException e) {

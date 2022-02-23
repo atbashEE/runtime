@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.logging.testing;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Handler;
@@ -24,8 +25,17 @@ public class TestLogHandler extends Handler {
 
     private final List<LoggingEvent> logEvents = new CopyOnWriteArrayList<>();
 
+    private static final List<String> TEST_LOGGERS = List.of("org.mockserver.log.MockServerEventLog");
+
+    private boolean removeTestLogEvents;
+
     @Override
     public void publish(LogRecord record) {
+        if (removeTestLogEvents) {
+            if (TEST_LOGGERS.contains(record.getLoggerName())) {
+                return;
+            }
+        }
         logEvents.add(new LoggingEvent(record));
     }
 
@@ -37,6 +47,10 @@ public class TestLogHandler extends Handler {
     @Override
     public void close() throws SecurityException {
 
+    }
+
+    public void setRemoveTestLogEvents(boolean removeTestLogEvents) {
+        this.removeTestLogEvents = removeTestLogEvents;
     }
 
     public List<LoggingEvent> getLogEvents() {

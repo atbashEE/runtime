@@ -55,6 +55,11 @@ public final class TestLogMessages {
         INSTANCE.addHandler();
     }
 
+    public static void init(boolean removeTestLogEvents) {
+        INSTANCE.addHandler();
+        INSTANCE.handler.setRemoveTestLogEvents(removeTestLogEvents);
+    }
+
     public static void reset() {
         INSTANCE.clearEvents();
     }

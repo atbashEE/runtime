@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+    Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -68,12 +68,44 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
+
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>logging-testing</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.utils</groupId>
+            <artifactId>utils-se</artifactId>
+            <classifier>tests</classifier>
+            <version>${atbash.utils-se.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.utils</groupId>
+            <artifactId>utils-se</artifactId>
+            <version>${atbash.utils-se.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-junit-jupiter</artifactId>
+            <version>5.12.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <finalName>atbash-cli</finalName>
         <plugins>
             <plugin>
+                <!-- this dependency is used by Framework and thus brings all transitive dependencies to the
+                testing framework, including the SLF4J-JUL bridge resulting in an warning that multiple
+                output systems are found -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.4</version>
