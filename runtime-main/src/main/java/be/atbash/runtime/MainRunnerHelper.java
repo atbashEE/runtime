@@ -178,7 +178,8 @@ public class MainRunnerHelper {
     public void logStartupTime(long start) {
         long end = System.currentTimeMillis();
 
-        logger.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
+        //logger.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
+        logger.atInfo().addArgument( ((double) end - start) / 1000).log("CLI-103");
     }
 
     public void registerRuntimeBean(ServerMon serverMon) {

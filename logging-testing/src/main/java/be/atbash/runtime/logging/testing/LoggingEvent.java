@@ -15,7 +15,7 @@
  */
 package be.atbash.runtime.logging.testing;
 
-import org.slf4j.MDC;
+import be.atbash.util.TestReflectionUtils;
 
 import java.time.Instant;
 import java.util.*;
@@ -25,23 +25,33 @@ import java.util.logging.LogRecord;
 public class LoggingEvent {
 
     private final Level level;
-    private final Map<String, String> mdc;
+    private Map<String, String> mdc;
     private final Throwable throwable;
     private final String message;
     private final List<Object> arguments;
     private final String creatingLogger;
     private final Instant timestamp;
+    private final ResourceBundle resourceBundle;
 
     public LoggingEvent(LogRecord logRecord) {
         level = logRecord.getLevel();
-        Map<String, String> map = MDC.getCopyOfContextMap();
-        mdc = map == null ? Collections.emptyMap() : Collections.unmodifiableMap(map);
+
         message = logRecord.getMessage();
         Object[] parameters = logRecord.getParameters();
         arguments = parameters == null ? Collections.emptyList() : Arrays.asList(parameters);
         creatingLogger = logRecord.getLoggerName();
         throwable = logRecord.getThrown();
         timestamp = logRecord.getInstant();
+        resourceBundle = logRecord.getResourceBundle();
+
+        // We cannot add dependency to logging-core as that would result in circular dependency
+        try {
+            Map<String, String> mdc = TestReflectionUtils.getValueOf(logRecord, "mdc");
+            this.mdc = mdc;
+        } catch (NoSuchFieldException e) {
+            // When Exception, it is not a EnhancedLogRecord
+            mdc = Collections.emptyMap();
+        }
 
     }
 
@@ -71,5 +81,9 @@ public class LoggingEvent {
 
     public Instant getTimestamp() {
         return timestamp;
+    }
+
+    public ResourceBundle getResourceBundle() {
+        return resourceBundle;
     }
 }

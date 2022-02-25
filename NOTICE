@@ -17,4 +17,5 @@ and others
 
 Some modules are inspired by and have snippets from other OpenSource projects
 
+Logging module: Contains an adapted version of the SLF4J-JDK14Logger project
 MP-Config module: SmallRye Config and Payara MicroProfile Config implementation.

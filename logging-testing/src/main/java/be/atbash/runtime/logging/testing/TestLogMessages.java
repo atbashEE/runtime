@@ -40,7 +40,10 @@ public final class TestLogMessages {
     }
 
     void clearEvents() {
-        handler.clearEvents();
+        if (handler != null) {
+
+            handler.clearEvents();
+        }
     }
 
     private List<LoggingEvent> getEvents() {

@@ -22,12 +22,19 @@ There are several options for rotation.
 
 The size based option is combined with the time based options. So unless you disable the size based rotation, you might so rotation happening of the log file in between the time based one.
 
-Time based rotation (including the daily one) has a granularity of 1 minute. So the rotation can happen at macimum 1 minute before or after the intended moment.
+Time based rotation (including the daily one) has a granularity of 1 minute. So the rotation can happen at maximum 1 minute before or after the intended moment.
 
 Daily rotation has precedence over the time based rotation.
 
+=== SLF4J message format and Resource Bundle
 
+The Atbash Runtime includes a special SLF4J to Java util Logging bridge. This bridge allows you to use Resource Bundles in combination with SLF4J.  For a SLF4J logger, the corresponding ResourceBundle is looked up according to this mapping.
 
+`LoggerFactory.getLogger(Foo.class);`  -> ResourceBundle is `msg.the.package.to.FOO.properties`.
+
+When the mesage passed to the SLF4J logger contains the `{}` placeholder, the message formatting is performed according the SLF4J rules. Otherwise the Java Util Logging formatter is responsible for creating the final message.
+
+More functionality in the next phase of the Logger module rewrite.
 
 == Logging - Technical
 

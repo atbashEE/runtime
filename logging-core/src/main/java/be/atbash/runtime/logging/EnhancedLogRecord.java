@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package be.atbash.runtime.logging;
 
+import org.slf4j.MDC;
+
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -25,6 +28,7 @@ import java.util.logging.LogRecord;
 public class EnhancedLogRecord extends LogRecord {
 
     private String threadName;
+    private Map<String, String> mdc;
 
     public EnhancedLogRecord(Level level, String msg) {
         super(level, msg);
@@ -51,6 +55,14 @@ public class EnhancedLogRecord extends LogRecord {
 
     public void setThreadName(String threadName) {
         this.threadName = threadName;
+    }
+
+    public void captureMDC() {
+        mdc = MDC.getCopyOfContextMap();
+    }
+
+    public Map<String, String> getMdc() {
+        return mdc;
     }
 
     /**
