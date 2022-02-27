@@ -23,6 +23,7 @@ package be.atbash.runtime.logging.slf4j.jul;
  * Original code was in slf4j-jdk14
  */
 
+import be.atbash.runtime.logging.mapping.BundleMapping;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 
@@ -56,9 +57,12 @@ public class JULLoggerFactory implements ILoggerFactory {
     // Based on the Environment Variable 'atbash_log_resourcebundle_warn', should we warn when Resource Bundle is not found.
     private final boolean logResourcebundleWarn;
 
+    private final BundleMapping bundleMapping;
+
     public JULLoggerFactory() {
         loggerMap = new ConcurrentHashMap<>();
         logResourcebundleWarn = Boolean.parseBoolean(System.getenv("atbash_log_resourcebundle_warn"));
+        bundleMapping = BundleMapping.getInstance();
     }
 
     /*
@@ -80,7 +84,7 @@ public class JULLoggerFactory implements ILoggerFactory {
             java.util.logging.Logger julLogger = java.util.logging.Logger.getLogger(name);
             boolean warnLoggerResourceBundle = false;
             try {
-                ResourceBundle bundle = ResourceBundle.getBundle("msg." + name);
+                ResourceBundle bundle = ResourceBundle.getBundle(bundleMapping.defineBundleName(name));
                 julLogger.setResourceBundle(bundle);
             } catch (MissingResourceException e) {
                 // Ignore

@@ -17,12 +17,17 @@ package be.atbash.runtime.logging;
 
 import be.atbash.runtime.AtbashRuntimeConstant;
 import be.atbash.runtime.logging.handler.RuntimeConsoleHandler;
+import be.atbash.runtime.logging.slf4j.RuntimeLoggingEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
 
 import java.io.PrintStream;
 import java.util.*;
 import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 
 public final class LoggingUtil {
 
@@ -36,6 +41,7 @@ public final class LoggingUtil {
     public static final PrintStream oStdOutBackup = System.out;
 
     private static final String HANDLERS = "handlers";
+    private static final SimpleFormatter formatter = new SimpleFormatter();
 
     private LoggingUtil() {
     }
@@ -112,5 +118,31 @@ public final class LoggingUtil {
         }
     }
 
+    public static String formatMessage(Logger logger, String message, Object... parameters) {
+        RuntimeLoggingEvent loggingEvent = new RuntimeLoggingEvent(logger, message, parameters);
+        return formatMessage(loggingEvent);
+    }
+
+    public static String formatMessage(RuntimeLoggingEvent event) {
+        String msg = event.getMessage();
+        String formattedMessage;
+        if (msg.contains("{}")) {
+            // {} means we have a message using SLF4J style of parameters
+            // Wand we need to format the message here
+            formattedMessage = MessageFormatter.basicArrayFormat(msg, event.getArgumentArray());
+
+        } else {
+            // We se the Formatter used by the java.util.logger to format the message.
+            LogRecord logRecord = new LogRecord(Level.INFO, msg);
+            logRecord.setParameters(event.getArgumentArray());
+            logRecord.setResourceBundle(event.getLoggerAdapter().getWrappedLogger().getResourceBundle());
+
+            //SimpleFormatter.formatMessage is thread safe and doesn't use class variables so can be used
+            // without creating a new instance.
+            formattedMessage = formatter.formatMessage(logRecord);
+        }
+
+        return formattedMessage;
+    }
 }
 

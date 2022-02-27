@@ -26,22 +26,18 @@ package be.atbash.runtime.logging.slf4j.jul;
 import be.atbash.runtime.logging.EnhancedLogRecord;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
-import org.slf4j.event.EventConstants;
-import org.slf4j.event.LoggingEvent;
 import org.slf4j.helpers.*;
 import org.slf4j.spi.DefaultLoggingEventBuilder;
 import org.slf4j.spi.LocationAwareLogger;
 
-import java.time.Instant;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 /**
  * A wrapper over {@link java.util.logging.Logger java.util.logging.Logger} in
  * conformity with the {@link Logger} interface. Note that the logging levels
  * mentioned in this class refer to those defined in the java.util.logging
  * package.
- *
+ * <p>
  * Changes for Atbash Runtime
  * - Message is passed as is to LogRecord to support ResourceBundles
  * - Usage of the EnhancedLogRecord of Atbash Runtime.
@@ -91,7 +87,7 @@ public final class JULLoggerAdapter extends LegacyAbstractLogger implements Loca
      * Is this logger instance enabled for the WARNING level?
      *
      * @return True if this Logger is enabled for the WARNING level, false
-     *         otherwise.
+     * otherwise.
      */
     public boolean isWarnEnabled() {
         return logger.isLoggable(Level.WARNING);
@@ -166,7 +162,7 @@ public final class JULLoggerAdapter extends LegacyAbstractLogger implements Loca
 
         int selfIndex = -1;
         for (int i = 0; i < steArray.length; i++) {
-             String className = steArray[i].getClassName();
+            String className = steArray[i].getClassName();
 
             if (barrierMatch(callerFQCN, className)) {
                 selfIndex = i;
@@ -176,7 +172,7 @@ public final class JULLoggerAdapter extends LegacyAbstractLogger implements Loca
 
         int found = -1;
         for (int i = selfIndex + 1; i < steArray.length; i++) {
-             String className = steArray[i].getClassName();
+            String className = steArray[i].getClassName();
             if (!(barrierMatch(callerFQCN, className))) {
                 found = i;
                 break;
@@ -190,6 +186,10 @@ public final class JULLoggerAdapter extends LegacyAbstractLogger implements Loca
             record.setSourceClassName(ste.getClassName());
             record.setSourceMethodName(ste.getMethodName());
         }
+    }
+
+    public java.util.logging.Logger getWrappedLogger() {
+        return logger;
     }
 
     static String SELF = JULLoggerAdapter.class.getName();

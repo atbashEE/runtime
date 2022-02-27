@@ -15,22 +15,29 @@
  */
 package be.atbash.runtime.logging.slf4j.jul;
 
+import be.atbash.runtime.logging.mapping.BundleMapping;
 import be.atbash.runtime.logging.testing.LoggingEvent;
 import be.atbash.runtime.logging.testing.TestLogMessages;
+import be.atbash.util.TestReflectionUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
-class JULLoggerFactoryTest {
-    // Some functionality of the class can't be tested (like the Environment variable for warnings and getting rootLgger.
+public class JULLoggerFactoryTest {
+    // Some functionality of the class can't be tested (like the Environment variable for warnings and getting rootLogger.)
+
+    private final BundleMapping bundleMapping = BundleMapping.getInstance();
 
     @AfterEach
-    public void teardown() {
+    public void teardown() throws NoSuchFieldException {
         TestLogMessages.reset();
+        Map mappings = TestReflectionUtils.getValueOf(bundleMapping, "mappings");
+        mappings.clear();
     }
 
     @Test
@@ -87,4 +94,20 @@ class JULLoggerFactoryTest {
         Assertions.assertThat(loggingEvents.get(0).getResourceBundle()).isNull();
     }
 
+    @Test
+    void getLogger_supportMappedResourceBundle() {
+        bundleMapping.addMapping("some name", JULLoggerFactoryTest.class.getName());
+
+        TestLogMessages.init();
+        JULLoggerFactory factory = new JULLoggerFactory();
+        Logger logger = factory.getLogger("some name");
+        Assertions.assertThat(logger).isNotNull();
+        logger.info("JUNIT-001", "Parameter Value");
+
+        List<LoggingEvent> loggingEvents = TestLogMessages.getLoggingEvents();
+
+        Assertions.assertThat(loggingEvents).hasSize(1);
+        //
+        Assertions.assertThat(loggingEvents.get(0).getResourceBundle().getBaseBundleName()).isEqualTo("msg." + JULLoggerFactoryTest.class.getName());
+    }
 }

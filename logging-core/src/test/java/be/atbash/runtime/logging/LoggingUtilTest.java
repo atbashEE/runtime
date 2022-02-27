@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@
 package be.atbash.runtime.logging;
 
 import be.atbash.runtime.logging.handler.RuntimeConsoleHandler;
+import be.atbash.runtime.logging.slf4j.jul.JULLoggerFactoryTest;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
@@ -227,4 +231,25 @@ class LoggingUtilTest {
 
     }
 
+    @Test
+    void formatMessage() {
+        Logger logger = LoggerFactory.getLogger("some.logger");
+        String message = LoggingUtil.formatMessage(logger, "The message");
+        Assertions.assertThat(message).isEqualTo("The message");
+    }
+
+    @Test
+    void formatMessage_usingSLF4J() {
+        Logger logger = LoggerFactory.getLogger("some.logger");
+        String message = LoggingUtil.formatMessage(logger, "The message with placeholder '{}'", "parameter");
+        Assertions.assertThat(message).isEqualTo("The message with placeholder 'parameter'");
+    }
+
+    @Test
+    void formatMessage_usingResourceBundle_andParameter() {
+        Logger logger = LoggerFactory.getLogger(JULLoggerFactoryTest.class);
+        String message = LoggingUtil.formatMessage(logger, "JUNIT-001", "parameter");
+        Assertions.assertThat(message).isEqualTo("Message from resource bundle with parameter 'parameter' value");
+
+    }
 }
