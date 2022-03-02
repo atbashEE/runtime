@@ -99,7 +99,7 @@ public final class ConfigFileUtil {
             if (applicationFile.canWrite()) {
                 Files.writeString(applicationFile.toPath(), content);
             } else {
-                LOGGER.warn(String.format("CONFIG-018: Unable to write to the file %s, the application will run but will not start the next time", APPLICATIONS_FILE));
+                LOGGER.atWarn().addArgument(APPLICATIONS_FILE).log("CONFIG-018");
             }
         } catch (IOException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);

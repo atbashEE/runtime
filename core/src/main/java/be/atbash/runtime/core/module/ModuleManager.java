@@ -134,7 +134,7 @@ public final class ModuleManager {
         }
 
         if (moduleStartFailed) {
-            LOGGER.error("MODULE-101: Tried to start all modules after a previous failed attempt");
+            LOGGER.atError().log("MODULE-101");
             throw new AtbashStartupAbortException();
         }
 
@@ -200,7 +200,7 @@ public final class ModuleManager {
                 .collect(Collectors.toList());
         if (!unknownModules.isEmpty()) {
             Logger logger = LoggingUtil.getMainLogger(ModuleManager.class);
-            logger.error(String.format("CONFIG-012: Incorrect Module name(s) specified '%s' (abort startup)", String.join(",", unknownModules)));
+            logger.atError().addArgument(String.join(",", unknownModules)).log("CONFIG-012");
         }
         return unknownModules.isEmpty();
     }
@@ -393,7 +393,7 @@ public final class ModuleManager {
         }
         if (LoggingUtil.isVerbose()) {
             String moduleList = result.stream().map(Module::name).collect(Collectors.joining(","));
-            LOGGER.trace(String.format("MODULE-1001: List of Modules included in Runtime %s", moduleList));
+            LOGGER.atTrace().addArgument(moduleList).log("MODULE-1001");
         }
         return result;
     }

@@ -46,7 +46,8 @@ public final class ArchiveDeploymentUtil {
         }
         boolean result = archiveFile.exists();
         if (!result) {
-            LOGGER.warn(String.format("DEPLOY-105: file %s not found", archiveFile));
+
+            LOGGER.atWarn().addArgument(archiveFile).log("DEPLOY-105");
         }
         if (result && isWar) {
             try {

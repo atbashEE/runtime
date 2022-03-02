@@ -113,7 +113,7 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
             return;
         }
 
-        LOGGER.info("JERSEY-104: End of registration of WebApp " + deployment.getDeploymentName());
+        LOGGER.atInfo().addArgument(deployment.getDeploymentName()) .log("JERSEY-104");
     }
 
     public void unregisterDeployment(ArchiveDeployment deployment) {

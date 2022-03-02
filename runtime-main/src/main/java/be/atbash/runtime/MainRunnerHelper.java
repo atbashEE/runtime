@@ -64,7 +64,7 @@ public class MainRunnerHelper {
 
     public void handleCommandlineArguments() {
         if (LoggingUtil.isVerbose()) {
-            logger.trace("CLI-1001: Handling command line arguments");
+            logger.atTrace().log("CLI-1001");
         }
         RuntimeCommand command = new RuntimeCommand(null);
         CommandLine commandLine = new CommandLine(command);
@@ -75,12 +75,12 @@ public class MainRunnerHelper {
         }
 
         if (!validateCommandLine(command)) {
-            logger.error("CLI-111: Number of values for parameter --contextroot does not math number of application to be deployed.");
+            logger.atError().log("CLI-111");
             System.exit(-1);
         }
 
         if (LoggingUtil.isVerbose()) {
-            logger.trace(String.format("CLI-1002: Command line arguments in use %s", actualCommand));
+            logger.atTrace().addArgument(actualCommand).log("CLI-1002");
         }
 
     }
@@ -138,7 +138,7 @@ public class MainRunnerHelper {
                 result.addAll(Arrays.asList(files));
             }
         } else {
-            logger.warn(String.format("CLI-105: %s is not a valid directory", deploymentDirectory));
+            logger.atWarn().addArgument(deploymentDirectory).log("CLI-113");
         }
         result.sort(new AlphabeticalFileComparator());
         return result;
@@ -151,7 +151,8 @@ public class MainRunnerHelper {
         WatcherService temporaryWatcherService = new WatcherService(WatcherType.MINIMAL);
 
         VersionInfo versionInfo = VersionInfo.getInstance();
-        temporaryWatcherService.logWatcherEvent(Module.CORE_MODULE_NAME, String.format("CLI-102: Starting Atbash Runtime version %s", versionInfo.getReleaseVersion()), true);
+
+        temporaryWatcherService.logWatcherEvent(Module.CORE_MODULE_NAME, LoggingUtil.formatMessage(logger, "CLI-102", versionInfo.getReleaseVersion()), true);
         serverMon.setVersion(versionInfo.getReleaseVersion());
     }
 
@@ -171,15 +172,15 @@ public class MainRunnerHelper {
 
             logger = LoggingUtil.getMainLogger(RuntimeMain.class);
 
-            abort("CLI-107: Atbash Runtime startup aborted due to previous errors. (See log if created for the reason of the abort)", -2);
+            String msg = LoggingUtil.formatMessage(logger, "CLI-107");
+            abort(msg, -2);
         }
     }
 
     public void logStartupTime(long start) {
         long end = System.currentTimeMillis();
 
-        //logger.info("CLI-103: Started Atbash Runtime in " + ((double) end - start) / 1000 + " secs");
-        logger.atInfo().addArgument( ((double) end - start) / 1000).log("CLI-103");
+        logger.atInfo().addArgument(((double) end - start) / 1000).log("CLI-103");
     }
 
     public void registerRuntimeBean(ServerMon serverMon) {
@@ -219,7 +220,7 @@ public class MainRunnerHelper {
                     .filter(ad -> ad.getDeploymentName().equals(deployment.getDeploymentName()))
                     .findAny();
             if (otherDeployment.isPresent()) {
-                logger.error(String.format("CLI-109: Deployment %s already active, can't deploy application with same name twice.", deployment.getDeploymentName()));
+                logger.atError().addArgument(deployment.getDeploymentName()).log("CLI-109");
                 System.exit(-2);
             }
             eventManager.publishEvent(Events.DEPLOYMENT, deployment);
@@ -247,13 +248,14 @@ public class MainRunnerHelper {
         int applications = runData.getDeployments().size();
 
         if (applications > 0) {
-            logger.info(String.format("CLI-104: %s Applications running", applications));
+            logger.atInfo().addArgument(applications).log("CLI-104");
         } else {
 
-            logger.warn("CLI-105: No Applications running");
+            logger.atWarn().log("CLI-105");
             if (!runData.isDomainMode() && !runData.isEmbeddedMode()) {
                 // Don't exit in embedded mode when deployment failed. This can be intended with TCK tests.
-                abort("CLI-108: Atbash Runtime stopped as there are no applications deployed and Runtime is not in domain mode.", -2);
+                String msg = LoggingUtil.formatMessage(logger, "CLI-108");
+                abort(msg, -2);
             }
         }
     }
@@ -261,23 +263,22 @@ public class MainRunnerHelper {
     public void handleWarmup() {
         if (actualCommand.getConfigurationParameters().isWarmup()) {
             CriticalThreadCount.getInstance().waitForCriticalThreadsToFinish();
-            abort("CLI-106: process stop due to warmup parameter", 0);
+            String msg = LoggingUtil.formatMessage(logger, "CLI-106");
+            abort(msg, 0);
         }
     }
 
     public void logEnvironmentInformation() {
-        logger.trace(String.format("CLI-102: JDK Version 'JDK %s'", System.getProperty("java.vm.specification.version")));
-        logger.trace(String.format("CLI-102: Full version '%s'", System.getProperty("java.vm.version")));
-        logger.trace(String.format("CLI-102: JVM Vendor '%s'", System.getProperty("java.vm.vendor")));
-        logger.trace(String.format("CLI-102: JVM name '%s'", System.getProperty("java.vm.name")));
-
-        logger.trace(String.format("CLI-102: OS name '%s'", System.getProperty("os.name")));
+        logger.atTrace().addArgument(System.getProperty("java.vm.specification.version")).log("CLI-102a");
+        logger.atTrace().addArgument(System.getProperty("java.vm.version")).log("CLI-102b");
+        logger.atTrace().addArgument(System.getProperty("java.vm.vendor")).log("CLI-102c");
+        logger.atTrace().addArgument(System.getProperty("java.vm.name")).log("CLI-102d");
+        logger.atTrace().addArgument(System.getProperty("os.name")).log("CLI-102e");
 
         Runtime runtime = Runtime.getRuntime();
         double mem = runtime.totalMemory() / 1024.0 / 1024.0;
 
-
-        logger.trace(String.format("CLI-102: Java memory %.0fMB", mem));
+        logger.atTrace().addArgument(mem).log("CLI-102f");
     }
 
     public void performConfiguration() {
@@ -285,12 +286,14 @@ public class MainRunnerHelper {
         if (configFile != null) {
             if (!configFile.exists() || !configFile.canRead()) {
                 // FIXME is status -3 good? what is the logic of the different exit statusses.
-                abort(String.format("CLI-112: Atbash Runtime startup aborted since the configuration file %s does not exists or cannot be read", configFile), -3);
+                String msg = LoggingUtil.formatMessage(logger, "CLI-112", configFile);
+                abort(msg, -3);
             }
             try {
                 RuntimeObjectsManager.getInstance().getExposedObject(ConfigurationManager.class).executeConfigFile(configFile);
             } catch (Throwable e) {
-                abort("CLI-107: Atbash Runtime startup aborted due to previous errors. (See log if created for the reason of the abort)", -2);
+                String msg = LoggingUtil.formatMessage(logger, "CLI-107");
+                abort(msg, -2);
             }
         }
     }

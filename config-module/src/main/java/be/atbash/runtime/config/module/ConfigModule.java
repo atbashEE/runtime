@@ -42,6 +42,7 @@ import be.atbash.runtime.core.data.util.ResourceReader;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.LoggingUtil;
+import be.atbash.runtime.logging.mapping.BundleMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,8 +121,13 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
     @Override
     public void run() {
+        BundleMapping.getInstance().addMapping(ConfigFileUtil.class.getName(), ConfigurationManager.class.getName());
+        BundleMapping.getInstance().addMapping(ConfigInstanceUtil.class.getName(), ConfigurationManager.class.getName());
+        BundleMapping.getInstance().addMapping(ConfigUtil.class.getName(), ConfigurationManager.class.getName());
+
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
-        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "CONFIG-1001: Module startup", false);
+        String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-1001");
+        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, msg, false);
 
         readProfiles();
         Profile profile = findProfile();
@@ -168,7 +174,8 @@ public class ConfigModule implements Module<ConfigurationParameters> {
             runData.registerDeploymentListener(new ArchiveDeploymentStorage(runtimeConfiguration));
         }
 
-        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, "CONFIG-1002: Module ready", false);
+        msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-1002");
+        watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, msg, false);
 
         configurationManager = new ConfigurationManager(runtimeConfiguration);
     }

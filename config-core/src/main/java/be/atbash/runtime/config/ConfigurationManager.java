@@ -16,14 +16,15 @@
 package be.atbash.runtime.config;
 
 import be.atbash.json.JSONValue;
+import be.atbash.runtime.AtbashRuntimeConstant;
 import be.atbash.runtime.config.commands.AbstractConfigurationCommand;
 import be.atbash.runtime.config.commands.ConfigFileCommands;
 import be.atbash.runtime.config.util.ConfigFileUtil;
-import be.atbash.runtime.AtbashRuntimeConstant;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.event.EventManager;
+import be.atbash.runtime.logging.LoggingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -36,7 +37,6 @@ import java.util.Optional;
 import java.util.Properties;
 
 import static be.atbash.runtime.core.data.module.event.Events.CONFIGURATION_UPDATE;
-import static be.atbash.runtime.core.data.module.event.Events.LOGGING_UPDATE;
 
 /**
  * Class responsible for executing configuration commands and executing the configuration file after modules startup.
@@ -44,7 +44,7 @@ import static be.atbash.runtime.core.data.module.event.Events.LOGGING_UPDATE;
 public class ConfigurationManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManager.class);
-    private static final String LOG_FILE_HANDLER_PREFIX = AtbashRuntimeConstant.LOGFILEHANDLER+ ".";
+    private static final String LOG_FILE_HANDLER_PREFIX = AtbashRuntimeConstant.LOGFILEHANDLER + ".";
 
     private final RuntimeConfiguration runtimeConfiguration;
 
@@ -57,11 +57,13 @@ public class ConfigurationManager {
         for (String option : options) {
             String[] parts = option.split("=");
             if (parts.length != 2) {
-                result.add(String.format("CONFIG-101: Option must be 2 parts separated by =, received '%s'", option));
+                String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-101", option);
+                result.add(msg);
             } else {
                 Optional<String> moduleName = getModuleName(parts[0]);
                 if (moduleName.isEmpty()) {
-                    result.add(String.format("CONFIG-102: Option key must be '.' separated value, received '%s'", parts[0]));
+                    String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-102", parts[0]);
+                    result.add(msg);
                 } else {
                     String key = parts[0].substring(moduleName.get().length() + 1);
                     runtimeConfiguration.getConfig().getModules().writeConfigValue(moduleName.get(), key, parts[1]);
@@ -109,7 +111,8 @@ public class ConfigurationManager {
         for (String option : options) {
             String[] parts = option.split("=");
             if (parts.length != 2) {
-                result.add(String.format("CONFIG-101: Option must be 2 parts separated by =, received '%s'", option));
+                String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-101", option);
+                result.add(msg);
             } else {
                 String key = parts[0];
                 // We can't use be.atbash.runtime.logging.util.LogUtil.getLogPropertyKey Logging depends on Config
@@ -158,7 +161,7 @@ public class ConfigurationManager {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
-        LOGGER.info(String.format("CONFIG-105: Performing execution defined in %s", configFile));
+        LOGGER.atInfo().addArgument(configFile).log("CONFIG-105");
         ConfigFileCommands configFileCommands = new ConfigFileCommands();
         CommandLine commandLine = new CommandLine(configFileCommands);
 
@@ -175,7 +178,7 @@ public class ConfigurationManager {
             try {
                 parseResult = commandLine.parseArgs(configLine.split(" "));
             } catch (CommandLine.ParameterException e) {
-                LOGGER.error(String.format("CONFIG-103: Configuration file parsing error on line %s : %s", line, e.getMessage()));
+                LOGGER.atError().addArgument(line).addArgument(e.getMessage()).log("CONFIG-103");
                 throw new AtbashStartupAbortException();
             }
 
@@ -183,12 +186,12 @@ public class ConfigurationManager {
             CommandLine actualCommandLine = commandLines.get(commandLines.size() - 1);
             AbstractConfigurationCommand currentCommand = actualCommandLine.getCommand();
 
-            LOGGER.info(String.format("CONFIG-106: Performing execution of command '%s' on line %s", actualCommandLine.getCommandName(), line));
+            LOGGER.atInfo().addArgument(actualCommandLine.getCommandName()).addArgument(line).log("CONFIG-106");
 
             Integer callResult = currentCommand.call();
             // result < 0 -> Error -> abort startup.
             if (callResult < 0) {
-                LOGGER.info(String.format("CONFIG-104: Configuration file aborted on line %s", line));
+                LOGGER.atError().addArgument(line).log("CONFIG-104");
                 throw new AtbashStartupAbortException();
             }
 

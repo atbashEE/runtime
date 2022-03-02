@@ -34,6 +34,7 @@ import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.deployment.monitor.ApplicationMon;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.LoggingUtil;
+import be.atbash.runtime.logging.mapping.BundleMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,9 @@ public class Deployer implements ModuleEventListener {
         this.runtimeConfiguration = runtimeConfiguration;
         this.modules = modules;
         watcherService.registerBean(WatcherBean.ApplicationWatcherBean, applicationMon);
+
+        // Make it possible to define all messages in the Deployer.properties file.
+        BundleMapping.getInstance().addMapping(ArchiveDeploymentUtil.class.getName(), Deployer.class.getName());
     }
 
     @Override
@@ -104,7 +108,7 @@ public class Deployer implements ModuleEventListener {
         File realApplicationDeploymentLocation = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getDeploymentLocation().getAbsolutePath() + "/WEB-INF");
         if (!realApplicationDeploymentLocation.exists()) {
             // Does no longer exists.
-            LOGGER.warn(String.format("DEPLOY-103: Deployment artifact for %s not found", deployment.getDeploymentName()));
+            LOGGER.atWarn().addArgument(deployment.getDeploymentName()).log("DEPLOY-103");
             deployment.setDeploymentLocation(null);
         } else {
             // realApplicationDeploymentLocation points to /WEB-INF, we need to go 1 up.
@@ -115,12 +119,14 @@ public class Deployer implements ModuleEventListener {
 
     private void deployArchive(ArchiveDeployment deployment) {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
-        watcherService.logWatcherEvent("Deployer", String.format("DEPLOY-101: Starting deployment of %s", deployment.getDeploymentName()), true);
+        String msg = LoggingUtil.formatMessage(LOGGER, "DEPLOY-101", deployment.getDeploymentName());
+        watcherService.logWatcherEvent("Deployer", msg, true);
 
         currentArchiveDeployment = deployment;
 
         if (deployment.getArchiveFile() == null) {
             // Deploy an application that was deployed during a previous run.
+            // FIXME Use ResourceBundle
             LOGGER.info(String.format("Loading application %s", deployment.getDeploymentName()));
         } else {
             if (!unpackArchive(deployment)) {
@@ -134,7 +140,8 @@ public class Deployer implements ModuleEventListener {
 
         if (deployment.getDeploymentModule() == null) {
             Logger logger = LoggingUtil.getMainLogger(Deployer.class);
-            logger.error(String.format("DEPLOY-107: No module available that can run the deployment '%s'", deployment.getDeploymentName()));
+            logger.atError().addArgument(deployment.getDeploymentName()).log("DEPLOY-107");
+
             return;
         }
 
@@ -151,11 +158,15 @@ public class Deployer implements ModuleEventListener {
             applicationMon.registerApplication(deployment);
         } else {
             Logger logger = LoggingUtil.getMainLogger(Deployer.class);
-            logger.error(String.format("DEPLOY-108: During deployment of %s the following error occurred: %s", deployment.getDeploymentName(), deployment.getDeploymentException().getMessage()));
+            logger.atError()
+                    .addArgument(deployment.getDeploymentName())
+                    .addArgument(deployment.getDeploymentException().getMessage())
+                    .log("DEPLOY-108");
 
         }
         eventManager.publishEvent(Events.POST_DEPLOYMENT, deployment);
-        watcherService.logWatcherEvent("Deployer", String.format("DEPLOY-102: End of deployment of %s", deployment.getDeploymentName()), true);
+        msg = LoggingUtil.formatMessage(LOGGER, "DEPLOY-102", deployment.getDeploymentName());
+        watcherService.logWatcherEvent("Deployer", msg, true);
 
     }
 
@@ -219,7 +230,7 @@ public class Deployer implements ModuleEventListener {
         ArchiveContent archiveContent = unpack.handleArchiveFile();
 
         if (archiveContent == null) {
-            LOGGER.warn(String.format("DEPLOY-104: Archive is empty or not a valid archive, '%s'", deployment.getDeploymentName()));
+            LOGGER.atWarn().addArgument(deployment.getDeploymentName()).log("DEPLOY-104");
             return false;
         }
 
@@ -237,7 +248,10 @@ public class Deployer implements ModuleEventListener {
 
             targetLocation = new File(FileUtil.getTempDirectory(), deployment.getDeploymentName() + "-" + uuid + ".war");
             if (LoggingUtil.isVerbose()) {
-                LOGGER.trace(String.format("DEPLOY-1001: The Archive Deployment '%s' is unpacked to the location '%s'", deployment.getDeploymentName(), targetLocation));
+                LOGGER.atTrace()
+                        .addArgument(deployment.getDeploymentName())
+                        .addArgument(targetLocation)
+                        .log("DEPLOY-1001");
             }
 
         } else {

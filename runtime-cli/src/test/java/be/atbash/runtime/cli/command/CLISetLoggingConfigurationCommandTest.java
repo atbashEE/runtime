@@ -273,7 +273,7 @@ class CLISetLoggingConfigurationCommandTest {
         List<LoggingEvent> loggingEvents = TestLogMessages.getLoggingEvents();
         Assertions.assertThat(loggingEvents).hasSize(1);
         Assertions.assertThat(loggingEvents.get(0).getLevel()).isEqualTo(Level.WARNING);
-        Assertions.assertThat(loggingEvents.get(0).getMessage()).isEqualTo("DEPLOY-105: file ./target/test-classes/someRandomFile not found");
+        Assertions.assertThat(loggingEvents.get(0).getMessage()).isEqualTo("DEPLOY-105");
 
 
     }

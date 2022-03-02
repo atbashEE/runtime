@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.util.FileUtil;
 import be.atbash.runtime.core.data.util.ResourceReader;
+import be.atbash.runtime.logging.LoggingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,8 @@ public final class ConfigInstanceUtil {
         // Does root directory exists?
         if (!root.exists()) {
             if (!configInstance.isReadOnlyFlag()) {
-                writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-014: The specified root directory '%s' doesn't point to an existing directory", root.getAbsolutePath()));
+                String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-014", root.getAbsolutePath());
+                writeErrorMessage(configInstance.isCreateCommand(), msg);
             }
             configInstance.invalidConfig();
             return;
@@ -53,13 +55,14 @@ public final class ConfigInstanceUtil {
         // And is root directory a directory?
         if (!root.isDirectory()) {
             if (!configInstance.isReadOnlyFlag()) {
-                writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-015: The specified root directory '%s' is not a directory", root.getAbsolutePath()));
+                String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-015", root.getAbsolutePath());
+                writeErrorMessage(configInstance.isCreateCommand(), msg);
                 configInstance.invalidConfig();
             }
             return;
         }
 
-        // Construct Configratin directory.
+        // Construct Configuration directory.
         File configDirectory = new File(root, configInstance.getConfigName());
 
         // Does that already exists?
@@ -74,14 +77,16 @@ public final class ConfigInstanceUtil {
             // Create the Config Directory
             boolean created = configDirectory.mkdirs();
             if (!created) {
-                writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-016: Unable to create the directory '%s'", configDirectory.getAbsolutePath()));
+                String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-016", configDirectory.getAbsolutePath());
+                writeErrorMessage(configInstance.isCreateCommand(), msg);
                 return;
 
             }
         } else {
             if (configInstance.isCreateCommand()) {
                 // CLI Only
-                writeErrorMessage(configInstance.isCreateCommand(), String.format("CONFIG-017: The config name '%s' already exists.", configInstance.getConfigName()));
+                String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-017", configInstance.getConfigName());
+                writeErrorMessage(configInstance.isCreateCommand(), msg);
             }
         }
 
