@@ -85,15 +85,15 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
                 response = client.send(request, HttpResponse.BodyHandlers.ofString());
             } catch (ConnectException e) {
 
-                LOGGER.error("CLI-210: Unable to contact Runtime domain endpoint.");
-                throw new DomainConnectException("Unable to contact Runtime domain endpoint.", e);
+                LOGGER.error("RC-210: Unable to contact Runtime domain endpoint.");
+                throw new DomainConnectException(e);
             }
 
             String data = response.body();
             int statusCode = response.statusCode();
             if (statusCode != 200) {
-                LOGGER.error("CLI-211: Calling Runtime domain endpoint resulted in status {} (message '{}')", statusCode, data);
-                throw new DomainConnectException("Call to Runtime domain endpoint resulted in a failure.", null);
+                LOGGER.error("RC-211: Calling Runtime domain endpoint resulted in status {} (message '{}')", statusCode, data);
+                throw new DomainConnectException(null);
             }
             writeCommandResult(remoteCLIParameters, data);
 
@@ -208,7 +208,7 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             int statusCode = response.statusCode();
             if (statusCode != 200) {
                 LOGGER.error("CLI-211: Calling Runtime domain endpoint resulted in status {} (message '{}')", statusCode, data);
-                throw new DomainConnectException("Call to Runtime domain endpoint resulted in a failure.", null);
+                throw new DomainConnectException(null);
             }
             writeCommandResult(remoteCLIParameters, data);
 

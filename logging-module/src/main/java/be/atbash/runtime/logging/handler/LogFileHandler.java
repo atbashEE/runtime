@@ -258,15 +258,13 @@ public class LogFileHandler extends StreamHandler implements ModuleEventListener
     private Formatter findFormatter(String formatterName) {
         Formatter result;
         if (!ClassUtils.isAvailable(formatterName)) {
-            throw new IncorrectConfigurationException(IncorrectConfigurationException.IncorrectConfigurationCode.CON_010
-                    , String.format("Unable to instantiate the Log Formatter '%s'", formatterName));
+            throw new IncorrectConfigurationException("CONFIG-019", formatterName);
 
         }
 
         Object instance = ClassUtils.newInstance(formatterName);
         if (!(instance instanceof Formatter)) {
-            throw new IncorrectConfigurationException(IncorrectConfigurationException.IncorrectConfigurationCode.CON_011
-                    , String.format("Configured Log Formatter '%s' is not an instance of java.util.logging.Formatter", formatterName));
+            throw new IncorrectConfigurationException("CONFIG-020", formatterName);
 
         }
         result = (Formatter) instance;

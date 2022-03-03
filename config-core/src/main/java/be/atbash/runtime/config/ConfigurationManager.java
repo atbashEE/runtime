@@ -198,7 +198,7 @@ public class ConfigurationManager {
             line++;
         }
 
-        LOGGER.info("CONFIG-107: All commands executed within the configuration file");
+        LOGGER.atInfo().log("CONFIG-107");
         EventManager.getInstance().publishEvent(CONFIGURATION_UPDATE, runtimeConfiguration);
     }
 }

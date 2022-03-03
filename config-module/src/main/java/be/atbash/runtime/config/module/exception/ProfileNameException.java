@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,6 @@ import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
 
 public class ProfileNameException extends AtbashRuntimeException {
     public ProfileNameException(String profileName) {
-        super("CONFIG-011", String.format("Incorrect Profile name '%s'", profileName));
+        super("CONFIG-011", profileName);
     }
 }

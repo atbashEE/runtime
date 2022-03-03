@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,10 @@
  */
 package be.atbash.runtime.core.data.exception;
 
-public class IncorrectUsageException extends AtbashRuntimeException{
+public class IncorrectUsageException extends AtbashRuntimeException {
 
-    public IncorrectUsageException(IncorrectUsageCode code, String message) {
-        super(code.name(), message);
+    public IncorrectUsageException(String code, Object... parameters) {
+        super(code, parameters);
     }
 
-    public enum IncorrectUsageCode {
-        _MM001
-    }
 }

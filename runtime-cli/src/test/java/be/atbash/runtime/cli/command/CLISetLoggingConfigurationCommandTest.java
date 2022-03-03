@@ -17,6 +17,7 @@ package be.atbash.runtime.cli.command;
 
 import be.atbash.runtime.cli.command.exception.DomainConnectException;
 import be.atbash.runtime.common.command.data.CommandResponse;
+import be.atbash.runtime.core.data.exception.message.ExceptionMessageUtil;
 import be.atbash.runtime.core.data.parameter.BasicRemoteCLIParameters;
 import be.atbash.runtime.logging.testing.LoggingEvent;
 import be.atbash.runtime.logging.testing.TestLogMessages;
@@ -48,6 +49,7 @@ class CLISetLoggingConfigurationCommandTest {
     @BeforeEach
     public void beforeEachLifecyleMethod(MockServerClient client) {
         this.client = client;
+        ExceptionMessageUtil.addModule("runtime-cli");
     }
 
     @AfterEach
@@ -143,12 +145,12 @@ class CLISetLoggingConfigurationCommandTest {
                 );
 
         Assertions.assertThatThrownBy(command::call).isInstanceOf(DomainConnectException.class)
-                .hasMessage("Call to Runtime domain endpoint resulted in a failure.");
+                .hasMessage("RC-010: Unable to contact Runtime domain endpoint");
 
 
         List<LoggingEvent> loggingEvents = TestLogMessages.getLoggingEvents();
         Assertions.assertThat(loggingEvents).hasSize(1);
-        Assertions.assertThat(loggingEvents.get(0).getMessage()).isEqualTo("CLI-211: Calling Runtime domain endpoint resulted in status 404 (message 'Unknown endpoint')");
+        Assertions.assertThat(loggingEvents.get(0).getMessage()).isEqualTo("RC-211: Calling Runtime domain endpoint resulted in status 404 (message 'Unknown endpoint')");
 
         HttpRequest[] requests = client.retrieveRecordedRequests(httpRequest);
         Assertions.assertThat(requests).hasSize(1);

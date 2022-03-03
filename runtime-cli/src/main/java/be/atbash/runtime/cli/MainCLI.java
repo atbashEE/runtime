@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import be.atbash.runtime.cli.command.RuntimeCommand;
 import be.atbash.runtime.common.command.AbstractAtbashCommand;
 import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
+import be.atbash.runtime.core.data.exception.message.ExceptionMessageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -30,8 +31,8 @@ public class MainCLI {
 
     public static void main(String[] args) {
 
-        // We can't create a logger before we have installed our EarlyLogHandler
         Logger LOGGER = LoggerFactory.getLogger(MainCLI.class);
+        ExceptionMessageUtil.addModule("runtime-cli");
 
         RuntimeCommand command = new RuntimeCommand();
         CommandLine commandLine = new CommandLine(command);

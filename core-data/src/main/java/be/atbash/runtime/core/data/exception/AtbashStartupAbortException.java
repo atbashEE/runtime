@@ -17,6 +17,6 @@ package be.atbash.runtime.core.data.exception;
 
 public class AtbashStartupAbortException extends AtbashRuntimeException {
     public AtbashStartupAbortException() {
-        super("MODULE-001", "Abort");
+        super("MODULE-001");
     }
 }

@@ -20,6 +20,7 @@ import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.IncorrectUsageException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
+import be.atbash.runtime.core.data.exception.message.ExceptionMessageUtil;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
@@ -79,6 +80,7 @@ public final class ModuleManager {
     private ModuleManager(ConfigurationParameters configurationParameters) {
         this.configurationParameters = configurationParameters;
         traceModuleStartProcessing = Boolean.parseBoolean(System.getProperty("traceModuleStartProcessing", "false"));
+        ExceptionMessageUtil.addModule("core-data");  // initialize Exception messages for core-data module.
     }
 
     private boolean init(ConfigurationParameters configurationParameters) {
@@ -289,6 +291,9 @@ public final class ModuleManager {
             traceModuleStartProcessing(String.format("Start module %s", module.name()));
         }
 
+        // Register Exception messages for module before module starts.
+        ExceptionMessageUtil.addModule(module.name());
+
         return executorService.submit(createModuleStarterThread(module, null));
     }
 
@@ -349,6 +354,8 @@ public final class ModuleManager {
     }
 
     private <T> boolean startEssentialModule(Module<Object> module, Object configValue) {
+        // Register message exception bundle for essential module
+        ExceptionMessageUtil.addModule(module.name());
 
         Future<Boolean> starter = executorService.submit(createModuleStarterThread(module, configValue));
 
@@ -434,7 +441,7 @@ public final class ModuleManager {
 
     public static ModuleManager getInstance() {
         if (INSTANCE == null) {
-            throw new IncorrectUsageException(IncorrectUsageException.IncorrectUsageCode._MM001, "ModuleManger is not properly configured through `getInstance(ConfigurationParameters)` call");
+            throw new IncorrectUsageException("MODULE-002");
         }
         return INSTANCE;
     }
