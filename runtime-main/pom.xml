@@ -169,6 +169,13 @@
                                 <contextDir>${project.basedir}/target/atbash-runtime</contextDir>
                             </build>
                         </image>
+                        <image>
+                            <name>%a:%v-jdk18</name>
+                            <build>
+                                <dockerFile>${project.basedir}/src/main/docker-jdk18/Dockerfile</dockerFile>
+                                <contextDir>${project.basedir}/target/atbash-runtime</contextDir>
+                            </build>
+                        </image>
                     </images>
                     <!--verbose>true</verbose-->
                     <skip>${docker.skip}</skip>

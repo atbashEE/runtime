@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,10 +85,7 @@ public final class DockerImageProcessor {
 
     private static String defineContent(ServerAdapterMetaData metaData, String name) {
         StringBuilder result = new StringBuilder();
-        String version = "";
-        if (metaData.getJdkRuntime() == JDKRuntime.JDK17) {
-            version = "-jdk17";
-        }
+        String version = metaData.getJdkRuntime().getSuffix();
 
         switch (metaData.getRuntimeType()) {
 
@@ -157,9 +154,8 @@ public final class DockerImageProcessor {
         newImage.append("runtime-main");
         newImage.append(':');
         newImage.append(metaData.getRuntimeVersion());
-        if (metaData.getJdkRuntime() == JDKRuntime.JDK17) {
-            newImage.append("-jdk17");
-        }
+        newImage.append(metaData.getJdkRuntime().getSuffix());
+
         parts[1] = newImage.toString();
 
         return String.join(" ", parts);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,14 @@ package be.atbash.runtime.testing.model;
 
 public enum JDKRuntime {
 
-    JDK11, JDK17, UNKNOWN;  // FIXME We do not have a JDK17 based Docker image.
+    JDK11(""), JDK17("-jdk17"), JDK18("-jdk18"), UNKNOWN(null);
+
+    private final String suffix;
+
+    JDKRuntime(String suffix) {
+        this.suffix = suffix;
+    }
+
 
     public static JDKRuntime parse(String data) {
         JDKRuntime result = UNKNOWN;
@@ -27,6 +34,13 @@ public enum JDKRuntime {
         if ("jdk17".equalsIgnoreCase(data)) {
             result = JDK17;
         }
+        if ("jdk18".equalsIgnoreCase(data)) {
+            result = JDK18;
+        }
         return result;
+    }
+
+    public String getSuffix() {
+        return suffix;
     }
 }
