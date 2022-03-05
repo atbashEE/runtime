@@ -24,7 +24,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -33,6 +32,14 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ServletSniffer implements Sniffer {
+    private final XMLInputFactory xmlInputFactory;
+
+    public ServletSniffer() {
+        xmlInputFactory = XMLInputFactory.newInstance();
+        // So that we don't read external entities and are vulnerable.
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
+
+    }
 
     @Override
     public Specification[] detectedSpecifications() {
@@ -63,7 +70,6 @@ public class ServletSniffer implements Sniffer {
 
     private boolean checkForServletMappings(String content) {
         boolean result = false;
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
         try {
             XMLEventReader reader = xmlInputFactory.createXMLEventReader(new StringReader(content));
             while (reader.hasNext()) {
@@ -77,7 +83,7 @@ public class ServletSniffer implements Sniffer {
 
                 }
             }
-        } catch (XMLStreamException  e) {
+        } catch (XMLStreamException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
         return result;
