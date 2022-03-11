@@ -19,6 +19,8 @@ import be.atbash.json.JSONValue;
 import be.atbash.json.TypeReference;
 import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.config.ConfigurationManager;
+import be.atbash.runtime.config.RuntimeConfigConstants;
+import be.atbash.runtime.config.module.exception.IncorrectFileContentException;
 import be.atbash.runtime.config.module.exception.ProfileNameException;
 import be.atbash.runtime.config.module.profile.ProfileManager;
 import be.atbash.runtime.config.util.ConfigFileUtil;
@@ -43,6 +45,7 @@ import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.LoggingUtil;
 import be.atbash.runtime.logging.mapping.BundleMapping;
+import be.atbash.util.exception.AtbashException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -210,7 +213,11 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     private void readConfiguration(ConfigInstance configInstance) {
         String content = ConfigFileUtil.readConfigurationContent(configInstance.getConfigDirectory(), configInstance.isReadOnlyFlag());
 
-        config = JSONValue.parse(content, Config.class);
+        try {
+            config = JSONValue.parse(content, Config.class);
+        } catch (AtbashException e) {
+            throw new IncorrectFileContentException(RuntimeConfigConstants.CONFIG_FILE, e);
+        }
         if (config.getModules() == null) {
             config.setModules(new Modules());
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,11 @@
 package be.atbash.runtime.config.module.exception;
 
 import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
+import be.atbash.util.exception.AtbashException;
 
 public class IncorrectFileContentException extends AtbashRuntimeException {
-    public IncorrectFileContentException(String fileName) {
-        super("CONFIG-013", "Unable to parse the content of " + fileName);
+
+    public IncorrectFileContentException(String configFile, Exception e) {
+        super("CONFIG-013", configFile, e.getMessage());
     }
 }

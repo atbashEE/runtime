@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 package be.atbash.runtime.config.module;
 
 import be.atbash.json.JSONValue;
+import be.atbash.runtime.config.RuntimeConfigConstants;
+import be.atbash.runtime.config.module.exception.IncorrectFileContentException;
 import be.atbash.runtime.config.util.ConfigFileUtil;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
+import be.atbash.util.exception.AtbashException;
 
 final class ConfigUtil {
 
@@ -28,7 +31,11 @@ final class ConfigUtil {
     public static PersistedDeployments readApplicationDeploymentsData(RuntimeConfiguration runtimeConfiguration) {
 
         String content = ConfigFileUtil.readDeployedApplicationsContent(runtimeConfiguration);
-        return JSONValue.parse(content, PersistedDeployments.class);
+        try {
+            return JSONValue.parse(content, PersistedDeployments.class);
+        } catch (AtbashException e) {
+            throw new IncorrectFileContentException(RuntimeConfigConstants.APPLICATIONS_FILE, e);
+        }
 
     }
 
