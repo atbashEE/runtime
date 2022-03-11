@@ -39,6 +39,12 @@
             <artifactId>logging-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>be.atbash.utils</groupId>
+            <artifactId>utils-se</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -54,6 +60,7 @@
             <groupId>be.atbash.json</groupId>
             <artifactId>octopus-json-smart</artifactId>
         </dependency>
+
         <!-- FIXME To verify -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
