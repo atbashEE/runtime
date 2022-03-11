@@ -211,7 +211,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     }
 
     private void readConfiguration(ConfigInstance configInstance) {
-        String content = ConfigFileUtil.readConfigurationContent(configInstance.getConfigDirectory(), configInstance.isReadOnlyFlag());
+        String content = ConfigFileUtil.readConfigurationContent(configInstance.getConfigDirectory(), configInstance.isStateless());
 
         try {
             config = JSONValue.parse(content, Config.class);
@@ -225,7 +225,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
     private void writeConfiguration(ConfigInstance configInstance) {
         String content = JSONValue.toJSONString(config);
-        ConfigFileUtil.writeConfigurationContent(configInstance.getConfigDirectory(), configInstance.isReadOnlyFlag(), content);
+        ConfigFileUtil.writeConfigurationContent(configInstance.getConfigDirectory(), configInstance.isStateless(), content);
     }
 
     private void readProfiles() {

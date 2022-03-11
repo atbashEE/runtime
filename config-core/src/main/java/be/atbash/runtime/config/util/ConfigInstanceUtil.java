@@ -44,7 +44,7 @@ public final class ConfigInstanceUtil {
 
         // Does root directory exists?
         if (!root.exists()) {
-            if (!configInstance.isReadOnlyFlag()) {
+            if (!configInstance.isStateless()) {
                 String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-014", root.getAbsolutePath());
                 writeErrorMessage(configInstance.isCreateCommand(), msg);
             }
@@ -54,7 +54,7 @@ public final class ConfigInstanceUtil {
 
         // And is root directory a directory?
         if (!root.isDirectory()) {
-            if (!configInstance.isReadOnlyFlag()) {
+            if (!configInstance.isStateless()) {
                 String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-015", root.getAbsolutePath());
                 writeErrorMessage(configInstance.isCreateCommand(), msg);
                 configInstance.invalidConfig();
@@ -69,7 +69,7 @@ public final class ConfigInstanceUtil {
         configInstance.setExistingConfigDirectory(configDirectory.exists());
 
         if (!configDirectory.exists()) {
-            if (configInstance.isReadOnlyFlag()) {
+            if (configInstance.isStateless()) {
                 // In readOnly (stateless) Config is not useable if not already pointing to existing directory
                 configInstance.invalidConfig();
                 return;
@@ -107,7 +107,7 @@ public final class ConfigInstanceUtil {
      * @param configInstance Information about the configuration this instance.
      */
     public static void storeRuntimeConfig(ConfigInstance configInstance) {
-        if (!configInstance.isReadOnlyFlag()) {
+        if (!configInstance.isStateless()) {
             writeFile(configInstance, DEFAULT_CONFIG_FILE, CONFIG_FILE, false);
         }
     }
@@ -119,13 +119,13 @@ public final class ConfigInstanceUtil {
     public static void storeLoggingConfig(ConfigInstance configInstance) {
         String targetFile;
 
-        if (configInstance.isReadOnlyFlag()) {
+        if (configInstance.isStateless()) {
             // Get the temporary directory .
             targetFile = FileUtil.getTempDirectory() + "/logging.properties";
         } else {
             targetFile = "/logging.properties";
         }
-        String loggingConfigFile = writeFile(configInstance, "/logging.properties", targetFile, configInstance.isReadOnlyFlag());
+        String loggingConfigFile = writeFile(configInstance, "/logging.properties", targetFile, configInstance.isStateless());
         configInstance.setLoggingConfigurationFile(loggingConfigFile);
     }
 

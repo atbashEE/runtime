@@ -115,7 +115,7 @@ class ConfigInstanceUtilTest {
 
         Assertions.assertThat(outCapture.toString()).isBlank();
         Assertions.assertThat(configInstance.isValid()).isTrue();  // because of the readOnly
-        Assertions.assertThat(configInstance.isReadOnlyFlag()).isTrue();
+        Assertions.assertThat(configInstance.isStateless()).isTrue();
         Assertions.assertThat(configInstance.getConfigName()).isNull();  // so that the code knowns it should use the ConfigDirectory
         Assertions.assertThat(configInstance.getConfigDirectory()).isNull();  // ConfigDirectory doesn't exists (but ok in readOnly mode)
     }
@@ -128,7 +128,7 @@ class ConfigInstanceUtilTest {
 
         Assertions.assertThat(outCapture.toString()).isBlank();
         Assertions.assertThat(configInstance.isValid()).isTrue();  // because of the readOnly
-        Assertions.assertThat(configInstance.isReadOnlyFlag()).isTrue();
+        Assertions.assertThat(configInstance.isStateless()).isTrue();
         Assertions.assertThat(configInstance.getConfigName()).isNull();  // so that the code knowns it should use the ConfigDirectory
         Assertions.assertThat(configInstance.getConfigDirectory()).isNull();  // ConfigDirectory doesn't exists (but ok in readOnly mode)
     }
@@ -141,7 +141,7 @@ class ConfigInstanceUtilTest {
 
         Assertions.assertThat(outCapture.toString()).isBlank();
         Assertions.assertThat(configInstance.isValid()).isTrue();  // because of the readOnly
-        Assertions.assertThat(configInstance.isReadOnlyFlag()).isTrue();
+        Assertions.assertThat(configInstance.isStateless()).isTrue();
         Assertions.assertThat(configInstance.getConfigName()).isEqualTo("testconfig");
         Assertions.assertThat(configInstance.getConfigDirectory()).isNotNull();  // ConfigDirectory is valid
     }

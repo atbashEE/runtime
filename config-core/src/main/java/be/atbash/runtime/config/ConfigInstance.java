@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,17 @@ public class ConfigInstance {
 
     private final String rootDirectory;
     private String configName;
-    private final boolean readOnlyFlag;
+    private final boolean stateless;
     private final boolean createCommand;
     private File configDirectory;
     private boolean existingConfigDirectory;
     private String loggingConfigurationFile;
 
-    public ConfigInstance(String rootDirectory, String configName, boolean readOnlyFlag, boolean createCommand) {
+    public ConfigInstance(String rootDirectory, String configName, boolean stateless, boolean createCommand) {
 
         this.rootDirectory = rootDirectory;
         this.configName = configName;
-        this.readOnlyFlag = readOnlyFlag;
+        this.stateless = stateless;
         this.createCommand = createCommand;
     }
 
@@ -47,8 +47,8 @@ public class ConfigInstance {
         return configName;
     }
 
-    public boolean isReadOnlyFlag() {
-        return readOnlyFlag;
+    public boolean isStateless() {
+        return stateless;
     }
 
     public boolean isCreateCommand() {
@@ -80,7 +80,7 @@ public class ConfigInstance {
     }
 
     public boolean isValid() {
-        return readOnlyFlag || configName != null;
+        return stateless || configName != null;
     }
 
     /**
