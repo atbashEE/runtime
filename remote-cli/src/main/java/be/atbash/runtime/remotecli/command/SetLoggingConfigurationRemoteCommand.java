@@ -52,7 +52,6 @@ public class SetLoggingConfigurationRemoteCommand extends SetLoggingConfiguratio
 
         if (errors.isEmpty()) {
             EventManager.getInstance().publishEvent(LOGGING_UPDATE, new Object());
-            result.setSuccess(true);
         } else {
             result.setErrorMessage(String.join(System.lineSeparator(), errors));
         }

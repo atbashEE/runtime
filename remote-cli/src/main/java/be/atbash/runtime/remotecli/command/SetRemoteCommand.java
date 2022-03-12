@@ -32,9 +32,7 @@ public class SetRemoteCommand extends SetCommand implements ServerRemoteCommand 
         ConfigurationManager configurationManager = RuntimeObjectsManager.getInstance().getExposedObject(ConfigurationManager.class);
         List<String> errors = configurationManager.setCommand(options.get("").split(","));
 
-        if (errors.isEmpty()) {
-            result.setSuccess(true);
-        } else {
+        if (!errors.isEmpty()) {
             result.setErrorMessage(String.join(System.lineSeparator(), errors));
         }
 

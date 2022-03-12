@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class CommandResponse {
 
-    private boolean success;
+    private boolean success = true;
     private String errorMessage;
     private Map<String, String> data = new HashMap<>();
 
@@ -28,16 +28,19 @@ public class CommandResponse {
         return success;
     }
 
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
     public String getErrorMessage() {
         return errorMessage;
     }
 
+    /**
+     * When setting error message, we also set the success flag to false
+     * @param errorMessage
+     */
     public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
+        if (errorMessage != null) {
+            this.errorMessage = errorMessage;
+            this.success = false;
+        }
     }
 
     public Map<String, String> getData() {

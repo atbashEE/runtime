@@ -98,7 +98,7 @@ public class ConfigurationManager {
             uploadedProperties.load(in);
 
         } catch (IOException e) {
-            // FIXME what happens when this Exception is thrown. Does runtime stop or where is it captured?
+            // Captured in the DomainHandler and a proper message send to client
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
 
         }
@@ -133,7 +133,7 @@ public class ConfigurationManager {
         try (OutputStream out = new FileOutputStream(System.getProperty(AtbashRuntimeConstant.LOGGING_FILE_SYSTEM_PROPERTY))) {
             properties.store(out, ""); // TODO Sorted output?
         } catch (IOException e) {
-            // FIXME what happens when this Exception is thrown. Does runtime stop or where is it captured?
+            // Captured in the DomainHandler and a proper message send to client
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }
@@ -144,7 +144,7 @@ public class ConfigurationManager {
             result.load(in);
 
         } catch (IOException e) {
-            // FIXME what happens when this Exception is thrown. Does runtime stop or where is it captured?
+            // Captured in the DomainHandler and a proper message send to client
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
 
         }

@@ -87,7 +87,6 @@ class CLISetLoggingConfigurationCommandTest {
         TestReflectionUtils.setFieldValue(command, "basicRemoteCLIParameters", remoteParameters);
 
         CommandResponse commandResponse = new CommandResponse();
-        commandResponse.setSuccess(true);
         commandResponse.getData().put("result", "All Good");
 
         ObjectMapper mapper = new ObjectMapper();
@@ -175,7 +174,6 @@ class CLISetLoggingConfigurationCommandTest {
                 .withPath("/domain/set-logging-configuration");
 
         CommandResponse commandResponse = new CommandResponse();
-        commandResponse.setSuccess(false);
         commandResponse.setErrorMessage("CONFIG-101: Option must be 2 parts separated by =, received 'key'");
 
         ObjectMapper mapper = new ObjectMapper();
@@ -219,7 +217,6 @@ class CLISetLoggingConfigurationCommandTest {
         TestReflectionUtils.setFieldValue(command, "basicRemoteCLIParameters", remoteParameters);
 
         CommandResponse commandResponse = new CommandResponse();
-        commandResponse.setSuccess(true);
         commandResponse.getData().put("result", "All Good");
 
         ObjectMapper mapper = new ObjectMapper();

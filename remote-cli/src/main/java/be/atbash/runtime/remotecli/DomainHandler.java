@@ -27,6 +27,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -42,6 +44,7 @@ public class DomainHandler extends AbstractHandler {
 
     public static final String DOMAIN_URL = "/domain/";  // FIXME Configurable?
     private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement("temp/upload");
+    private static final Logger LOGGER = LoggerFactory.getLogger(DomainHandler.class);
 
     private final Map<String, ServerRemoteCommand> commands;
 
@@ -98,7 +101,18 @@ public class DomainHandler extends AbstractHandler {
                         .forEach(e -> options.put(e.getKey(), e.getValue()));
             }
         }
-        CommandResponse result = remoteCommand.handleCommand(options);
+        CommandResponse result;
+        try {
+            result = remoteCommand.handleCommand(options);
+
+        } catch (RuntimeException ex) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            result = new CommandResponse();
+            String errorMessage = Optional.ofNullable(ex.getMessage()).orElse(ex.getClass().getName());
+            result.setErrorMessage(errorMessage);
+
+            LOGGER.warn("RC-011", remoteCommand.getClass().getName(), errorMessage);
+        }
 
         ObjectMapper mapper = new ObjectMapper();
         response.getOutputStream().println(mapper.writeValueAsString(result));

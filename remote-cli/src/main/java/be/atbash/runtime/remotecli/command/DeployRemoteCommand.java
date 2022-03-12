@@ -45,8 +45,6 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
     public CommandResponse handleCommand(Map<String, String> options) {
         CommandResponse result = new CommandResponse();
 
-        result.setSuccess(true);
-
         // FIXME option to do this asynchronous? (in another thread when we already
         // respond to the CLI)
         EventManager eventManager = EventManager.getInstance();
@@ -54,7 +52,6 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
         List<ArchiveDeployment> deployments = uploadedFiles.stream().map(this::buildArchiveDeployment).collect(Collectors.toList());
         String contextRoots = options.get("contextroot");
         if (!validateCommandLine(deployments, contextRoots)) {
-            result.setSuccess(false);
             result.setErrorMessage("RC-101: The number of context root values doesn't match the number of archives.");
             return result;
         }
@@ -68,7 +65,6 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
                     .filter(ad -> ad.getDeploymentName().equals(deployment.getDeploymentName()))
                     .findAny();
             if (otherDeployment.isPresent()) {
-                result.setSuccess(false);
                 result.setErrorMessage(String.format("RC-106: Deployment %s already active, can't deploy application with same name twice.", deployment.getDeploymentName()));
                 return result;
             }
@@ -77,7 +73,6 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
 
             if (applicationCount == runData.getDeployments().size()) {
                 // The application did not deploy
-                result.setSuccess(false);
                 result.setErrorMessage(String.format("RC-107: Deployment of '%s' failed. Invalid Archive", deployment.getDeploymentName()));
                 return result;
 
