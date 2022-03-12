@@ -18,7 +18,7 @@ package be.atbash.runtime.jetty;
 import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
-import be.atbash.runtime.core.data.config.ConfigUtil;
+import be.atbash.runtime.core.data.config.ConfigHelper;
 import be.atbash.runtime.core.data.config.Endpoint;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
@@ -151,7 +151,7 @@ public class JettyModule implements Module<RuntimeConfiguration> {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
         watcherService.logWatcherEvent("Jetty", "JETTY-1001: Module startup", false);
 
-        Endpoint httpEndpoint = ConfigUtil.getHttpEndpoint(configuration.getConfig());
+        Endpoint httpEndpoint = ConfigHelper.getHttpEndpoint(configuration.getConfig());
         server = new Server(httpEndpoint.getPort());
         handlers = new HandlerCollection(true);
         server.setHandler(handlers);

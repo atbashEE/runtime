@@ -18,19 +18,19 @@ package be.atbash.runtime.core.data.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class ConfigUtil {
+public final class ConfigHelper {
 
-    private static final Logger LOGGER  = LoggerFactory.getLogger(ConfigUtil.class);
+    private static final Logger LOGGER  = LoggerFactory.getLogger(ConfigHelper.class);
     public static final String HTTP = "http";
 
-    private ConfigUtil() {
+    private ConfigHelper() {
     }
 
     public static Endpoint getHttpEndpoint(Config config) {
         return config.getEndpoints().stream()
                 .filter(e -> HTTP.equals(e.getName()))
                 .findAny()
-                .orElseGet(ConfigUtil::createDefaultHttpEndpoint);
+                .orElseGet(ConfigHelper::createDefaultHttpEndpoint);
 
     }
 

@@ -19,8 +19,6 @@ import be.atbash.json.JSONValue;
 import be.atbash.json.TypeReference;
 import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.config.ConfigurationManager;
-import be.atbash.runtime.config.RuntimeConfigConstants;
-import be.atbash.runtime.config.module.exception.IncorrectFileContentException;
 import be.atbash.runtime.config.module.exception.ProfileNameException;
 import be.atbash.runtime.config.module.profile.ProfileManager;
 import be.atbash.runtime.config.util.ConfigFileUtil;
@@ -29,7 +27,8 @@ import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.config.Config;
-import be.atbash.runtime.core.data.config.Modules;
+import be.atbash.runtime.core.data.config.ConfigHelper;
+import be.atbash.runtime.core.data.config.Endpoint;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
@@ -45,7 +44,6 @@ import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.LoggingUtil;
 import be.atbash.runtime.logging.mapping.BundleMapping;
-import be.atbash.util.exception.AtbashException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +130,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-1001");
         watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, msg, false);
 
-        readProfiles();
+        profiles = ConfigUtil.readProfiles();
         Profile profile = findProfile();
 
         ConfigInstance configInstance = new ConfigInstance(parameters.getRootDirectory(), parameters.getConfigName()
@@ -148,10 +146,10 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
 
         ProfileManager profileManager = new ProfileManager(parameters, profile);
-        readConfiguration(configInstance);
+        config = ConfigUtil.readConfiguration(configInstance);
         updateConfiguration();
 
-        writeConfiguration(configInstance);
+        ConfigUtil.writeConfiguration(configInstance, config);
 
         // Handle log to file correctly
         System.setProperty(LoggingUtil.SYSTEM_PROPERTY_FILE_LOGGING, Boolean.toString(config.getLogging().isLogToFile()));
@@ -208,37 +206,8 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         if (parameters.getWatcher() == WatcherType.JMX || parameters.getWatcher() == WatcherType.ALL) {
             config.getMonitoring().setJmx(true);
         }
+
+        Endpoint httpEndpoint = ConfigHelper.getHttpEndpoint(config);
+        httpEndpoint.setPort(parameters.getPort());
     }
-
-    private void readConfiguration(ConfigInstance configInstance) {
-        String content = ConfigFileUtil.readConfigurationContent(configInstance.getConfigDirectory(), configInstance.isStateless());
-
-        try {
-            config = JSONValue.parse(content, Config.class);
-        } catch (AtbashException e) {
-            throw new IncorrectFileContentException(RuntimeConfigConstants.CONFIG_FILE, e);
-        }
-        if (config.getModules() == null) {
-            config.setModules(new Modules());
-        }
-    }
-
-    private void writeConfiguration(ConfigInstance configInstance) {
-        String content = JSONValue.toJSONString(config);
-        ConfigFileUtil.writeConfigurationContent(configInstance.getConfigDirectory(), configInstance.isStateless(), content);
-    }
-
-    private void readProfiles() {
-        String content;
-        try {
-            content = ResourceReader.readResource("/profiles.json");
-        } catch (IOException e) {
-            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
-        }
-
-        profiles = (List<Profile>) JSONValue.parse(content,
-                new TypeReference<List<Profile>>() {
-                });
-    }
-
 }

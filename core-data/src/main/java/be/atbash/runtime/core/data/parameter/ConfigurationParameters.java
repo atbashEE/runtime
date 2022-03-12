@@ -49,6 +49,9 @@ public class ConfigurationParameters {
     @CommandLine.Option(names = {"-n", "--configName"}, description = "Configuration name")
     private String configName = "default";
 
+    @CommandLine.Option(names = { "--port"}, description = "Port number assigned to the process running the Atbash runtime.")
+    private int port = 8080;
+
     @CommandLine.Option(names = {LOG_TO_CONSOLE_OPTION}, description = "Does the Runtime logs to the console?")
     private boolean logToConsole = false;
 
@@ -134,6 +137,14 @@ public class ConfigurationParameters {
 
     public void setConfigName(String configName) {
         this.configName = configName;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public boolean isLogToConsole() {

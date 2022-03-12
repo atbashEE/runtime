@@ -31,6 +31,8 @@ The mandatory modules _Config_  and _Logging_  are always added to the list.
 
 The `--modules` option is an expert setting and using it incorrectly can result in a failure to run your application.
 
+*--port*:  The main HTTP port for accepting requests. By default 8080.
+
 *--stateless*:  No configuration information is stored on disk for future runs.  Ideal for creating stateless containers in combination with `--no-logToFile`.
 
 *--logToConsole*: Send all logging to the console.  This overrules the value in the logging configuration file (TBC)
