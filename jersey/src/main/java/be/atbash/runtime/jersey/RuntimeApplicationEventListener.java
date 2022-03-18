@@ -46,7 +46,7 @@ public class RuntimeApplicationEventListener implements ApplicationEventListener
             applicationPath = Deployer.getCurrentDeployment().getDeploymentData(JerseyModuleConstant.APPLICATION_PATH);
             ResourceModel resourceModel = event.getResourceModel();
             final ResourceLogDetails logDetails = new ResourceLogDetails();
-            resourceModel.getResources().stream().forEach((resource) -> {
+            resourceModel.getResources().forEach((resource) -> {
                 logDetails.addEndpointLogLines(getLinesFromResource(resource));
             });
 

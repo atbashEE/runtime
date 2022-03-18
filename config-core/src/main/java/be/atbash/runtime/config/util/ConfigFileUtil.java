@@ -39,7 +39,7 @@ public final class ConfigFileUtil {
      *
      * @param configDirectory The location of the configDirectory
      * @param stateless       is this stateless mode.
-     * @return The content (as JSON)
+     * @return The content as String
      */
     public static String readConfigurationContent(File configDirectory, boolean stateless) {
         if (stateless) {
@@ -93,7 +93,10 @@ public final class ConfigFileUtil {
         File applicationFile = new File(runtimeConfiguration.getConfigDirectory(), APPLICATIONS_FILE);
         try {
             if (!applicationFile.exists()) {
-                applicationFile.createNewFile();
+                boolean created = applicationFile.createNewFile();
+                if (!created) {
+                    throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, String.format("Unable to create file '%s'", applicationFile));
+                }
             }
 
             if (applicationFile.canWrite()) {

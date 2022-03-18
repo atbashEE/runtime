@@ -21,6 +21,10 @@ public class UnexpectedException extends AtbashRuntimeException {
         super(code.name(), exception, exception.getMessage());
     }
 
+    public UnexpectedException(UnexpectedExceptionCode code, String message) {
+        super(code.name(), message);
+    }
+
     public enum UnexpectedExceptionCode {
         UE001  // IOException that should not happen
     }

@@ -97,7 +97,11 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             }
             writeCommandResult(remoteCLIParameters, data);
 
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException e) {
+            // re-interrupt so that we have a proper cleanup
+            Thread.currentThread().interrupt();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        } catch (IOException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }
@@ -212,7 +216,11 @@ public abstract class AbstractRemoteAtbashCommand extends AbstractAtbashCommand 
             }
             writeCommandResult(remoteCLIParameters, data);
 
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        } catch (InterruptedException e) {
+            // re-interrupt so that we have a proper cleanup
+            Thread.currentThread().interrupt();
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }

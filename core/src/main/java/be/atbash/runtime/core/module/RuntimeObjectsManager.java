@@ -37,7 +37,7 @@ public class RuntimeObjectsManager {
         }
         module.getRuntimeObjectTypes().forEach(c -> {
             if (LoggingUtil.isVerbose()) {
-                LOGGER.trace(String.format("CORE-1003: Registering instance of %s against Module %s", c, module.name()));
+                LOGGER.trace(String.format("CORE-1003: Registering instance of '%s' against Module '%s'", c, module.name()));
             }
 
             runtimeObjectMapping.put(c, module);
@@ -47,9 +47,9 @@ public class RuntimeObjectsManager {
     public <T> T getExposedObject(Class<T> exposedObjectType) {
         if (runtimeObjectMapping.containsKey(exposedObjectType)) {
             return runtimeObjectMapping.get(exposedObjectType).getRuntimeObject(exposedObjectType);
-        } else {
-            LOGGER.error(String.format("RO-101: Object '%s' not exposed by any Module", exposedObjectType.getName()));
         }
+        LOGGER.error(String.format("RO-101: Object '%s' not exposed by any Module", exposedObjectType.getName()));
+
         return null;
     }
 

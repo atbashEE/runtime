@@ -562,6 +562,8 @@ public class LogFileHandler extends StreamHandler implements ModuleEventListener
             record = pendingRecords.take();
             super.publish(record);
         } catch (InterruptedException e) {
+            // Re-interrupt the current thread to have proper cleanup.
+            Thread.currentThread().interrupt();
             return;
         }
 
@@ -588,10 +590,10 @@ public class LogFileHandler extends StreamHandler implements ModuleEventListener
      * Publishes the logrecord storing it in our queue
      */
     @Override
-    public void publish(LogRecord record) {
+    public synchronized void publish(LogRecord record) {
 
         // the queue has shutdown, we are not processing any more records
-        if (synchronizer.isSignalled()) {
+        if (synchronizer != null && synchronizer.isSignalled()) {
             return;
         }
 
@@ -610,6 +612,7 @@ public class LogFileHandler extends StreamHandler implements ModuleEventListener
             try {
                 pendingRecords.put(wrappedRecord);
             } catch (InterruptedException e1) {
+                Thread.currentThread().interrupt();
                 // too bad, record is lost...
                 new ErrorManager().error("LogFileHandler: Waiting was interrupted. Log record lost.", e1, ErrorManager.GENERIC_FAILURE);
             }

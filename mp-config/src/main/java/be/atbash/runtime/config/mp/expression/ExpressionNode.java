@@ -59,11 +59,7 @@ public class ExpressionNode extends Node {
         if (pos < 2) {
             return true;
         }
-        if (value.charAt(pos - 2) == '\\' && value.charAt(pos - 1) == '\\') {
-
-            return false;
-        }
-        return true;
+        return value.charAt(pos - 2) != '\\' || value.charAt(pos - 1) != '\\';
     }
 
     @Override

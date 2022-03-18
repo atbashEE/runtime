@@ -16,9 +16,9 @@
 package be.atbash.runtime.core.data.deployment;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 public class ArchiveContent {
@@ -43,7 +43,7 @@ public class ArchiveContent {
         archiveClasses = classesFiles.stream()
                 .filter(n -> n.endsWith(".class"))  // To be on the safe side
                 // - 6 -> remove .class
-                .map(n -> n.substring(0, n.length() - 6).replaceAll(File.separator, "."))
+                .map(n -> n.substring(0, n.length() - 6).replace(Matcher.quoteReplacement(File.separator), "."))
                 .collect(Collectors.toList());
     }
 

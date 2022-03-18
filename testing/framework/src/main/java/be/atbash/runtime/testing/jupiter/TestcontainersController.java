@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,7 +160,7 @@ public class TestcontainersController {
 
     private static class ShutdownWait implements WaitStrategy {
 
-        private AtbashContainer atbashContainer;
+        private final AtbashContainer atbashContainer;
         private Duration waitTimeout;
 
         public ShutdownWait(AtbashContainer atbashContainer) {
@@ -174,20 +174,19 @@ public class TestcontainersController {
 
             try {
                 // Schedule a task to poll for the instance status
-                executor.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        Boolean running = atbashContainer.getStatus().getRunning();
-                        if (running != null && running) {
-                            shutdownTimeout.countDown();
-                        }
+                executor.schedule(() -> {
+                    Boolean running = atbashContainer.getStatus().getRunning();
+                    if (running != null && running) {
+                        shutdownTimeout.countDown();
                     }
                 }, 200, TimeUnit.MILLISECONDS);
 
 
                 shutdownTimeout.await(waitTimeout.getSeconds(), TimeUnit.SECONDS);
+                // FIXME What should we do if we don't get container up and running within the time frame?
             } catch (InterruptedException e) {
-                // FIXME
+                // re-interrupt for proper clean up
+                Thread.currentThread().interrupt();
             } finally {
                 executor.shutdown();
             }

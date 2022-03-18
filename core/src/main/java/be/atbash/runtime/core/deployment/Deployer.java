@@ -21,6 +21,7 @@ import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.WebAppClassLoader;
 import be.atbash.runtime.core.data.deployment.ArchiveContent;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.EventPayload;
@@ -81,8 +82,9 @@ public class Deployer implements ModuleEventListener {
                 .filter(ad -> ad.getDeploymentName().equals(deploymentName))
                 .findAny();
         if (archiveDeployment.isEmpty()) {
-            // FIXME this should never happen as it is already tested
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, String.format("Unable to fine deployment with name '%s'", deploymentName));
         }
+
         ArchiveDeployment deployment = archiveDeployment.get();
         deployment.getDeploymentModule().unregisterDeployment(deployment);
 

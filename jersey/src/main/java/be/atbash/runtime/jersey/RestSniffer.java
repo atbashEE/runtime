@@ -34,6 +34,7 @@ public class RestSniffer implements Sniffer {
     }
 
     @Override
+    @SuppressWarnings("squid:S1872")
     public boolean triggered(Class<?> aClass) {
         for (Annotation annotation : aClass.getAnnotations()) {
             if ("jakarta.ws.rs.Path".equals(annotation.annotationType().getName())) {
@@ -75,6 +76,7 @@ public class RestSniffer implements Sniffer {
                 .collect(Collectors.toSet());
     }
 
+    @SuppressWarnings("squid:S1872")
     private String findApplicationPath() {
 
         String result = null;

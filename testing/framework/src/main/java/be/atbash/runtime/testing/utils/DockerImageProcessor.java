@@ -18,7 +18,6 @@ package be.atbash.runtime.testing.utils;
 import be.atbash.runtime.testing.exception.DockerFileNotFound;
 import be.atbash.runtime.testing.exception.UnexpectedException;
 import be.atbash.runtime.testing.images.LoggableImageFromDockerFile;
-import be.atbash.runtime.testing.model.JDKRuntime;
 import be.atbash.runtime.testing.model.RuntimeType;
 import be.atbash.runtime.testing.model.ServerAdapterMetaData;
 import org.assertj.core.api.Assertions;
@@ -149,14 +148,12 @@ public final class DockerImageProcessor {
             }
         }
 
-        StringBuilder newImage = new StringBuilder();
+        String newImage = "runtime-main" +
+                ':' +
+                metaData.getRuntimeVersion() +
+                metaData.getJdkRuntime().getSuffix();
 
-        newImage.append("runtime-main");
-        newImage.append(':');
-        newImage.append(metaData.getRuntimeVersion());
-        newImage.append(metaData.getJdkRuntime().getSuffix());
-
-        parts[1] = newImage.toString();
+        parts[1] = newImage;
 
         return String.join(" ", parts);
     }

@@ -75,7 +75,7 @@ public final class ModuleManager {
     private Deployer deployer;
     private Module<Object> coreModule;  // TODO Can we avoid this, to keep that reference?
 
-    private boolean traceModuleStartProcessing;
+    private final boolean traceModuleStartProcessing;
 
     private ModuleManager(ConfigurationParameters configurationParameters) {
         this.configurationParameters = configurationParameters;
@@ -111,11 +111,7 @@ public final class ModuleManager {
 
         // Start Logging
         Module<Object> module3 = ModuleUtil.findModule(modules, Module.LOGGING_MODULE_NAME);
-        if (!startEssentialModule(module3, runtimeConfiguration)) {
-            return false;
-        }
-
-        return true;
+        return startEssentialModule(module3, runtimeConfiguration);
     }
 
     private void registerSniffers() {
@@ -127,7 +123,7 @@ public final class ModuleManager {
      * Starts all the non-essential modules. Return false when a module is requested that doesn't exist.
      * It can also throw an {@link AtbashStartupAbortException} when a module fails to start.
      *
-     * @return
+     * @return successful started all modules.
      */
     public boolean startModules() {
         if (modulesStarted) {
@@ -264,7 +260,11 @@ public final class ModuleManager {
                     }
                 }
             }
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            // Keep thread interrupted for correct cleanup and closure.
+            Thread.currentThread().interrupt();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        } catch (ExecutionException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
@@ -277,6 +277,8 @@ public final class ModuleManager {
 
             allModulesStarted.await();
         } catch (InterruptedException e) {
+            // Keep thread interrupted for correct cleanup and closure.
+            Thread.currentThread().interrupt();
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }
@@ -362,7 +364,11 @@ public final class ModuleManager {
         Boolean success;
         try {
             success = starter.get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            // Keep thread interrupted for correct cleanup and closure.
+            Thread.currentThread().interrupt();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        } catch (ExecutionException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 

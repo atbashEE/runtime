@@ -46,6 +46,7 @@ public class ServletSniffer implements Sniffer {
         return new Specification[]{Specification.SERVLET, Specification.HTML};
     }
 
+    @SuppressWarnings("squid:S1872")
     @Override
     public boolean triggered(Class<?> aClass) {
         Optional<Annotation> WebServletAnnotation = Arrays.stream(aClass.getAnnotations())

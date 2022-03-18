@@ -42,7 +42,7 @@ public class RotationTimerUtil {
 
     public void restartTimerForDayBasedRotation() {
         cancelTimer();
-        minutes = 60 * 24; // 24 hours x 60 minutes
+        minutes = 60L * 24; // 24 hours x 60 minutes
         startTimer();
     }
 

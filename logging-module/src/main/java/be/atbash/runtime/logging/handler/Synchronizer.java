@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package be.atbash.runtime.logging.handler;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -34,11 +36,13 @@ import java.util.concurrent.locks.ReentrantLock;
  * Thread 2
  * <p>
  * synchronizer.raiseSignal(1, TimeUnit.SECONDS);
- * // Either Thread 1 stopped the loop or we waited 1 sec and can interupt the thread 1
+ * // Either Thread 1 stopped the loop or we waited 1 sec and can interrupt the thread 1
  */
 public class Synchronizer {
 
-    private ReentrantLock lock = new ReentrantLock();
+    private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
+
+    private final ReentrantLock lock = new ReentrantLock();
     private boolean signalled = false;
 
     public Synchronizer() {
@@ -53,15 +57,18 @@ public class Synchronizer {
         lock.unlock();
     }
 
-    public boolean raiseSignal(long timeout, TimeUnit unit) {
+    public void raiseSignal(long timeout, TimeUnit unit) {
         signalled = true;
         try {
-            return lock.tryLock(timeout, unit);
+            boolean locked = lock.tryLock(timeout, unit);
+            if (!locked) {
+                LOGGER.warn("LOG-012");
+            }
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            // FIXME logging
+            // re-interrupt the Thread again for proper cleanup
+            Thread.currentThread().interrupt();
+
         }
-        return false; // FIXME
     }
 
 }

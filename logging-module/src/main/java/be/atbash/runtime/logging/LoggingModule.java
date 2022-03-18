@@ -22,14 +22,15 @@ import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class LoggingModule implements Module<RuntimeConfiguration> {
 
-    private static final Logger LOGGER = Logger.getLogger(LoggingModule.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoggingModule.class);
     private RuntimeConfiguration configuration;
 
     @Override
@@ -79,7 +80,7 @@ public class LoggingModule implements Module<RuntimeConfiguration> {
     @Override
     public void run() {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
-        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-1001: Module startup", false);
+        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, LoggingUtil.formatMessage(LOGGER, "LOG-1001"), false);
 
         if (configuration.getConfig().getLogging().isLogToFile()) {
             LoggingManager.getInstance().configureLogging(configuration);
@@ -87,7 +88,7 @@ public class LoggingModule implements Module<RuntimeConfiguration> {
 
         LoggingManager.getInstance().removeEarlyLogHandler();
 
-        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, "LOG-1002: Module ready", false);
+        watcherService.logWatcherEvent(Module.LOGGING_MODULE_NAME, LoggingUtil.formatMessage(LOGGER, "LOG-1002"), false);
 
     }
 

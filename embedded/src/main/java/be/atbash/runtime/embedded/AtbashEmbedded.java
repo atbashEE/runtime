@@ -21,6 +21,8 @@ import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
+import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
@@ -43,7 +45,7 @@ import java.util.stream.Collectors;
 
 public class AtbashEmbedded {
 
-    private Logger logger = LoggerFactory.getLogger(AtbashEmbedded.class);
+    private final Logger logger = LoggerFactory.getLogger(AtbashEmbedded.class);
 
     private RuntimeCommand runtimeCommand;
 
@@ -75,9 +77,11 @@ public class AtbashEmbedded {
         runtimeCommand = new RuntimeCommand(configurationParameters);
         try {
             runtimeCommand.call();
+        } catch (AtbashRuntimeException e) {
+            // actually, this was just a way to jump to here :)
+            return;
         } catch (Exception e) {
-            // FIXME
-            e.printStackTrace();
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 
         RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class RuntimeConsoleHandler extends StreamHandler {
      *               silently ignored and is not published
      */
     @Override
-    public void publish(LogRecord record) {
+    public synchronized void publish(LogRecord record) {
         if (record.getMessage().startsWith("*")) {
             // This is a message from the EarlyLogHandler and should not be written
             //to console again (is already)
@@ -63,7 +63,7 @@ public class RuntimeConsoleHandler extends StreamHandler {
      * close {@code System.err}.
      */
     @Override
-    public void close() {
+    public synchronized void close() {
         flush();
     }
 

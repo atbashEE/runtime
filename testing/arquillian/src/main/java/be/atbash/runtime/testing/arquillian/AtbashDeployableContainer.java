@@ -29,7 +29,6 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.glassfish.jersey.ext.cdi1x.internal.CdiComponentProvider;
 import org.jboss.arquillian.container.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.container.spi.client.container.DeploymentException;
 import org.jboss.arquillian.container.spi.client.container.LifecycleException;
@@ -49,8 +48,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Optional;
-
-import static java.util.logging.Level.SEVERE;
 
 /**
  * Implementation of Arquillian {@code DeployableContainer} for use with Atbash Embedded.
@@ -170,7 +167,10 @@ public class AtbashDeployableContainer implements DeployableContainer<AtbashCont
 
         if (!atbashContainerConfiguration.isKeepArchive()) {
             File archiveLocation = defineArchiveLocation(archive.getName());
-            archiveLocation.delete();
+            boolean deleted = archiveLocation.delete();
+            if (!deleted) {
+                LOGGER.warn(String.format("Unable to delete the archive from the location '%s'", archiveLocation));
+            }
         }
     }
 
