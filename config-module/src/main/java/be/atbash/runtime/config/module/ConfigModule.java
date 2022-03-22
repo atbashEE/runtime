@@ -15,8 +15,6 @@
  */
 package be.atbash.runtime.config.module;
 
-import be.atbash.json.JSONValue;
-import be.atbash.json.TypeReference;
 import be.atbash.runtime.config.ConfigInstance;
 import be.atbash.runtime.config.ConfigurationManager;
 import be.atbash.runtime.config.module.exception.ProfileNameException;
@@ -31,7 +29,6 @@ import be.atbash.runtime.core.data.config.ConfigHelper;
 import be.atbash.runtime.core.data.config.Endpoint;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
-import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.EventPayload;
@@ -39,7 +36,6 @@ import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.parameter.WatcherType;
 import be.atbash.runtime.core.data.profile.Profile;
-import be.atbash.runtime.core.data.util.ResourceReader;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.LoggingUtil;
@@ -47,7 +43,6 @@ import be.atbash.runtime.logging.mapping.BundleMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 

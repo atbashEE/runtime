@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public interface Module<C> extends Runnable, ModuleEventListener {
     String[] dependencies();
 
     /**
-     * Defines the class that is expected to pass to the {@link setConfig()} method
+     * Defines the class that is expected to pass to the {@code setConfig()} method
      * before the call ro the run method is performed.
      *
      * @return
@@ -74,7 +74,7 @@ public interface Module<C> extends Runnable, ModuleEventListener {
 
     /**
      * Return the List of Object classes that are exposed by the module and can for
-     * which an instance can be retrieved from the module by {@link getExposedObject()} method.
+     * which an instance can be retrieved from the module by {@code getExposedObject()} method.
      *
      * @return
      */

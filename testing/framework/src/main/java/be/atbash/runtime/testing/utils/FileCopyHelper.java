@@ -31,8 +31,8 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class FileCopyHelper {
 
-    private URL resource;
-    private Path tempDir;
+    private final URL resource;
+    private final Path tempDir;
 
     private FileSystem fileSystem;
 

@@ -23,7 +23,7 @@ public final class EventManager {
 
     private static final EventManager INSTANCE = new EventManager();
 
-    private List<ModuleEventListener> listeners = new CopyOnWriteArrayList<>();
+    private final List<ModuleEventListener> listeners = new CopyOnWriteArrayList<>();
 
     private EventManager() {
     }

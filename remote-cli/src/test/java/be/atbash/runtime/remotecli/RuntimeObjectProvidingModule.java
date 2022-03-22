@@ -26,7 +26,7 @@ import java.util.Optional;
 
 public class RuntimeObjectProvidingModule implements Module<Void> {
 
-    private Object[] runtimeObjects;
+    private final Object[] runtimeObjects;
 
     public RuntimeObjectProvidingModule(Object... runtimeObjects) {
         this.runtimeObjects = runtimeObjects;

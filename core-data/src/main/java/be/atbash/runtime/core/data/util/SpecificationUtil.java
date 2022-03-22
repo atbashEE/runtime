@@ -17,7 +17,6 @@ package be.atbash.runtime.core.data.util;
 
 import be.atbash.runtime.core.data.Specification;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;

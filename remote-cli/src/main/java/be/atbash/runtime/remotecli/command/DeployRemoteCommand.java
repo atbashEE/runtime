@@ -26,8 +26,6 @@ import be.atbash.runtime.core.data.util.FileUtil;
 import be.atbash.runtime.core.data.util.StringUtil;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

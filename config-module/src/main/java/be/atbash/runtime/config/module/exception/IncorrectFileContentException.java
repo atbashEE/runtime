@@ -16,7 +16,6 @@
 package be.atbash.runtime.config.module.exception;
 
 import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
-import be.atbash.util.exception.AtbashException;
 
 public class IncorrectFileContentException extends AtbashRuntimeException {
 

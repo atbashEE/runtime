@@ -28,7 +28,6 @@ import static be.atbash.runtime.config.RuntimeConfigConstants.CONFIG_FILE;
 
 class ConfigurationManagerTest {
 
-
     @Test
     void setCommand() {
         File configDirectory = new File("./target/testDirectory1");

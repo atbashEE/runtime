@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicate the Atbash Integration Testing based extension. Test class must be extending from {@link AbstractContainerTest}.
+ * Indicate the Atbash Integration Testing based extension. Test class must be extending from {@code AbstractContainerTest}.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

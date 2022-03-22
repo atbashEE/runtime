@@ -18,7 +18,6 @@ package be.atbash.runtime.remotecli.command;
 import be.atbash.runtime.common.command.data.CommandResponse;
 import be.atbash.runtime.config.ConfigurationManager;
 import be.atbash.runtime.core.data.module.Module;
-import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.remotecli.RuntimeObjectProvidingModule;
 import be.atbash.util.TestReflectionUtils;
@@ -35,7 +34,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

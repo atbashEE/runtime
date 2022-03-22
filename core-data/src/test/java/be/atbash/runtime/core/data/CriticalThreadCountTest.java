@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import java.util.List;
 
 class CriticalThreadCountTest {
 
-    private static List<String> messages = new ArrayList<>();
+    private static final List<String> messages = new ArrayList<>();
 
     @Test
     void test() {
@@ -37,9 +37,9 @@ class CriticalThreadCountTest {
 
     private static class CriticalThread implements Runnable {
 
-        private String message;
-        private long initialWait;
-        private long threadWait;
+        private final String message;
+        private final long initialWait;
+        private final long threadWait;
 
         public CriticalThread(String message, long initialWait, long threadWait) {
             this.message = message;

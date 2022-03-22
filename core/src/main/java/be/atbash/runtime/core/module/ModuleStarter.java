@@ -29,7 +29,7 @@ public class ModuleStarter implements Callable<Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModuleStarter.class);
 
-    private Module module;
+    private final Module module;
 
     public ModuleStarter(Module module) {
         this.module = module;

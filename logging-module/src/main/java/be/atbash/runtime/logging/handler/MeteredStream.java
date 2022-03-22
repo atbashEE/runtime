@@ -22,7 +22,7 @@ class MeteredStream extends OutputStream {
 
     private volatile boolean isOpen;
 
-    private OutputStream out;
+    private final OutputStream out;
     private long written;
 
     MeteredStream(OutputStream out, long written) {

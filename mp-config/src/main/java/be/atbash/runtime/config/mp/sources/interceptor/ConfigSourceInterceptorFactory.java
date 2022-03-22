@@ -28,7 +28,7 @@ import java.util.OptionalInt;
  * initialized.
  * <p>
  * <p>
- * Instances of this interface will be discovered by {@link AtbashConfigBuilder#addDiscoveredInterceptors()} via the
+ * Instances of this interface will be discovered by {@code AtbashConfigBuilder#addDiscoveredInterceptors()} via the
  * {@link java.util.ServiceLoader} mechanism and can be registered by providing a
  * {@code META-INF/services/be.atbash.runtime.config.mp.sources.interceptor.ConfigSourceInterceptorFactory} which contains the fully qualified class
  * name of the custom {@link ConfigSourceInterceptor} implementation.

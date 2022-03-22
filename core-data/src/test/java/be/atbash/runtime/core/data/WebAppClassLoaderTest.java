@@ -26,8 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 class WebAppClassLoaderTest {
 
     @Test
@@ -41,7 +39,7 @@ class WebAppClassLoaderTest {
     }
 
     @Test
-    public void loadDescriptor() throws IOException, ClassNotFoundException {
+    public void loadDescriptor() throws IOException {
 
         File rootDirectory = new File("../demo/demo-servlet/target/demo-servlet");
 

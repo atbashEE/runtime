@@ -99,8 +99,8 @@ public class ImplicitConverters {
 
         private static final long serialVersionUID = 3350265927359848883L;
 
-        private Class<? extends T> clazz;
-        private Method method;
+        private final Class<? extends T> clazz;
+        private final Method method;
 
         StaticMethodConverter(Class<? extends T> clazz, Method method) {
             assert clazz == method.getReturnType();
@@ -174,7 +174,7 @@ public class ImplicitConverters {
             @SuppressWarnings("unused")
             private final Class<?> p;
 
-            Serialized(final Class<?> c, final Class<?> p) {
+            Serialized(Class<?> c, Class<?> p) {
                 this.c = c;
                 this.p = p;
             }

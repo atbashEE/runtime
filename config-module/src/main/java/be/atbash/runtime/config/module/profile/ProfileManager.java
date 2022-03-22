@@ -29,8 +29,8 @@ public class ProfileManager {
     private static final String MODULE_ACTION_REMOVE = "Remove";
     private static final String MODULE_ACTION_REPLACE = "Replace";
 
-    private ConfigurationParameters parameters;
-    private Profile profile;
+    private final ConfigurationParameters parameters;
+    private final Profile profile;
 
     public ProfileManager(ConfigurationParameters parameters, Profile profile) {
 

@@ -22,7 +22,7 @@ public class CommandResponse {
 
     private boolean success = true;
     private String errorMessage;
-    private Map<String, String> data = new HashMap<>();
+    private final Map<String, String> data = new HashMap<>();
 
     public boolean isSuccess() {
         return success;

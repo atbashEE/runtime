@@ -29,7 +29,7 @@ class SpecificationUtilTest {
         Set<String> values = new HashSet<>(Arrays.asList("HtMl", "SERVLET", "Something"));
         Set<Specification> specifications = SpecificationUtil.asEnum(values);
 
-        assertThat(specifications).containsExactly(Specification.HTML, Specification.SERVLET);
+        assertThat(specifications).contains(Specification.HTML, Specification.SERVLET);
     }
 
     @Test

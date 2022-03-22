@@ -101,6 +101,9 @@ public class JettyModule implements Module<RuntimeConfiguration> {
         handler.setWar(deployment.getDeploymentLocation().getAbsolutePath());
         handler.setParentLoaderPriority(true);  // FIXME Configure
 
+        // TODO: testing required -> So that we have a CDI container for each deployment?
+        // handler.setInitParameter("WELD_CONTEXT_ID_KEY", deployment.getDeploymentName());
+
         handlers.addHandler(handler);
         try {
             handler.start();

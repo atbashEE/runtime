@@ -31,7 +31,6 @@ import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.deployment.sniffer.SingleTriggeredSniffer;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.util.TestReflectionUtils;
-import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

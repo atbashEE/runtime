@@ -32,7 +32,7 @@ public abstract class AbstractLocationConfigSourceFactory extends AbstractLocati
         implements ConfigSourceFactory {
 
     @Override
-    public Iterable<ConfigSource> getConfigSources(final ConfigSourceContext context) {
+    public Iterable<ConfigSource> getConfigSources(ConfigSourceContext context) {
         ConfigValue value = context.getValue(ConfigSources.ATBASH_CONFIG_LOCATIONS);
         if (value.getValue() == null) {
             return Collections.emptyList();

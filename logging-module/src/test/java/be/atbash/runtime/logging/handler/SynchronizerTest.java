@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class SynchronizerTest {
             , THREAD_1_END_RUN
             , THREAD_2_END_RUN);
 
-    private static List<String> events = new CopyOnWriteArrayList<>();
+    private static final List<String> events = new CopyOnWriteArrayList<>();
     private static Synchronizer synchronizer;
 
     @BeforeEach
@@ -88,7 +88,7 @@ class SynchronizerTest {
     @Test
     public void synchronize_NoResponseFromSynchronizer() {
 
-        Thread thread1 = new Thread(new Thread1(1000));
+        Thread thread1 = new Thread(new Thread1(10000));
         Thread thread2 = new Thread(new Thread2(1000, 200));
         thread1.start();
         thread2.start();
@@ -113,7 +113,7 @@ class SynchronizerTest {
 
     static class Thread1 implements Runnable {
 
-        private long waitTime;
+        private final long waitTime;
 
         public Thread1(long waitTime) {
             this.waitTime = waitTime;
@@ -140,8 +140,8 @@ class SynchronizerTest {
 
     static class Thread2 implements Runnable {
 
-        private long waitTimeBeforeStart;
-        private long waitTimeForRelease;
+        private final long waitTimeBeforeStart;
+        private final long waitTimeForRelease;
 
         public Thread2(long waitTimeBeforeStart, long waitTimeForRelease) {
             this.waitTimeBeforeStart = waitTimeBeforeStart;

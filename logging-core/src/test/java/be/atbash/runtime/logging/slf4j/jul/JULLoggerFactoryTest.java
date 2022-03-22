@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 public class JULLoggerFactoryTest {
     // Some functionality of the class can't be tested (like the Environment variable for warnings and getting rootLogger.)

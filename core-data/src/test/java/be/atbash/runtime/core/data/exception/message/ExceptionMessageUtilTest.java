@@ -18,8 +18,6 @@ package be.atbash.runtime.core.data.exception.message;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class ExceptionMessageUtilTest {
 
     @Test

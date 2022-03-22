@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * This is not a complete implementation of the {@code LoggingEvent} interface but one that is enough
- * for the retrieval of the message by {code {@link be.atbash.runtime.logging.LoggingUtil#formatMessage(LoggingEvent)}},
+ * for the retrieval of the message by {code {@code be.atbash.runtime.logging.LoggingUtil#formatMessage(LoggingEvent)}},
  * just as a normal logger would do.
  */
 public class RuntimeLoggingEvent implements LoggingEvent {
@@ -36,7 +36,7 @@ public class RuntimeLoggingEvent implements LoggingEvent {
     private final JULLoggerAdapter logger;
     private final String message;
 
-    private List<Object> arguments;
+    private final List<Object> arguments;
 
 
     private Throwable throwable;

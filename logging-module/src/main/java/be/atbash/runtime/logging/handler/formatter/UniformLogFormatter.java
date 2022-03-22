@@ -68,7 +68,7 @@ public class UniformLogFormatter extends AnsiColorFormatter {
     private final Map<String, ResourceBundle> loggerResourceBundleTable;
     private final LogManager logManager;
     // A Dummy Container Date Object is used to format the date
-    private Date date = new Date();
+    private final Date date = new Date();
 
 
     private static final Pattern MESSAGE_ID_PATTERN = Pattern.compile("(\\D+)-(\\d+):\\s(.+)");

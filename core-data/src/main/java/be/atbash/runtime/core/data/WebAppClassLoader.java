@@ -144,7 +144,7 @@ public class WebAppClassLoader extends ClassLoader {
 
     private static class DelegatingURLClassLoader extends URLClassLoader {
 
-        private ClassLoader parent;
+        private final ClassLoader parent;
 
         public DelegatingURLClassLoader(URL[] urls, ClassLoader parent) {
             super(urls);

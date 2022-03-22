@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ public enum WatcherBean {
     RuntimeWatcherBean("Atbash.Runtime", "Info"),
     ApplicationWatcherBean("Atbash.Server.Applications", "data");
 
-    private String hierarchyName;
-    private String name;
+    private final String hierarchyName;
+    private final String name;
 
     WatcherBean(String hierarchyName, String name) {
         this.hierarchyName = hierarchyName;

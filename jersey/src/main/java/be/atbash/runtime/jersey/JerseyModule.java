@@ -89,6 +89,10 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
         handler.setWar(deployment.getDeploymentLocation().getAbsolutePath());
         handler.setParentLoaderPriority(true);  // FIXME Configure
 
+
+        // TODO: testing required -> So that we have a CDI container for each deployment?
+        //handler.setInitParameter("WELD_CONTEXT_ID_KEY", deployment.getDeploymentName());
+
         String applicationPath = deployment.getDeploymentData(JerseyModuleConstant.APPLICATION_PATH);
 
         ServletHolder jerseyServlet = handler.addServlet(
@@ -113,7 +117,7 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
             return;
         }
 
-        LOGGER.atInfo().addArgument(deployment.getDeploymentName()) .log("JERSEY-104");
+        LOGGER.atInfo().addArgument(deployment.getDeploymentName()).log("JERSEY-104");
     }
 
     public void unregisterDeployment(ArchiveDeployment deployment) {
@@ -132,12 +136,6 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
             }
         }
         LOGGER.info("JERSEY-105: Unregistration of WebApp " + deployment.getDeploymentName() + " done");
-    }
-
-    private RestSniffer getRestSniffer(ArchiveDeployment deployment) {
-        return (RestSniffer) deployment.getSniffers().stream()
-                .filter(sn -> sn.getClass().equals(RestSniffer.class))
-                .findAny().get();  // Guaranteed to be found
     }
 
     @Override
