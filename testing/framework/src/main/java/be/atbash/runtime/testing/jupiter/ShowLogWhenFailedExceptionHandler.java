@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package be.atbash.runtime.testing.jupiter;
 import be.atbash.runtime.testing.AbstractAtbashTest;
 import be.atbash.runtime.testing.AtbashContainer;
 import com.github.dockerjava.api.exception.NotFoundException;
+import jakarta.ws.rs.InternalServerErrorException;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 
@@ -25,7 +26,7 @@ public class ShowLogWhenFailedExceptionHandler implements TestExecutionException
 
     @Override
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable) throws Throwable {
-        if (throwable instanceof AssertionError || throwable instanceof NotFoundException) {
+        if (throwable instanceof AssertionError || throwable instanceof NotFoundException || throwable instanceof InternalServerErrorException) {
             AtbashContainer atbash = AbstractAtbashTest.atbash;
             String logs = atbash.getLogs();
             System.out.println("Atbash container log");
