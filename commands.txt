@@ -1,5 +1,5 @@
 ====
-    Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+    Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,11 +25,21 @@ mvn clean package -Ddocumentation.skip
 # Fast artifact generation
 mvn clean install -Ddocumentation.skip -DskipTests
 
-# Update license header
+# Skip Docker image creation
+mvn clean install -Ddocker.skip
 
+# Update license header
 mvn license:format
+
+# Check dependencies
+ mvn validate -PcheckDependencies
 
 
 # Setting versions
+mvn versions:set -DnewVersion=0.3 -DgenerateBackupPoms=false
 
-mvn versions:set -DnewVersion=0.3-SNAPSHOT -DgenerateBackupPoms=false
+# Run application with defaults
+java -jar target/atbash-runtime.jar <path-to>/<application>.war
+
+# Debug application without leaving a trace on disk
+java -jar '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005' runtime-main/target/atbash-runtime.jar --stateless --verbose <path-to>/<application>.war

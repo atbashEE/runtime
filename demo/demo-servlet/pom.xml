@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+    Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@
     <parent>
         <groupId>be.atbash.runtime</groupId>
         <artifactId>demo</artifactId>
-        <version>0.3-SNAPSHOT</version>
+        <version>0.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>be.atbash.runtime.demo</groupId>
     <artifactId>servlet</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3</version>
     <packaging>war</packaging>
 
     <name>Demo Servlet</name>
