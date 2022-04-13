@@ -1,0 +1,8 @@
+[
+  {
+    "name": "custom",
+    "modules": [
+      %moduleNames%
+    ]
+  }
+]

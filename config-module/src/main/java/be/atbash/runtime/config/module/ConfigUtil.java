@@ -31,6 +31,7 @@ import be.atbash.runtime.core.data.util.ResourceReader;
 import be.atbash.util.exception.AtbashException;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 final class ConfigUtil {
@@ -64,10 +65,13 @@ final class ConfigUtil {
         return config;
     }
 
-    public static List<Profile> readProfiles() {
+    public static List<Profile> readProfiles(String location, boolean custom) {
+        if (custom && !ResourceReader.existsResource(location)) {
+            return Collections.emptyList();
+        }
         String content;
         try {
-            content = ResourceReader.readResource("/profiles.json");
+            content = ResourceReader.readResource(location);
         } catch (IOException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }

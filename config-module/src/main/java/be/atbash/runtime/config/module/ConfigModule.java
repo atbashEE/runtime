@@ -125,7 +125,15 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-1001");
         watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, msg, false);
 
-        profiles = ConfigUtil.readProfiles();
+        profiles = ConfigUtil.readProfiles("/profiles.json", false);
+        List<Profile> customProfiles = ConfigUtil.readProfiles("/custom-profile.json", true);
+        if (!customProfiles.isEmpty()) {
+            profiles = customProfiles;
+            parameters.setProfile("custom");
+            // We need to resolve the message upfront as this goes to the EarlyLog Handler that cannot handle this
+            // and modifies it by adding a * in front of it, so it is no longer recognized as key.
+            LOGGER.atInfo().log(LoggingUtil.formatMessage(LOGGER, "CONFIG-021"));
+        }
         Profile profile = findProfile();
 
         ConfigInstance configInstance = new ConfigInstance(parameters.getRootDirectory(), parameters.getConfigName()

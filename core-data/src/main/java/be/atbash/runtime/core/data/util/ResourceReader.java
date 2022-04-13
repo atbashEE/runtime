@@ -28,14 +28,19 @@ public final class ResourceReader {
     }
 
     public static String readResource(String location) throws IOException {
-        InputStream profilesJSONStream = ResourceReader.class.getResourceAsStream(location);
+        InputStream stream = ResourceReader.class.getResourceAsStream(location);
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
-        for (int length; (length = profilesJSONStream.read(buffer)) != -1; ) {
+        for (int length; (length = stream.read(buffer)) != -1; ) {
             result.write(buffer, 0, length);
         }
-        profilesJSONStream.close();
+        stream.close();
         return result.toString(StandardCharsets.UTF_8.name());
+    }
+
+    public static boolean existsResource(String location)  {
+        URL resourceURL = ResourceReader.class.getResource(location);
+        return resourceURL != null;
     }
 
     public static String readStringFromURL(URL requestURL) throws IOException {

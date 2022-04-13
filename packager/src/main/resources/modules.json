@@ -1,0 +1,66 @@
+[
+  {
+    "name": "core",
+    "artifactId": "core",
+    "required": true,
+    "dependencies": []
+  },
+  {
+    "name": "config",
+    "artifactId": "config-module",
+    "required": true,
+    "dependencies": []
+  },
+  {
+    "name": "logging",
+    "artifactId": "logging-module",
+    "required": true,
+    "dependencies": []
+  },
+  {
+    "name": "weld",
+    "artifactId": "weld-module",
+    "required": true,
+    "dependencies": []
+  },
+  {
+    "name": "jetty",
+    "artifactId": "jetty-module",
+    "required": false,
+    "dependencies": []
+  },
+  {
+    "name": "jersey-weld",
+    "artifactId": "jersey-weld-module",
+    "required": false,
+    "dependencies": [
+    ]
+  },
+  {
+    "name": "jersey",
+    "artifactId": "jersey-module",
+    "required": false,
+    "dependencies": [
+      "jetty",
+      "jersey-weld"
+    ]
+  },
+  {
+    "name": "mp-config",
+    "artifactId": "mp-config",
+    "required": false,
+    "dependencies": [
+      "jersey",
+      "jetty"
+
+    ]
+  },
+  {
+    "name": "domain",
+    "artifactId": "remote-cli",
+    "required": false,
+    "dependencies": [
+      "jetty"
+    ]
+  }
+]

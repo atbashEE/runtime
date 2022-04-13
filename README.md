@@ -17,6 +17,12 @@ Details:
 
 Current status
 
+**version 0.4**
+
+Added Features
+
+- Packager for creating custom runtimes.
+
 **version 0.3**
 
 

@@ -1,0 +1,28 @@
+== Packager
+
+The main artifact, `atbash-runtime.zip` contains all modules and depending on the profile, some modules are active and other not.  Although a module is not active, it is still on the classpath and might have an impact on the performance of the runtime.
+
+The Runtime packager, build by the _packager_ module, can create a new _executable_ that contains only those modules that you have specified. This also means that when a certain module is not included, some functionality is not available on the runtime.
+
+The packager generates a _pom.xml_ that can be used to generate the runtime with the modules that you have specified.
+
+=== Usage
+
+The packager can be used on the command line as follows:
+
+[source]
+----
+java -jar atbash-packager.jar -r <path> -a <artifact> -m <modules>
+----
+
+-r/--root: Indicates the target directory where the maven project will be created. This directory should not exist.
+
+-a/--artifact: Name of the custom packaging. It will be the name of the zip file that is created when you execute the generated project and also the name of the main executable jar file.
+
+-main/--modules: A comma separated list of modules names that must be included in the packaging. The supported module names are
+
+* jetty: Handles user requests and provides Servlet Specification
+* jersey: Brings the JAX-RS support but also the JSON-P and JSON-B
+* mp-config: Brings in the MicroProfile Config support.
+
+The modules for the core, configuration, logging, and CDI (Weld) are always included.

@@ -40,6 +40,8 @@ include::commandlineoptions.adoc[]
 
 include::mpconfig.adoc[]
 
+include::packager.adoc[]
+
 include::integrations.adoc[]
 
 include::docker.adoc[]

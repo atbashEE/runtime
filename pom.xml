@@ -140,6 +140,7 @@
         <module>remote-cli</module>
         <module>runtime-common</module>
         <module>runtime-main</module>
+        <module>packager</module>
         <module>embedded</module>
         <module>runtime-cli</module>
         <module>testing</module>
@@ -177,6 +178,7 @@
                         <exclude>**/config.yml</exclude>
                         <exclude>**/*.sh</exclude>
                         <exclude>**/Dockerfile</exclude>
+                        <exclude>**/test.txt</exclude>
                     </excludes>
                     <mapping>
                         <java>SLASHSTAR_STYLE</java>
