@@ -22,6 +22,7 @@ Current status
 Added Features
 
 - Packager for creating custom runtimes.
+- Support for microprofile-config.properties files at alternative locations.
 
 **version 0.3**
 
