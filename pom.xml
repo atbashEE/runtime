@@ -26,8 +26,10 @@
     <version>0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <name>Atbash Runtime for Jakarta EE Core Profile</name>
     <inceptionYear>2021</inceptionYear>
     <description>Atbash Runtime parent</description>
+    <url>https://github.com/atbashEE/runtime</url>
 
     <licenses>
         <license>
@@ -37,6 +39,12 @@
             <comments>A business-friendly OSS license</comments>
         </license>
     </licenses>
+
+    <scm>
+        <connection>scm:git:git://github.com/atbashEE/runtime.git</connection>
+        <developerConnection>scm:git:ssh://github.com/atbashEE/runtime.git</developerConnection>
+        <url>http://github.com/atbashEE/atbash-utils/tree/master</url>
+    </scm>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -237,6 +245,78 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>release</id>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.4</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Configure the jar with the javadoc (or rather, convince Maven that
+                        we want javadoc at all) -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.3</version>
+                        <configuration>
+                            <javadocVersion>1.8</javadocVersion>
+                            <notimestamp>true</notimestamp>
+                            <!--splitindex>true</splitindex-->
+                            <doctitle>${project.name} ${project.version}</doctitle>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                            <bottom>
+                                <![CDATA[]]>
+                            </bottom>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+
         </profile>
     </profiles>
 </project>

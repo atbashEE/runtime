@@ -95,6 +95,14 @@
     <build>
         <finalName>atbash-cli</finalName>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
             <plugin>
                 <!-- this dependency is used by Framework and thus brings all transitive dependencies to the
                 testing framework, including the SLF4J-JUL bridge resulting in an warning that multiple

@@ -43,3 +43,8 @@ java -jar target/atbash-runtime.jar <path-to>/<application>.war
 
 # Debug application without leaving a trace on disk
 java -jar '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005' runtime-main/target/atbash-runtime.jar --stateless --verbose <path-to>/<application>.war
+
+
+# Release
+
+mvn clean deploy -Prelease -Ddocumentation.skip -DskipTests -Ddocker.skip
