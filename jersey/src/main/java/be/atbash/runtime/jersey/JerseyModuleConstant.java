@@ -17,7 +17,14 @@ package be.atbash.runtime.jersey;
 
 public final class JerseyModuleConstant {
 
+    // The comma separated list of package names detected by the RestSniffer.
     public static final String PACKAGE_NAMES = "jersey.package.names";
+
+    // The comma separated list of class names detected by the RestSniffer.
+    public static final String CLASS_NAMES = "jersey.class.names";
+
+    // The comma separated list of packages that contain providers added by some modules.
+    public static final String EXTRA_PACKAGE_NAMES = "jersey.extra.package.names";
     public static final String APPLICATION_PATH = "jersey.application.path";
 
     private JerseyModuleConstant() {

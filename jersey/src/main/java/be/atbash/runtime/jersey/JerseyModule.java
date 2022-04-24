@@ -98,9 +98,7 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
         ServletHolder jerseyServlet = handler.addServlet(
                 org.glassfish.jersey.servlet.ServletContainer.class, applicationPath + "/*");
 
-        List<String> resourcePackages = new ArrayList<>(Arrays.asList(deployment.getDeploymentData(JerseyModuleConstant.PACKAGE_NAMES).split(",")));
-        resourcePackages.add("be.atbash.runtime.jersey");
-        String packages = String.join(";", resourcePackages);
+        String packages = determinePackageNames(deployment);
 
         jerseyServlet.setInitParameter(
                 "jersey.config.server.provider.packages",
@@ -118,6 +116,18 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
         }
 
         LOGGER.atInfo().addArgument(deployment.getDeploymentName()).log("JERSEY-104");
+    }
+
+    private String determinePackageNames(ArchiveDeployment deployment) {
+        List<String> resourcePackages = new ArrayList<>(Arrays.asList(deployment.getDeploymentData(JerseyModuleConstant.PACKAGE_NAMES).split(",")));
+        resourcePackages.add("be.atbash.runtime.jersey");
+
+        String extraPackageNames = deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES);
+        if (extraPackageNames != null) {
+
+            resourcePackages.addAll(Arrays.asList(extraPackageNames.split(",")));
+        }
+        return String.join(";", resourcePackages);
     }
 
     public void unregisterDeployment(ArchiveDeployment deployment) {

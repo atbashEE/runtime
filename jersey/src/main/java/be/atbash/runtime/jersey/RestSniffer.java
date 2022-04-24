@@ -62,6 +62,7 @@ public class RestSniffer implements Sniffer {
     @Override
     public Map<String, String> deploymentData() {
         Map<String, String> result = new HashMap<>();
+        result.put(JerseyModuleConstant.CLASS_NAMES, String.join(",", resourceClassNames()));
         result.put(JerseyModuleConstant.PACKAGE_NAMES, String.join(",", determinePackages()));
         result.put(JerseyModuleConstant.APPLICATION_PATH, findApplicationPath());
 
@@ -74,6 +75,13 @@ public class RestSniffer implements Sniffer {
                 .stream()
                 .map(Class::getPackageName)
                 .collect(Collectors.toSet());
+    }
+
+    private List<String> resourceClassNames() {
+        return resourceClasses
+                .stream()
+                .map(Class::getName)
+                .collect(Collectors.toList());
     }
 
     @SuppressWarnings("squid:S1872")
