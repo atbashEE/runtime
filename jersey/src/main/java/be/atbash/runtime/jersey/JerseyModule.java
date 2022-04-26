@@ -24,6 +24,7 @@ import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
+import be.atbash.runtime.jersey.util.PathUtil;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -96,7 +97,7 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
         String applicationPath = deployment.getDeploymentData(JerseyModuleConstant.APPLICATION_PATH);
 
         ServletHolder jerseyServlet = handler.addServlet(
-                org.glassfish.jersey.servlet.ServletContainer.class, applicationPath + "/*");
+                org.glassfish.jersey.servlet.ServletContainer.class, PathUtil.determinePathForServlet(applicationPath));
 
         String packages = determinePackageNames(deployment);
 

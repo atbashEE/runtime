@@ -41,10 +41,12 @@ class RestSnifferTest {
 
         Map<String, String> data = sniffer.deploymentData();
 
-        assertThat(data).hasSize(2);
-        assertThat(data.keySet()).contains(JerseyModuleConstant.APPLICATION_PATH, JerseyModuleConstant.PACKAGE_NAMES);
+        assertThat(data).hasSize(3);
+        assertThat(data.keySet()).contains(JerseyModuleConstant.APPLICATION_PATH, JerseyModuleConstant.PACKAGE_NAMES, JerseyModuleConstant.CLASS_NAMES);
         assertThat(data.get(JerseyModuleConstant.APPLICATION_PATH)).isEqualTo("/rest");
         assertThat(data.get(JerseyModuleConstant.PACKAGE_NAMES)).isEqualTo("be.atbash.runtime.demo.rest");
+        assertThat(data.get(JerseyModuleConstant.CLASS_NAMES)).contains("be.atbash.runtime.demo.rest.HelloResource");
+        assertThat(data.get(JerseyModuleConstant.CLASS_NAMES)).contains("be.atbash.runtime.demo.rest.RequestResource");
         /// FIXME we need a 3th JAX-RS resource in another package so that we can test the concatenation.
     }
 }

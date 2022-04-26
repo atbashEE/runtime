@@ -22,8 +22,9 @@ Current status
 Added Features
 
 - Packager for creating custom runtimes.
-- Support for microprofile-config.properties files at alternative locations.
-
+- Support for _microprofile-config.properties_ files at alternative locations.
+- Fix issue for certain values of `@ApplicationPath.value`
+-
 **version 0.3**
 
 
