@@ -67,8 +67,8 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
     }
 
     @Override
-    public Sniffer moduleSniffer() {
-        return new RestSniffer();
+    public Class<? extends Sniffer> moduleSniffer() {
+        return RestSniffer.class;
     }
 
     @Override

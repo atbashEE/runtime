@@ -69,7 +69,7 @@ public class LoggingModule implements Module<RuntimeConfiguration> {
     }
 
     @Override
-    public Sniffer moduleSniffer() {
+    public Class<? extends Sniffer> moduleSniffer() {
         return null;
     }
 

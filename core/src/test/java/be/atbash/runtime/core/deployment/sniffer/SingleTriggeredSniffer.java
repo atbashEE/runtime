@@ -17,13 +17,27 @@ package be.atbash.runtime.core.deployment.sniffer;
 
 import be.atbash.runtime.core.data.Specification;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class SingleTriggeredSniffer extends TestSniffer {
 
+    public static final String SINGLE_TRIGGERED_SNIFFER_SPECIFICATIONS = "runtime.test.SingleTriggeredSniffer.specifications";
+
     public SingleTriggeredSniffer() {
+        defineSpecifications();
     }
 
-    public SingleTriggeredSniffer(Specification[] specifications) {
-        super(specifications);
+    private void defineSpecifications() {
+        String specs = System.getProperty(SINGLE_TRIGGERED_SNIFFER_SPECIFICATIONS);
+        if (specs == null) {
+            return;
+        }
+        List<Specification> specifications = Arrays.stream(specs.split(","))
+                .map(Specification::fromCode)
+                .collect(Collectors.toList());
+        this.specifications = specifications.toArray(new Specification[]{});
     }
 
     @Override

@@ -39,7 +39,7 @@ public class SomeParameterizedInterface implements Module<String> {
     }
 
     @Override
-    public Sniffer moduleSniffer() {
+    public Class<? extends Sniffer> moduleSniffer() {
         return null;
     }
 

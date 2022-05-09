@@ -106,7 +106,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     }
 
     @Override
-    public Sniffer moduleSniffer() {
+    public Class<? extends Sniffer> moduleSniffer() {
         return null;
     }
 

@@ -48,7 +48,7 @@ public class RuntimeObjectProvidingModule implements Module<Void> {
     }
 
     @Override
-    public Sniffer moduleSniffer() {
+    public Class<? extends Sniffer> moduleSniffer() {
         return null;
     }
 

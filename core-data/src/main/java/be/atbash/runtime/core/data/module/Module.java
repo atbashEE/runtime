@@ -70,7 +70,7 @@ public interface Module<C> extends Runnable, ModuleEventListener {
     /**
      *
      */
-    Sniffer moduleSniffer();
+    Class<? extends Sniffer> moduleSniffer();
 
     /**
      * Return the List of Object classes that are exposed by the module and can for

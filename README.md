@@ -24,7 +24,8 @@ Added Features
 - Packager for creating custom runtimes.
 - Support for _microprofile-config.properties_ files at alternative locations.
 - Fix issue for certain values of `@ApplicationPath.value`
--
+- `Sniffer` is no longer a singleton but instantiated for each deployment.
+
 **version 0.3**
 
 

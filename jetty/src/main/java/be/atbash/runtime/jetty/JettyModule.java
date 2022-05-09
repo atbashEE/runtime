@@ -77,8 +77,8 @@ public class JettyModule implements Module<RuntimeConfiguration> {
     }
 
     @Override
-    public Sniffer moduleSniffer() {
-        return new ServletSniffer();
+    public Class<? extends Sniffer> moduleSniffer() {
+        return ServletSniffer.class;
     }
 
     @Override

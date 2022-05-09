@@ -27,14 +27,10 @@ public abstract class TestSniffer implements Sniffer {
 
     private final List<Class<?>> seenClasses = new ArrayList<>();
     private final List<String> seenDescriptors = new ArrayList<>();
-    private final Specification[] specifications;
+    protected Specification[] specifications;
 
     public TestSniffer() {
         this.specifications = new Specification[]{};
-    }
-
-    public TestSniffer(Specification[] specifications) {
-        this.specifications = specifications;
     }
 
     protected void addClass(Class<?> clazz) {

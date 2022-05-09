@@ -42,6 +42,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static be.atbash.runtime.core.deployment.sniffer.SingleTriggeredSniffer.SINGLE_TRIGGERED_SNIFFER_SPECIFICATIONS;
+
 class DeployerTest {
 
     private TestModule testModule;
@@ -59,6 +61,7 @@ class DeployerTest {
         // Clear sniffers
         List<Sniffer> sniffers = TestReflectionUtils.getValueOf(SnifferManager.getInstance(), "sniffers");
         sniffers.clear();
+        System.clearProperty(SINGLE_TRIGGERED_SNIFFER_SPECIFICATIONS);
     }
 
     /**
@@ -91,8 +94,9 @@ class DeployerTest {
 
         List<Module> modules = Collections.singletonList(testModule);
 
-        SingleTriggeredSniffer sniffer = new SingleTriggeredSniffer(new Specification[]{Specification.SERVLET, Specification.HTML});
-        SnifferManager.getInstance().registerSniffer(sniffer);
+        System.setProperty(SINGLE_TRIGGERED_SNIFFER_SPECIFICATIONS, "SERVLET,HTML");
+        SnifferManager.getInstance().registerSniffer(SingleTriggeredSniffer.class);
+
         EventManager.getInstance().registerListener(testModule);
 
         Deployer deployer = new Deployer(watcherService, runtimeConfiguration, modules);
@@ -137,13 +141,13 @@ class DeployerTest {
 
         List<Module> modules = Collections.singletonList(testModule);
 
+        System.setProperty(SINGLE_TRIGGERED_SNIFFER_SPECIFICATIONS, "REST");
         // Sniffer says REST but our TestModule can only handle Servlet
-        SingleTriggeredSniffer sniffer = new SingleTriggeredSniffer(new Specification[]{Specification.REST});
-        SnifferManager.getInstance().registerSniffer(sniffer);
+        SnifferManager.getInstance().registerSniffer(SingleTriggeredSniffer.class);
+
         EventManager.getInstance().registerListener(testModule);
 
         Deployer deployer = new Deployer(watcherService, runtimeConfiguration, modules);
-
 
         ArchiveDeployment deployment = new ArchiveDeployment(new File("../demo/demo-servlet/target/demo-servlet.war"));
         deployer.onEvent(new EventPayload(Events.DEPLOYMENT, deployment));
@@ -183,12 +187,12 @@ class DeployerTest {
 
         List<Module> modules = Collections.singletonList(testModule);
 
-        SingleTriggeredSniffer sniffer = new SingleTriggeredSniffer(new Specification[]{Specification.SERVLET, Specification.HTML});
-        SnifferManager.getInstance().registerSniffer(sniffer);
+        System.setProperty(SINGLE_TRIGGERED_SNIFFER_SPECIFICATIONS, "SERVLET,HTML");
+        SnifferManager.getInstance().registerSniffer(SingleTriggeredSniffer.class);
+
         EventManager.getInstance().registerListener(testModule);
 
         Deployer deployer = new Deployer(watcherService, runtimeConfiguration, modules);
-
 
         ArchiveDeployment deployment = new ArchiveDeployment(new File("../demo/demo-servlet/target/demo-servlet.war"));
         deployer.onEvent(new EventPayload(Events.DEPLOYMENT, deployment));
@@ -228,7 +232,7 @@ class DeployerTest {
         }
 
         @Override
-        public Sniffer moduleSniffer() {
+        public Class<? extends Sniffer> moduleSniffer() {
             return null; // Not needed, comes through a direct call to SnifferManager.registerSniffer()
         }
 

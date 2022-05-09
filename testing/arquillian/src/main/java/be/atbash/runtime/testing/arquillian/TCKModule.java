@@ -60,8 +60,8 @@ public class TCKModule implements Module<RuntimeConfiguration> {
     }
 
     @Override
-    public Sniffer moduleSniffer() {
-        return new TCKSniffer();
+    public Class<? extends Sniffer> moduleSniffer() {
+        return TCKSniffer.class;
     }
 
     @Override

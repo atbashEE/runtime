@@ -19,35 +19,57 @@ import be.atbash.runtime.core.data.WebAppClassLoader;
 import be.atbash.runtime.core.data.deployment.ArchiveContent;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class SnifferManager {
 
     private static final SnifferManager INSTANCE = new SnifferManager();
 
-    private final List<Sniffer> sniffers = new ArrayList<>();
+    private final List<Class<? extends Sniffer>> sniffers = new ArrayList<>();
 
     private SnifferManager() {
     }
 
-    public void registerSniffer(Sniffer sniffer) {
+    public void registerSniffer(Class<? extends Sniffer> sniffer) {
         if (sniffer != null && !sniffers.contains(sniffer)) {
             sniffers.add(sniffer);
         }
     }
 
     public SpecificationChecker startSpecificationCheck(ArchiveContent archiveContent, WebAppClassLoader classLoader) {
-        return new SpecificationChecker(archiveContent, classLoader, new ArrayList<>(sniffers));
+        return new SpecificationChecker(archiveContent, classLoader, createSnifferInstances(true, null));
     }
 
 
     public List<Sniffer> retrieveSniffers(List<String> snifferNames) {
-        return sniffers.stream()
-                .filter(s -> snifferNames.contains(s.getClass().getSimpleName()))
-                .collect(Collectors.toList());
+        return createSnifferInstances(false, snifferNames);
 
+    }
+
+    private List<Sniffer> createSnifferInstances(boolean allSniffers, List<String> snifferNames) {
+        Predicate<Class<? extends Sniffer>> classPredicate;
+        if (allSniffers) {
+            classPredicate = c -> true;
+        } else {
+            classPredicate = c -> snifferNames.contains(c.getSimpleName());
+        }
+        return sniffers.stream()
+                .filter(classPredicate)
+                .map(this::newSnifferInstance)
+                .collect(Collectors.toList());
+    }
+
+    private Sniffer newSnifferInstance(Class<? extends Sniffer> snifferClass) {
+        try {
+            return snifferClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static SnifferManager getInstance() {

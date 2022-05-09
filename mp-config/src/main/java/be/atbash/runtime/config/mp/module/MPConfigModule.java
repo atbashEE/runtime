@@ -36,6 +36,7 @@ public class MPConfigModule implements Module<RuntimeConfiguration> {
     private static final Logger LOGGER = Logger.getLogger(MPConfigModule.class.getName());
     public static final String MP_CONFIG_MODULE_NAME = "mp-config";
 
+    //TODO this is not Thread safe, find a solution
     public static boolean validationDisable;
     public static boolean configDisabled;
 
@@ -57,8 +58,8 @@ public class MPConfigModule implements Module<RuntimeConfiguration> {
     }
 
     @Override
-    public Sniffer moduleSniffer() {
-        return new MPConfigSniffer();
+    public Class<? extends Sniffer> moduleSniffer() {
+        return MPConfigSniffer.class;
     }
 
     @Override
