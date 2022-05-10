@@ -59,6 +59,8 @@
         <jakarta.rest.api.version>3.0.0</jakarta.rest.api.version>
         <atbash.utils-se.version>1.1.0</atbash.utils-se.version>
         <mockito.version>4.3.1</mockito.version>
+
+        <license.skip>true</license.skip>
     </properties>
 
     <dependencyManagement>
@@ -169,6 +171,7 @@
                 <artifactId>license-maven-plugin</artifactId>
                 <version>3.0</version>
                 <configuration>
+                    <skip>${license.skip}</skip>
                     <header>src/etc/headerTemplate.txt</header>
                     <properties>
                         <owner>Rudy De Busscher</owner>
@@ -221,6 +224,12 @@
     </developers>
 
     <profiles>
+        <profile>
+            <id>licenseCheck</id>
+            <properties>
+                <license.skip>false</license.skip>
+            </properties>
+        </profile>
         <profile>
             <id>checkDependencies</id>
             <build>

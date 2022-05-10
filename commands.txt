@@ -29,7 +29,10 @@ mvn clean install -Ddocumentation.skip -DskipTests
 mvn clean install -Ddocker.skip
 
 # Update license header
-mvn license:format
+mvn license:format -PlicenseCheck
+
+# Build everything and check license headers
+mvn clean install -PlicenseCheck
 
 # Check dependencies
  mvn validate -PcheckDependencies
