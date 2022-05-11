@@ -17,5 +17,11 @@ package be.atbash.runtime.core.data.module.event;
 
 public interface ModuleEventListener {
 
+    /**
+     * Inform the different modules within the runtime about some action. Don't use
+     * a multi-threaded solution to reach each module as some modules expect a single thread
+     * related to all aspects of the deployment, including extensions of Jersey and CDI Extensions.
+     * @param eventPayload
+     */
     void onEvent(EventPayload eventPayload);
 }

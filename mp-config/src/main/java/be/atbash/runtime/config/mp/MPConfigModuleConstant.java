@@ -20,6 +20,10 @@ public final class MPConfigModuleConstant {
     public static final String CONFIG_FILES = "mp-config.properties.files";  // Used by Sniffer to indicate of microprofile-config.properties is found
     public static final String ENABLED_FORCED = "enabled.forced";  // Module setting to force MPConfig enabled (enabled even when deployment doesn't has microprofile-config.properties)
 
+    public static final String MPCONFIG_ENABLED = "mp-config.enabled";  // Is MPConfig Module enabled. if not the CDI extension doesn't add beans.
+
+    public static final String MPCONFIG_VALIDATION_DISABLED = "mp-config.validation.enabled";  // Is MPConfig Cdi validation enabled?
+
     private MPConfigModuleConstant() {
     }
 }

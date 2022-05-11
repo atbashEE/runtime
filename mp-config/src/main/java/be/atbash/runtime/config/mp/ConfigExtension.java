@@ -22,6 +22,8 @@ import be.atbash.runtime.config.mp.prefix.ConfigPropertiesProducer;
 import be.atbash.runtime.config.mp.prefix.TypesBeanAttributes;
 import be.atbash.runtime.config.mp.util.AnnotationUtil;
 import be.atbash.runtime.config.mp.util.ConfigProducerUtil;
+import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.CurrentArchiveDeployment;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.spi.AnnotatedType;
 import jakarta.enterprise.inject.spi.*;
@@ -59,7 +61,10 @@ public class ConfigExtension implements Extension {
     private final Set<Type> configPropertiesBeanTypes = new HashSet<>();
 
     protected void beforeBeanDiscovery(@Observes BeforeBeanDiscovery event, BeanManager bm) {
-        if (MPConfigModule.configDisabled) {
+        ArchiveDeployment archiveDeployment = CurrentArchiveDeployment.getInstance().getCurrent();
+        boolean configDisabled = !getBooleanFromData(archiveDeployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
+
+        if (configDisabled) {
             return;
         }
         AnnotatedType<ConfigProducer> configBean = bm.createAnnotatedType(ConfigProducer.class);
@@ -102,7 +107,10 @@ public class ConfigExtension implements Extension {
     }
 
     private boolean validTypeForConfigProperties(Type type, InjectionPoint injectionPoint) {
-        if (MPConfigModule.configDisabled) {
+        ArchiveDeployment archiveDeployment = CurrentArchiveDeployment.getInstance().getCurrent();
+        boolean configDisabled = !getBooleanFromData(archiveDeployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
+
+        if (configDisabled) {
             // Don't do the checks when validation is disabled.
             return true;
         }
@@ -127,7 +135,10 @@ public class ConfigExtension implements Extension {
     }
 
     protected void registerCustomBeans(@Observes AfterBeanDiscovery event, BeanManager bm) {
-        if (MPConfigModule.configDisabled) {
+        ArchiveDeployment archiveDeployment = CurrentArchiveDeployment.getInstance().getCurrent();
+        boolean configDisabled = !getBooleanFromData(archiveDeployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
+
+        if (configDisabled) {
             // Don't perform this since MPConfig is disabled.
             return;
         }
@@ -181,7 +192,10 @@ public class ConfigExtension implements Extension {
     }
 
     protected void validate(@Observes AfterDeploymentValidation event) {
-        if (MPConfigModule.validationDisable || MPConfigModule.configDisabled) {
+        ArchiveDeployment archiveDeployment = CurrentArchiveDeployment.getInstance().getCurrent();
+        boolean validationDisabled = getBooleanFromData(archiveDeployment, MPConfigModuleConstant.MPCONFIG_VALIDATION_DISABLED);
+        boolean configDisabled = !getBooleanFromData(archiveDeployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
+        if (validationDisabled || configDisabled) {
             // We don't want validation to happen or MPConfig is not enabled at all (sniffer or config based).
             return;
         }
@@ -190,6 +204,10 @@ public class ConfigExtension implements Extension {
         validateConfigPropertyInjectionPoints(event, config);
         validateConfigProperties(event, config);
 
+    }
+
+    private boolean getBooleanFromData(ArchiveDeployment archiveDeployment, String key) {
+        return Boolean.parseBoolean(archiveDeployment.getDeploymentData(key));
     }
 
     private void validateConfigProperties(AfterDeploymentValidation adv, Config config) {

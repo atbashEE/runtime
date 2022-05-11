@@ -21,6 +21,7 @@ import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.WebAppClassLoader;
 import be.atbash.runtime.core.data.deployment.ArchiveContent;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.CurrentArchiveDeployment;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
@@ -45,8 +46,6 @@ import java.util.*;
 public class Deployer implements ModuleEventListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Deployer.class);
-
-    private static ArchiveDeployment currentArchiveDeployment;
 
     private final RuntimeConfiguration runtimeConfiguration;
     private final List<Module> modules;
@@ -124,7 +123,7 @@ public class Deployer implements ModuleEventListener {
         String msg = LoggingUtil.formatMessage(LOGGER, "DEPLOY-101", deployment.getDeploymentName());
         watcherService.logWatcherEvent("Deployer", msg, true);
 
-        currentArchiveDeployment = deployment;
+        CurrentArchiveDeployment.getInstance().setCurrent(deployment);
 
         if (deployment.getArchiveFile() == null) {
             // Deploy an application that was deployed during a previous run.
@@ -269,13 +268,4 @@ public class Deployer implements ModuleEventListener {
         deployment.setClassLoader(appClassLoader);
     }
 
-    /*
-     * This is an exception as it is too difficult to expose this through RuntimeObjectsManager.
-     * The CoreModule.run() can't create an instance of the Deployer class yet since ModuleManager needs to
-     * install all modules first (as Deployer needs all started modules)
-     * And having the CoreModule to call a method like this is overhead if we want to enforce RuntimeObjectsManager usage.
-     */
-    public static ArchiveDeployment getCurrentDeployment() {
-        return currentArchiveDeployment;
-    }
 }

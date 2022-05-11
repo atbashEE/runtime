@@ -36,9 +36,7 @@ public class MPConfigModule implements Module<RuntimeConfiguration> {
     private static final Logger LOGGER = Logger.getLogger(MPConfigModule.class.getName());
     public static final String MP_CONFIG_MODULE_NAME = "mp-config";
 
-    //TODO this is not Thread safe, find a solution
-    public static boolean validationDisable;
-    public static boolean configDisabled;
+    private Boolean validationDisabled = false;
 
     private RuntimeConfiguration configuration;
 
@@ -90,34 +88,36 @@ public class MPConfigModule implements Module<RuntimeConfiguration> {
         if (Events.PRE_DEPLOYMENT.equals(eventPayload.getEventCode())) {
             checkConfigActive(eventPayload.getPayload());
         }
-        if (Events.POST_DEPLOYMENT.equals(eventPayload.getEventCode())) {
-            configDisabled = false;  // default value.
-        }
 
     }
 
     private void checkConfigActive(ArchiveDeployment deployment) {
+        deployment.addDeploymentData(MPConfigModuleConstant.MPCONFIG_VALIDATION_DISABLED, validationDisabled.toString());
+
         Map<String, String> moduleConfiguration = configuration.getConfig().getModuleConfiguration(MP_CONFIG_MODULE_NAME);
 
         String enabledForcedValue = moduleConfiguration.computeIfAbsent(ENABLED_FORCED, k -> "false");
         if (Boolean.parseBoolean(enabledForcedValue)) {
             // Config says that module is always enabled, so don't look at the DeploymentData
-            configDisabled = false;
+            deployment.addDeploymentData(MPConfigModuleConstant.MPCONFIG_ENABLED, "true");
             return;
         }
 
         String deploymentData = deployment.getDeploymentData(MPConfigModuleConstant.CONFIG_FILES);
         if (deploymentData == null || deploymentData.isBlank()) {
             LOGGER.info(String.format("MPCONFIG-001: MP Config functionality is disabled for application %s", deployment.getDeploymentName()));
-            configDisabled = true;
+            deployment.addDeploymentData(MPConfigModuleConstant.MPCONFIG_ENABLED, "false");
+            return;
         }
+
+        deployment.addDeploymentData(MPConfigModuleConstant.MPCONFIG_ENABLED, "true");
     }
 
 
     private void configChangedEvent(RuntimeConfiguration configuration) {
         Map<String, String> moduleConfiguration = configuration.getConfig().getModuleConfiguration(MP_CONFIG_MODULE_NAME);
         String validationDisableConfigValue = moduleConfiguration.computeIfAbsent("validation.disable", k -> "false");
-        validationDisable = Boolean.parseBoolean(validationDisableConfigValue);
+        validationDisabled = Boolean.parseBoolean(validationDisableConfigValue);
     }
 
     @Override
