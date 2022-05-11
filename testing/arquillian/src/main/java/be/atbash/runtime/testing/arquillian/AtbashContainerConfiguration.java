@@ -18,17 +18,35 @@ package be.atbash.runtime.testing.arquillian;
 import org.jboss.arquillian.container.spi.ConfigurationException;
 import org.jboss.arquillian.container.spi.client.container.ContainerConfiguration;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 /**
  * Configuration of Atbash for Arquillian.
  */
 public class AtbashContainerConfiguration implements ContainerConfiguration {
 
+
     // Is the archive kept in temp directory?
     private boolean keepArchive;
+
+    private String profile;
 
     @Override
     public void validate() throws ConfigurationException {
 
+        if (notValidProfile()) {
+            throw new ConfigurationException("Profile parameter is not valid");
+        }
+        profile = profile.toLowerCase(Locale.ENGLISH);
+    }
+
+    private boolean notValidProfile() {
+        if (profile == null || profile.isBlank()) {
+            profile = "default";
+        }
+        // Instead of reading profiles.json, we define here the valid names.
+        return !Arrays.asList("default", "domain", "all").contains(profile.toLowerCase(Locale.ENGLISH));
     }
 
     public boolean isKeepArchive() {
@@ -37,5 +55,13 @@ public class AtbashContainerConfiguration implements ContainerConfiguration {
 
     public void setKeepArchive(boolean keepArchive) {
         this.keepArchive = keepArchive;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 }

@@ -31,11 +31,12 @@ The selection of the connector can be done using the following snippet in the `a
     <container qualifier="atbash" default="true">
         <configuration>
             <property name="keepArchive">true</property>
+            <property name="profile">default</property>
         </configuration>
     </container>
 ----
 
-The connector has one configuration property for the moment
+The connector has the following configuration properties
 
 - keepArchive: parameter to indicate that the archive file in the temporary directory is not cleaned up after the test. This can be helpful if you want to inspect the contents of the wat file.
-
+- profile: The name of the profile that must be activated for the test run. By default, this is the _default_ profile but it can be any name that is defined in the _profiles.json_ file.
