@@ -116,9 +116,9 @@ public final class JULLoggerAdapter extends LegacyAbstractLogger implements Loca
         // millis and thread are filled by the constructor
         Level julLevel = slf4jLevelToJULLevel(level);
         EnhancedLogRecord record;
-        if (msg.contains("{}")) {
+        if (msg != null && msg.contains("{}")) {
             // {} means we have a message using SLF4J style of parameters
-            // Wand we need to format the message here
+            // and thus we need to format the message here
             String formattedMessage = MessageFormatter.basicArrayFormat(msg, args);
             record = new EnhancedLogRecord(julLevel, formattedMessage);
         } else {

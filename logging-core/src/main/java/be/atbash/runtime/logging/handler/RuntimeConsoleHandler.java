@@ -48,7 +48,7 @@ public class RuntimeConsoleHandler extends StreamHandler {
      */
     @Override
     public synchronized void publish(LogRecord record) {
-        if (record.getMessage().startsWith("*")) {
+        if (record.getMessage() == null || record.getMessage().startsWith("*")) {
             // This is a message from the EarlyLogHandler and should not be written
             //to console again (is already)
             return;
