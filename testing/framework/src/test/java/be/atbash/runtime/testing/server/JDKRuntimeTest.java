@@ -48,6 +48,30 @@ class JDKRuntimeTest {
     }
 
     @Test
+    void jdk18Value() {
+        JDKRuntime runtime = JDKRuntime.parse("jdk18");
+        assertThat(runtime).isEqualTo(JDKRuntime.JDK18);
+
+        runtime = JDKRuntime.parse("JDK18");
+        assertThat(runtime).isEqualTo(JDKRuntime.JDK18);
+
+        runtime = JDKRuntime.parse("jDk18");
+        assertThat(runtime).isEqualTo(JDKRuntime.JDK18);
+    }
+
+    @Test
+    void jdk19Value() {
+        JDKRuntime runtime = JDKRuntime.parse("jdk19");
+        assertThat(runtime).isEqualTo(JDKRuntime.JDK19);
+
+        runtime = JDKRuntime.parse("JDK19");
+        assertThat(runtime).isEqualTo(JDKRuntime.JDK19);
+
+        runtime = JDKRuntime.parse("jDk19");
+        assertThat(runtime).isEqualTo(JDKRuntime.JDK19);
+    }
+
+    @Test
     void otherValue() {
         JDKRuntime runtime = JDKRuntime.parse("");
         assertThat(runtime).isEqualTo(JDKRuntime.UNKNOWN);

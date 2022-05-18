@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-alpine:18.0.1
+FROM openjdk:19-alpine3.15
 
 # Default ports to expose
 EXPOSE 8080

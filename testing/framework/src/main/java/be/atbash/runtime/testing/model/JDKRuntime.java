@@ -17,7 +17,11 @@ package be.atbash.runtime.testing.model;
 
 public enum JDKRuntime {
 
-    JDK11(""), JDK17("-jdk17"), JDK18("-jdk18"), UNKNOWN(null);
+    JDK11("")
+    , JDK17("-jdk17")
+    , JDK18("-jdk18")
+    , JDK19("-jdk19")
+    , UNKNOWN(null);
 
     private final String suffix;
 
@@ -36,6 +40,9 @@ public enum JDKRuntime {
         }
         if ("jdk18".equalsIgnoreCase(data)) {
             result = JDK18;
+        }
+        if ("jdk19".equalsIgnoreCase(data)) {
+            result = JDK19;
         }
         return result;
     }

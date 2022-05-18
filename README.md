@@ -12,7 +12,7 @@ Details:
 - Extensible
 - DevOps in mind (configure, monitor, ...)
 - Runtime and Domain mode
-- Running on JDK 11 and JDK 17
+- Running on JDK 11, JDK 17, JDK 18 and JDK 19 ea
 
 
 Current status
