@@ -155,6 +155,7 @@
         <module>runtime-cli</module>
         <module>testing</module>
         <module>docs</module>
+        <module>jwt-auth-module</module>
     </modules>
 
     <build>

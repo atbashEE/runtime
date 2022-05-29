@@ -1,0 +1,42 @@
+== MicroProfile JWT Auth
+
+=== Activation
+
+This module is not active by default as it is not art of the Jakarta Core Profile.  You can activate it in two ways
+
+- -m +jwt-auth
+- -p all
+
+The first command line option activates the module on top of the defaults modules of the Core profile.  The second option activates all modules known by Atbash Runtime, including the MicroProfile JWT Auth module.
+
+Even when it is activated, an application can make use of it when at deployment time the `@LoginConfig` annotation is found at the class level of any class. The class doesn't need to be defined as a CDI bean either.
+
+This is less strict as the specification indicates.
+
+
+=== Validation
+
+At deployment time, the following configuration values are checked and deployment fails if there is a problem.
+
+- The MicroProfile Config based property key `mp.jwt.verify.issuer` must result in a non-blank value.
+- When the MicroProfile Config based property key `mp.jwt.verify.publickey.location` is not defined, `mp.jwt.verify.publickey.location` must resolve to a location that exists. An URL is not checked during deployment to allow the deployment of the application before the other service providing the keys is accessible.
+
+=== Less strict implementation
+
+Several aspects of the implementation are implemented in a less strict manner as they impose unnecessary constraints or restrict the JOSE specification so that JWT Auth is not usable in a microservice environment that includes components written in other languages or frameworks.
+
+Some rules can be made strict as defined in the TCK by setting the JVM System property `atbash.runtime.tck.jwt`.
+
+Some parameter's interpretation is changed so that the application to be functional in a multi-tenancy or multi-source environment.  Since the goal is to be used in a microservices environment, it can be part of several systems operating under different tools providing different type of tokens.
+
+
+- The MicroProfile Config based property key `mp.jwt.token.header` is used in a more loosely way. Unless the value is explicitly set to _Authorization_, the presence of a token within a Cookie is also accepted when no header found. Can be made restrictive by using the System property.
+- The indication of a decryption key does not exclude the possibility to use also a Signed token. Valid tokens can either be signed or encrypted. Can be made restrictive by using the System property.
+- The properties `mp.jwt.verify.publickey.location` and `mp.jwt.decrypt.key.location` are interpreted as a List (comma separated values) and keys are loaded from all the specified locations. This is part of the support for the multi-tenancy / multi-source support.
+- The property `mp.jwt.verify.issuer` is also interpreted as a List (comma separated values) and the issuer found in the token must be present in this list. This is part of the support for the multi-tenancy / multi-source support.
+- As encryption algorithm, RSA-OAEP is not supported as it uses the SHA-1 hashing which is indicated as insecure since 2017.  RSA-OAEP might not be affected but as a precaution, only RSA-OAEP-256 is supported (containing the SHA 2 family hashing algorithm)
+
+== Additional functionality
+
+- The Claims that specify a date value (like _exp_, _iat_, etc) but also custom claims that are transmitted as a number but actually represent the number of seconds since 1 Jan 1970, can be injected as a Date.
+- In contrast to JWT Auth Specification, a JAX-RS resource method that is not annotated with a permission annotation (@RolesAllowed or @permitAll), will receive the @DenyAll annotation as this is probably an oversight of the developer. These occurrences are reported in the log the first time they are called.

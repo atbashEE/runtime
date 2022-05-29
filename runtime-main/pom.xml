@@ -91,6 +91,12 @@
             <version>${project.parent.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>jwt-auth-module</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

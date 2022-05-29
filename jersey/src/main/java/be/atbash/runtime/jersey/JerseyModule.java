@@ -112,6 +112,11 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
         try {
             handler.start();
         } catch (Exception e) {
+            try {
+                handler.stop();
+            } catch (Exception ex) {
+                // FIXME log, but we don't want to propagate
+            }
             deployment.setDeploymentException(e);
             return;
         }

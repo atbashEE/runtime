@@ -18,6 +18,8 @@ package be.atbash.runtime.testing.arquillian;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
+import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
+import be.atbash.runtime.core.data.parameter.WatcherType;
 import be.atbash.runtime.core.data.util.FileUtil;
 import be.atbash.runtime.core.data.util.StringUtil;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
@@ -79,7 +81,13 @@ public class AtbashDeployableContainer implements DeployableContainer<AtbashCont
     }
 
     private void startAtbashEmbedded() {
-        embedded = new AtbashEmbedded();
+        ConfigurationParameters configurationParameters = new ConfigurationParameters();
+        configurationParameters.setLogToFile(false);
+        configurationParameters.setStateless(true);
+        configurationParameters.setWatcher(WatcherType.OFF);
+        configurationParameters.setProfile(atbashContainerConfiguration.getProfile());
+
+        embedded = new AtbashEmbedded(configurationParameters);
         embedded.withTCKModule();  // TCK module defines a specific deployer.
         embedded.start();
     }

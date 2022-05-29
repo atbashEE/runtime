@@ -15,5 +15,15 @@
       "mp-config",
       "remote-cli"
     ]
+  },
+  {
+    "name": "all",
+    "modules": [
+      "jersey",
+      "jetty",
+      "mp-config",
+      "mp-jwt",
+      "remote-cli"
+    ]
   }
 ]

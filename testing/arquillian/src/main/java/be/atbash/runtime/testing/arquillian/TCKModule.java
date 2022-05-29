@@ -23,8 +23,12 @@ import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
+import be.atbash.runtime.jersey.JerseyModuleConstant;
+import be.atbash.runtime.jersey.util.PathUtil;
+import be.atbash.runtime.security.jwt.MPJWTModuleConstant;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,15 +115,38 @@ public class TCKModule implements Module<RuntimeConfiguration> {
         handler.setWar(deployment.getDeploymentLocation().getAbsolutePath());
         handler.setParentLoaderPriority(true);  // FIXME Configure
 
-        /*
-        FIXME, find out if we need JerseyServlet or not
-        String applicationPath = deployment.getDeploymentData(JerseyModuleConstant.APPLICATION_PATH);
+        String packageNames = deployment.getDeploymentData(JerseyModuleConstant.PACKAGE_NAMES);
+        if (packageNames != null) {
+            // we have JAX-RS endpoints, add jersey servlet.
+            String applicationPath = deployment.getDeploymentData(JerseyModuleConstant.APPLICATION_PATH);
 
-        ServletHolder jerseyServlet = handler.addServlet(
-                org.glassfish.jersey.servlet.ServletContainer.class, applicationPath + "/*");
+            ServletHolder jerseyServlet = handler.addServlet(
+                    org.glassfish.jersey.servlet.ServletContainer.class, PathUtil.determinePathForServlet(applicationPath));
 
-        jerseyServlet.setInitOrder(0);
-        */
+            String classNames = deployment.getDeploymentData(JerseyModuleConstant.CLASS_NAMES);
+            jerseyServlet.setInitParameter(
+                    "jersey.config.server.provider.classnames",
+                    classNames);
+
+
+            // Since we run in embedded and Classpath also contains the TCK jar, multiple JAX-RS resources can be
+            // found from within the TCK jar and we don't want them. That is the reason we use explicit class names above.
+            List<String> resourcePackages = new ArrayList<>();
+            resourcePackages.add("be.atbash.runtime.jersey");
+
+            String realmName = deployment.getDeploymentData(MPJWTModuleConstant.REALM_NAME);
+            if (realmName != null) {
+                resourcePackages.add("be.atbash.runtime.security.jwt.jaxrs");  // The MP JWT Authentication filter
+            }
+            String packages = String.join(";", resourcePackages);
+
+            jerseyServlet.setInitParameter(
+                    "jersey.config.server.provider.packages",
+                    packages);
+
+            jerseyServlet.setInitParameter("jersey.config.server.resource.validation.ignoreErrors", "true");
+            jerseyServlet.setInitOrder(0);
+        }
 
         handlers.addHandler(handler);
         try {
