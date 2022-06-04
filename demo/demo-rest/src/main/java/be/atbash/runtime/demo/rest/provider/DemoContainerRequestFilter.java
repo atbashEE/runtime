@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.demo.rest;
+package be.atbash.runtime.demo.rest.provider;
 
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.ext.Provider;
 
-@Path("/request")
-@RequestScoped
-public class RequestResource {
+import java.io.IOException;
 
-    @GET
-    public String sayHello() {
-        return "RequestScoped resource response " ;
+@Provider
+public class DemoContainerRequestFilter implements ContainerRequestFilter {
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        System.out.println(requestContext.getHeaders());
     }
 }

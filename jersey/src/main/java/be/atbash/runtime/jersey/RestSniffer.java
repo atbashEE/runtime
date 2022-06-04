@@ -28,6 +28,8 @@ public class RestSniffer implements Sniffer {
     private final List<Class<?>> applicationClasses = new ArrayList<>();
     private final List<Class<?>> resourceClasses = new ArrayList<>();
 
+    private final List<Class<?>> providerClasses = new ArrayList<>();
+
     @Override
     public Specification[] detectedSpecifications() {
         return new Specification[]{Specification.REST};
@@ -39,6 +41,9 @@ public class RestSniffer implements Sniffer {
         for (Annotation annotation : aClass.getAnnotations()) {
             if ("jakarta.ws.rs.Path".equals(annotation.annotationType().getName())) {
                 resourceClasses.add(aClass);
+            }
+            if ("jakarta.ws.rs.ext.Provider".equals(annotation.annotationType().getName())) {
+                providerClasses.add(aClass);
             }
             if ("jakarta.ws.rs.ApplicationPath".equals(annotation.annotationType().getName())) {
                 // FIXME, this is not the only way to define the base URI
@@ -71,7 +76,10 @@ public class RestSniffer implements Sniffer {
 
     private Set<String> determinePackages() {
         // We use a set to have unique package names.
-        return resourceClasses
+        List<Class<?>> allClasses = new ArrayList<>();
+        allClasses.addAll(resourceClasses);
+        allClasses.addAll(providerClasses);
+        return allClasses
                 .stream()
                 .map(Class::getPackageName)
                 .collect(Collectors.toSet());

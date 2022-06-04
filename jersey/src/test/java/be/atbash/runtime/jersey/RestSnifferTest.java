@@ -35,8 +35,9 @@ class RestSnifferTest {
 
         RestSniffer sniffer = new RestSniffer();
 
-        sniffer.triggered(loader.loadClass("be.atbash.runtime.demo.rest.HelloResource"));
-        sniffer.triggered(loader.loadClass("be.atbash.runtime.demo.rest.RequestResource"));
+        sniffer.triggered(loader.loadClass("be.atbash.runtime.demo.rest.resources.HelloResource"));
+        sniffer.triggered(loader.loadClass("be.atbash.runtime.demo.rest.resources.RequestResource"));
+        sniffer.triggered(loader.loadClass("be.atbash.runtime.demo.rest.provider.DemoContainerRequestFilter"));
         sniffer.triggered(loader.loadClass("be.atbash.runtime.demo.rest.JaxRsActivator"));
 
         Map<String, String> data = sniffer.deploymentData();
@@ -44,9 +45,9 @@ class RestSnifferTest {
         assertThat(data).hasSize(3);
         assertThat(data.keySet()).contains(JerseyModuleConstant.APPLICATION_PATH, JerseyModuleConstant.PACKAGE_NAMES, JerseyModuleConstant.CLASS_NAMES);
         assertThat(data.get(JerseyModuleConstant.APPLICATION_PATH)).isEqualTo("/rest");
-        assertThat(data.get(JerseyModuleConstant.PACKAGE_NAMES)).isEqualTo("be.atbash.runtime.demo.rest");
-        assertThat(data.get(JerseyModuleConstant.CLASS_NAMES)).contains("be.atbash.runtime.demo.rest.HelloResource");
-        assertThat(data.get(JerseyModuleConstant.CLASS_NAMES)).contains("be.atbash.runtime.demo.rest.RequestResource");
+        assertThat(data.get(JerseyModuleConstant.PACKAGE_NAMES)).isEqualTo("be.atbash.runtime.demo.rest.resources,be.atbash.runtime.demo.rest.provider");
+        assertThat(data.get(JerseyModuleConstant.CLASS_NAMES)).contains("be.atbash.runtime.demo.rest.resources.HelloResource");
+        assertThat(data.get(JerseyModuleConstant.CLASS_NAMES)).contains("be.atbash.runtime.demo.rest.resources.RequestResource");
         /// FIXME we need a 3th JAX-RS resource in another package so that we can test the concatenation.
     }
 }
