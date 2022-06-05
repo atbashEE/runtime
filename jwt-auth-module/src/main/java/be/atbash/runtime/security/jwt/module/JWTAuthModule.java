@@ -87,15 +87,7 @@ public class JWTAuthModule implements Module<RuntimeConfiguration> {
     }
 
     private void addPackageWithProvider(ArchiveDeployment deployment) {
-        StringBuilder packageNames = new StringBuilder();
-        Optional<String> currentNames = Optional.ofNullable(deployment.getDeploymentData(EXTRA_PACKAGE_NAMES));
-        packageNames.append(currentNames.orElse(""));
-
-        if (packageNames.length() > 0) {
-            packageNames.append(',');
-        }
-        packageNames.append("be.atbash.runtime.security.jwt.jaxrs");
-        deployment.addDeploymentData(EXTRA_PACKAGE_NAMES, packageNames.toString());
+        ExtraPackagesUtil.addPackages(deployment, "be.atbash.runtime.security.jwt.jaxrs");
     }
 
     @Override

@@ -68,7 +68,7 @@ class JWTAuthModuleTest {
         Assertions.assertThat(enabled).isEqualTo("true");
 
         String packages = deployment.getDeploymentData(EXTRA_PACKAGE_NAMES);
-        Assertions.assertThat(packages).isEqualTo("some.package,be.atbash.runtime.security.jwt.jaxrs");
+        Assertions.assertThat(packages).isEqualTo("some.package;be.atbash.runtime.security.jwt.jaxrs");
     }
 
     @Test
