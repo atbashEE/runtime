@@ -22,6 +22,7 @@ import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.ModuleEventListener;
 import be.atbash.runtime.core.data.util.FileUtil;
+import be.atbash.runtime.core.data.util.Synchronizer;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.EnhancedLogRecord;
 import be.atbash.runtime.logging.handler.formatter.JSONLogFormatter;
