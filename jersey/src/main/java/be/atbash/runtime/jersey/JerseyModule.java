@@ -25,6 +25,7 @@ import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.jersey.util.PathUtil;
+import be.atbash.runtime.jetty.JettyModule;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -36,6 +37,8 @@ import java.util.*;
 
 public class JerseyModule implements Module<RuntimeConfiguration> {
 
+    public static final String JERSEY_MODULE_NAME = "jersey";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JerseyModule.class);
 
     private RuntimeConfiguration configuration;
@@ -43,12 +46,12 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
 
     @Override
     public String name() {
-        return "jersey";
+        return JERSEY_MODULE_NAME;
     }
 
     @Override
     public String[] dependencies() {
-        return new String[]{"jetty"};
+        return new String[]{JettyModule.JETTY_MODULE_NAME};
     }
 
     @Override
@@ -131,7 +134,7 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
         String extraPackageNames = deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES);
         if (extraPackageNames != null) {
 
-            resourcePackages.addAll(Arrays.asList(extraPackageNames.split(",")));
+            resourcePackages.addAll(Arrays.asList(extraPackageNames.split(";")));
         }
         return String.join(";", resourcePackages);
     }
@@ -157,11 +160,11 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
     @Override
     public void run() {
         WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
-        watcherService.logWatcherEvent("Jersey", "JERSEY-1001: Module startup", false);
+        watcherService.logWatcherEvent(JERSEY_MODULE_NAME, "JERSEY-1001: Module startup", false);
 
         handlers = RuntimeObjectsManager.getInstance().getExposedObject(HandlerCollection.class);
 
-        watcherService.logWatcherEvent("Jersey", "JERSEY-1002: Module ready", false);
+        watcherService.logWatcherEvent(JERSEY_MODULE_NAME, "JERSEY-1002: Module ready", false);
 
     }
 

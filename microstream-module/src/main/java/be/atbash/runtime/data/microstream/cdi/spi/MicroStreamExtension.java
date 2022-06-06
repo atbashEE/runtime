@@ -15,7 +15,10 @@
  */
 package be.atbash.runtime.data.microstream.cdi.spi;
 
+import be.atbash.runtime.core.data.RunData;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.data.microstream.InstanceStorer;
+import be.atbash.runtime.data.microstream.MicroStreamModule;
 import be.atbash.runtime.data.microstream.cdi.Storage;
 import be.atbash.runtime.data.microstream.cdi.StorageBean;
 import be.atbash.runtime.data.microstream.cdi.StoreInterceptor;
@@ -34,7 +37,18 @@ public class MicroStreamExtension implements Extension {
 
     private final Set<Class<?>> storageRoot = new HashSet<>();
 
+    private boolean moduleActive;
+
+    private void determineIfModuleIsActive() {
+        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+        moduleActive = runData.isModuleRunning(MicroStreamModule.MICROSTREAM_MODULE_NAME);
+    }
+
     void beforeBeanDiscovery(@Observes BeforeBeanDiscovery event, BeanManager beanManager) {
+        determineIfModuleIsActive();
+        if (!moduleActive) {
+            return;
+        }
 
         addAnnotatedType(event, beanManager, StorageManagerProducer.class);
         addAnnotatedType(event, beanManager, DirtyInstanceCollector.class);
@@ -44,7 +58,12 @@ public class MicroStreamExtension implements Extension {
 
     }
 
+
     <T> void findRoot(@Observes @WithAnnotations({Storage.class}) ProcessAnnotatedType<T> target) {
+        if (!moduleActive) {
+            return;
+        }
+
         AnnotatedType<T> annotatedType = target.getAnnotatedType();
         if (annotatedType.isAnnotationPresent(Storage.class)) {
             Class<T> javaClass = target.getAnnotatedType().getJavaClass();
@@ -55,6 +74,10 @@ public class MicroStreamExtension implements Extension {
     }
 
     void afterBeanDiscovery(@Observes AfterBeanDiscovery afterBeanDiscovery, BeanManager beanManager) {
+        if (!moduleActive) {
+            return;
+        }
+
         LOGGER.info(String.format("Processing MicroStreamExtension:  %d found", storageRoot.size()));
         if (storageRoot.size() > 1) {
             throw new IllegalStateException(
@@ -70,6 +93,9 @@ public class MicroStreamExtension implements Extension {
     }
 
     void afterTypeDiscovery(@Observes AfterTypeDiscovery afterBeanDiscovery, BeanManager beanManager) {
+        if (!moduleActive) {
+            return;
+        }
 
         if (!storageRoot.isEmpty()) {
             // Interceptor can be added in this afterTypeDiscovery.

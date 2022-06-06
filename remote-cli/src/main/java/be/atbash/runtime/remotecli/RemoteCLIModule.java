@@ -34,7 +34,7 @@ public class RemoteCLIModule implements Module<Void> {
 
     @Override
     public String[] dependencies() {
-        return new String[]{"jersey"};
+        return new String[]{"jersey"};  // FIXME Is this an exception that we depend on jersey but pom.xml doesn't has dependency?
     }
 
     @Override

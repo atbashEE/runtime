@@ -42,6 +42,8 @@ import java.util.Optional;
 
 public class JettyModule implements Module<RuntimeConfiguration> {
 
+    public static final String JETTY_MODULE_NAME = "jetty";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JettyModule.class);
 
     private RuntimeConfiguration configuration;
@@ -50,7 +52,7 @@ public class JettyModule implements Module<RuntimeConfiguration> {
 
     @Override
     public String name() {
-        return "jetty";
+        return JETTY_MODULE_NAME;
     }
 
     @Override

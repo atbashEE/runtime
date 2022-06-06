@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.security.jwt.module;
 
+import be.atbash.runtime.config.mp.module.MPConfigModule;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
@@ -22,6 +23,8 @@ import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.jersey.JerseyModule;
+import be.atbash.runtime.jersey.util.ExtraPackagesUtil;
 import be.atbash.runtime.security.jwt.MPJWTModuleConstant;
 
 import java.util.List;
@@ -44,7 +47,7 @@ public class JWTAuthModule implements Module<RuntimeConfiguration> {
 
     @Override
     public String[] dependencies() {
-        return new String[]{"mp-config", "jersey"};
+        return new String[]{MPConfigModule.MP_CONFIG_MODULE_NAME, JerseyModule.JERSEY_MODULE_NAME};
     }
 
     @Override

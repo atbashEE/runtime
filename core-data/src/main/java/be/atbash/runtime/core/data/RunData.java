@@ -34,6 +34,10 @@ public class RunData {
         return startedModules;
     }
 
+    public boolean isModuleRunning(String moduleName) {
+        return startedModules.contains(moduleName);
+    }
+
     public void setStartedModules(List<String> startedModules) {
         this.startedModules = Collections.unmodifiableList(startedModules);
     }
