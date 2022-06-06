@@ -62,7 +62,7 @@ public class Synchronizer {
         try {
             boolean locked = lock.tryLock(timeout, unit);
             if (!locked) {
-                LOGGER.warn("LOG-012");
+                LOGGER.warn("SYN-001");
             }
         } catch (InterruptedException e) {
             // re-interrupt the Thread again for proper cleanup
