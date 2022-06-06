@@ -156,6 +156,7 @@
         <module>testing</module>
         <module>docs</module>
         <module>jwt-auth-module</module>
+        <module>microstream-module</module>
     </modules>
 
     <build>

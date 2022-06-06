@@ -23,6 +23,7 @@
       "jetty",
       "mp-config",
       "mp-jwt",
+      "microstream",
       "remote-cli"
     ]
   }

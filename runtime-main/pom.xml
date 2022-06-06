@@ -97,6 +97,12 @@
             <version>${project.parent.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>microstream-module</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -186,6 +192,13 @@
                             <name>%a:%v-jdk18</name>
                             <build>
                                 <dockerFile>${project.basedir}/src/main/docker-jdk18/Dockerfile</dockerFile>
+                                <contextDir>${project.basedir}/target/atbash-runtime</contextDir>
+                            </build>
+                        </image>
+                        <image>
+                            <name>%a:%v-jdk19</name>
+                            <build>
+                                <dockerFile>${project.basedir}/src/main/docker-jdk19/Dockerfile</dockerFile>
                                 <contextDir>${project.basedir}/target/atbash-runtime</contextDir>
                             </build>
                         </image>

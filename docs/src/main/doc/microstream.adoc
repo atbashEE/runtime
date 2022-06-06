@@ -1,0 +1,59 @@
+== MicroStream integration
+
+=== Activation
+
+This module is not active by default as it is not art of the Jakarta Core Profile.  You can activate it in two ways
+
+- -m +microstream
+- -p all
+
+The first command line option activates the module on top of the defaults modules of the Core profile.  The second option activates all modules known by Atbash Runtime, including the MicroStream integration module.
+
+=== 3 integration aspects
+
+The `EmbeddedStorageManager` can be configured by defining configuration values through MicroProfile config properties keys.  All the supported configuration values can be found on https://docs.microstream.one/manual/storage/configuration/properties.html[Configuration properties] with the following conversion rules for the name
+
+- The `_` is replaced by a dot `.`
+- They keys are prefixed by `one.microstream.`
+
+The root object for the Storage Manager needs to be annotated with `@Storage`.  When using the recommended bean discovery mode _annotated_ this means that also a bean defining annotation like `@ApplicationScoped` needs to be specified on this class. However, this scope is ignored and the bean is always made available with scope `@ApplicationScoped`.  This annotation makes it possible to recognize the CDI bean that needs to be used as root object and will be used to initialize an empty storage.
+
+The last integration relates to the indication when a part of the graph is modified and needs to be written by the MicroStream Storage Manager.  This can be done by using the `DirtyMarker` in combination with the `@Store` CDI interceptor.
+
+For example
+
+[source,java]
+----
+
+   @Inject
+   private DirtyMarker marker;
+
+   @Inject
+   private Root root;  // The class that is marked as storage root.
+
+   @Store
+   public void addUser(User user) {
+      // Some additional code
+      marker.mark(root.getUsers()).add(user);
+      // some more code
+   }
+----
+
+We need to supply the Storage manager the object that has changed, for example the _ArrayList_ where we added an item, the object where where we changed the description as a String. With the `DirtyMarker` this can be done by the developer.
+
+At the end of the method, the CDI interceptor will call the `StorageManager.store(Object)` method with all the objects that are marked as dirty.  There are 2 members of the annotation that can be used to tune the processing.
+
+[source,java]
+----
+   @Store(asynchronous = true, clearLazy = true)
+----
+
+Storing will happen by default in a separate thread, asynchronous. If you do not want this, you can specify the value false with a small performance penalty for your user request.
+
+When you have marked a Lazy reference, it will be cleared by the interceptor unless you specify the value _false_ for the member.
+
+You do not need to use the `@Store` annotation.  At the end of the request, all objects that are marked will be stored anyway, asynchronous and when it is a Lazy reference it will also be cleared.
+
+=== Limitations
+
+MicroStream Storage Manager cannot be used in a clustered environment pointing to the same data location. Additional coding effort is required (for example, have a look at https://docs.microstream.one/manual/communication/index.html[communication] documentation). In a future version of the integration, some put of the box solution might be made available.
