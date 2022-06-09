@@ -50,6 +50,8 @@ public class ArchiveDeployment {
 
     private final Map<String, String> deploymentData;
 
+    private File configDataFile;
+
     private Exception deploymentException;
 
     public ArchiveDeployment(File archiveFile) {
@@ -177,6 +179,14 @@ public class ArchiveDeployment {
 
     public void addDeploymentData(String key, String value) {
         deploymentData.put(key, value);
+    }
+
+    public File getConfigDataFile() {
+        return configDataFile;
+    }
+
+    public void setConfigDataFile(File configDataFile) {
+        this.configDataFile = configDataFile;
     }
 
     public Exception getDeploymentException() {

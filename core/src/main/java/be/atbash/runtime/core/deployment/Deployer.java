@@ -33,6 +33,7 @@ import be.atbash.runtime.core.data.util.ArchiveDeploymentUtil;
 import be.atbash.runtime.core.data.util.FileUtil;
 import be.atbash.runtime.core.data.watcher.WatcherBean;
 import be.atbash.runtime.core.data.watcher.WatcherService;
+import be.atbash.runtime.core.deployment.data.DeploymentDataRetriever;
 import be.atbash.runtime.core.deployment.monitor.ApplicationMon;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.LoggingUtil;
@@ -136,6 +137,9 @@ public class Deployer implements ModuleEventListener {
             }
             determineSpecifications(deployment);
         }
+        // We reread deployment data. When running archived deployments, we reload the
+        // data since they can be changed by user.
+        addDeploymentData(deployment);
 
         determineDeploymentModule(deployment);
 
@@ -169,6 +173,16 @@ public class Deployer implements ModuleEventListener {
         msg = LoggingUtil.formatMessage(LOGGER, "DEPLOY-102", deployment.getDeploymentName());
         watcherService.logWatcherEvent("Deployer", msg, true);
 
+    }
+
+    private void addDeploymentData(ArchiveDeployment deployment) {
+        ServiceLoader<DeploymentDataRetriever> loader = ServiceLoader.load(DeploymentDataRetriever.class);
+        for (DeploymentDataRetriever deploymentDataRetriever : loader) {
+            Map<String, String> data = deploymentDataRetriever.getDeploymentData(deployment);
+            for (Map.Entry<String, String> entry : data.entrySet()) {
+                deployment.addDeploymentData(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     private void determineDeploymentModule(ArchiveDeployment deployment) {

@@ -61,7 +61,6 @@ class DeploymentMetadataTest {
         Assertions.assertThat(new DeploymentMetadata(deployment1, runtimeConfiguration))
                 .isEqualTo(new DeploymentMetadata(deployment2, runtimeConfiguration));
 
-
     }
 
     @Test
@@ -96,6 +95,87 @@ class DeploymentMetadataTest {
                 .isNotEqualTo(new DeploymentMetadata(deployment2, runtimeConfiguration));
 
 
+    }
+
+    @Test
+    void testDeploymentLocation() {
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
+
+        List<Sniffer> sniffers = Collections.singletonList(new TestSniffer());
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
+
+
+        ArchiveDeployment deployment = new ArchiveDeployment(new File("./applications/test1.war"));
+        File targetLocation1 = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getArchiveFile().getName());
+        deployment.setDeploymentLocation(targetLocation1);
+        deployment.setSniffers(sniffers);
+        deployment.setSpecifications(specifications);
+        deployment.setContextRoot("/root1");
+
+
+        DeploymentMetadata metadata = new DeploymentMetadata(deployment, runtimeConfiguration);
+        Assertions.assertThat(metadata.getDeploymentLocation()).isEqualTo("/test1.war");
+    }
+
+
+    @Test
+    void testConfigDataFile() {
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
+
+        List<Sniffer> sniffers = Collections.singletonList(new TestSniffer());
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
+
+
+        ArchiveDeployment deployment = new ArchiveDeployment(new File("./applications/test1.war"));
+        File targetLocation1 = new File(runtimeConfiguration.getApplicationDirectory(), deployment.getArchiveFile().getName());
+        deployment.setDeploymentLocation(targetLocation1);
+        deployment.setSniffers(sniffers);
+        deployment.setSpecifications(specifications);
+        deployment.setContextRoot("/root1");
+
+        File file = new File("./src/test/resources/DeploymentData.properties");
+        deployment.setConfigDataFile(file);
+
+        DeploymentMetadata metadata = new DeploymentMetadata(deployment, runtimeConfiguration);
+        String location = "/src/test/resources/DeploymentData.properties";
+        Assertions.assertThat(metadata.getConfigDataFile()).endsWith(location);
+
+        // Larger than location as we requested full path.
+        Assertions.assertThat(metadata.getConfigDataFile().length()).isGreaterThan(location.length() + 10);
+
+    }
+
+    @Test
+    void testDeploymentLocation_corrupted() {
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
+
+        List<Sniffer> sniffers = Collections.singletonList(new TestSniffer());
+        Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
+
+
+        ArchiveDeployment deployment = new ArchiveDeployment(new File("./applications/test1.war"));
+        deployment.setSniffers(sniffers);
+        deployment.setSpecifications(specifications);
+        deployment.setContextRoot("/root1");
+
+
+        DeploymentMetadata metadata = new DeploymentMetadata(deployment, runtimeConfiguration);
+        Assertions.assertThat(metadata.getDeploymentLocation()).isNull();
     }
 
     private static class TestSniffer implements Sniffer {

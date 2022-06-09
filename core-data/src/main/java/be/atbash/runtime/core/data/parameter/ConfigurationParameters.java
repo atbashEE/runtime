@@ -67,8 +67,11 @@ public class ConfigurationParameters {
     @CommandLine.Option(names = {"--stateless"}, description = "In stateless mode, no configuration files are written and logs are places in the temp directory.")
     private boolean stateless = false;
 
-    @CommandLine.Option(names = {"-c","--configfile"}, description = "Configuration file that needs to be executed after startup and before applications are deployed")
+    @CommandLine.Option(names = {"-c", "--configfile"}, description = "Configuration file that needs to be executed after startup and before applications are deployed")
     private File configFile;
+
+    @CommandLine.Option(names = {"--datafile"}, description = "Configuration properties file that are provided to deployer and application")
+    private File configDataFile;
 
     @CommandLine.Parameters(index = "0..*")
     private File[] archives;
@@ -211,6 +214,14 @@ public class ConfigurationParameters {
         this.configFile = configFile;
     }
 
+    public File getConfigDataFile() {
+        return configDataFile;
+    }
+
+    public void setConfigDataFile(File configDataFile) {
+        this.configDataFile = configDataFile;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("ConfigurationParameters{");
@@ -231,6 +242,12 @@ public class ConfigurationParameters {
         sb.append(", --warmup=").append(warmup);
         sb.append(", --stateless=").append(stateless);
         sb.append(", --contextRoot='").append(contextRoot).append('\'');
+        if (configFile != null) {
+            sb.append(", --configfile=").append(configFile);
+        }
+        if (configDataFile != null) {
+            sb.append(", --datafile=").append(configDataFile);
+        }
         if (archives != null) {
             sb.append(", archives=").append(Arrays.toString(archives));
         }

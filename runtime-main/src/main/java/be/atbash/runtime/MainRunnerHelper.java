@@ -86,6 +86,27 @@ public class MainRunnerHelper {
     }
 
     private boolean validateCommandLine(RuntimeCommand command) {
+
+        File configFile = command.getConfigurationParameters().getConfigFile();
+        if (configFile != null) {
+            if (!configFile.exists() || !configFile.canRead()) {
+                // FIXME is status -3 good? what is the logic of the different exit statusses.
+                String msg = LoggingUtil.formatMessage(logger, "CLI-112", configFile);
+                abort(msg, -3);
+            }
+
+        }
+
+        File configDataFile = command.getConfigurationParameters().getConfigDataFile();
+        if (configDataFile != null) {
+            if (!configDataFile.exists() || !configDataFile.canRead()) {
+                // FIXME is status -3 good? what is the logic of the different exit statusses.
+                String msg = LoggingUtil.formatMessage(logger, "CLI-114", configDataFile);
+                abort(msg, -3);
+            }
+
+        }
+
         String contextRoot = command.getConfigurationParameters().getContextRoot();
         if (contextRoot.isBlank()) {
             // No contextroot value specified, nothing to check.
@@ -198,6 +219,9 @@ public class MainRunnerHelper {
                 .stream()
                 .map(ArchiveDeployment::new)
                 .collect(Collectors.toList());
+        for (ArchiveDeployment deployment : archives) {
+            deployment.setConfigDataFile(actualCommand.getConfigurationParameters().getConfigDataFile());
+        }
 
         EventManager eventManager = EventManager.getInstance();
 
@@ -240,6 +264,11 @@ public class MainRunnerHelper {
             runData.undeployed(deployment);
 
             deployment = null;
+        } else {
+            File configDataFile = new File(metadata.getConfigDataFile());
+            if (configDataFile.exists()) {
+                deployment.setConfigDataFile(configDataFile);
+            }
         }
         return deployment;
     }
@@ -284,11 +313,6 @@ public class MainRunnerHelper {
     public void performConfiguration() {
         File configFile = actualCommand.getConfigurationParameters().getConfigFile();
         if (configFile != null) {
-            if (!configFile.exists() || !configFile.canRead()) {
-                // FIXME is status -3 good? what is the logic of the different exit statusses.
-                String msg = LoggingUtil.formatMessage(logger, "CLI-112", configFile);
-                abort(msg, -3);
-            }
             try {
                 RuntimeObjectsManager.getInstance().getExposedObject(ConfigurationManager.class).executeConfigFile(configFile);
             } catch (Throwable e) {

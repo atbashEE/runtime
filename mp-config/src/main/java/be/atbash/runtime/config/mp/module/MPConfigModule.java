@@ -94,12 +94,19 @@ public class MPConfigModule implements Module<RuntimeConfiguration> {
     private void checkConfigActive(ArchiveDeployment deployment) {
         deployment.addDeploymentData(MPConfigModuleConstant.MPCONFIG_VALIDATION_DISABLED, validationDisabled.toString());
 
+        // This is at the runtime level.
         Map<String, String> moduleConfiguration = configuration.getConfig().getModuleConfiguration(MP_CONFIG_MODULE_NAME);
 
         String enabledForcedValue = moduleConfiguration.computeIfAbsent(ENABLED_FORCED, k -> "false");
         if (Boolean.parseBoolean(enabledForcedValue)) {
             // Config says that module is always enabled, so don't look at the DeploymentData
             deployment.addDeploymentData(MPConfigModuleConstant.MPCONFIG_ENABLED, "true");
+            return;
+        }
+
+        String configEnabled = deployment.getDeploymentData(MPConfigModuleConstant.MPCONFIG_ENABLED);
+        if (Boolean.parseBoolean(configEnabled)) {
+            // Current deployment data says it is enabled, don't look any further.
             return;
         }
 

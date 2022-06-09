@@ -36,6 +36,8 @@ public class DeploymentMetadata {
     private String contextRoot;
     private Map<String, String> deploymentData;
 
+    private String configDataFile;
+
     // required for Json Processing
     public DeploymentMetadata() {
     }
@@ -56,6 +58,9 @@ public class DeploymentMetadata {
                 .collect(Collectors.toList());
         contextRoot = deployment.getContextRoot();
         deploymentData = deployment.getDeploymentData();
+        if (deployment.getConfigDataFile() != null) {
+            configDataFile = deployment.getConfigDataFile().getAbsolutePath();
+        }
     }
 
     // setters are for the JSON handling
@@ -106,6 +111,14 @@ public class DeploymentMetadata {
     // required for the JSON de-serialisation.
     public void setDeploymentData(Map<String, String> deploymentData) {
         this.deploymentData = deploymentData;
+    }
+
+    public String getConfigDataFile() {
+        return configDataFile;
+    }
+
+    public void setConfigDataFile(String configDataFile) {
+        this.configDataFile = configDataFile;
     }
 
     // context root is the unique identifier in the system.

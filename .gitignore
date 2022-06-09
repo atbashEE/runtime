@@ -1,6 +1,9 @@
 # default configuration in the domain
 default
 
+# Test data
+deploymentData.properties
+
 # Compiled class file
 *.class
 target

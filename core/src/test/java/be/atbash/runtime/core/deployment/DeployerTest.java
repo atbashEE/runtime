@@ -113,6 +113,51 @@ class DeployerTest {
     }
 
     /**
+     * See if the DeploymentDatRetriever is called..
+     *
+     * @throws NoSuchFieldException
+     */
+    @Test
+    void onEvent_data() throws NoSuchFieldException {
+
+        testModule = new TestModule(watcherService, false);
+
+        // At some point we do RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
+        //We perform mocking for that here.
+        Map<Class<?>, Module<?>> mapping = TestReflectionUtils.getValueOf(RuntimeObjectsManager.getInstance(), "runtimeObjectMapping");
+        mapping.clear();
+        mapping.put(WatcherService.class, testModule);
+        mapping.put(RunData.class, testModule);
+
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
+
+        Config config = new Config();
+        config.setModules(new Modules());
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .setConfig(config)
+                .build();
+
+        List<Module> modules = Collections.singletonList(testModule);
+
+        System.setProperty(SINGLE_TRIGGERED_SNIFFER_SPECIFICATIONS, "SERVLET,HTML");
+        SnifferManager.getInstance().registerSniffer(SingleTriggeredSniffer.class);
+
+        EventManager.getInstance().registerListener(testModule);
+
+        Deployer deployer = new Deployer(watcherService, runtimeConfiguration, modules);
+
+
+        ArchiveDeployment deployment = new ArchiveDeployment(new File("../demo/demo-servlet/target/demo-servlet.war"));
+        deployer.onEvent(new EventPayload(Events.DEPLOYMENT, deployment));
+
+        Assertions.assertThat(deployment.getDeploymentData("deployment-name")).isEqualTo("demo-servlet");
+
+    }
+
+    /**
      * test the behaviour when no module can deploy the application.
      *
      * @throws NoSuchFieldException
