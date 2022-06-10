@@ -31,6 +31,19 @@ java -jar atbash-cli.jar set mp-config.enabled.forced=true
 
 or define the set command within the configuration file supplied during start up.
 
+You can also use the properties file you specify ith --datafile command line parameter to activate the MicroProfile Config functionality for a certain deployment.
+
+----
+java -jar atbash-runtime.jar --datafile path/to/deploy.properties /path/to/app.war
+----
+
+with the content for the _deploy.properties_ as
+
+----
+mp-config.enabled=true
+----
+
+
 === Disable validation
 
 The MicroProfile Configuration specification requires that all injection points to be validated to make sure that all required configuration value are present.
@@ -65,3 +78,5 @@ The following types are supported.
 - URl when value starts with _http:_ or _https:_.
 - Classpath when value starts with _classpath:_.
 - Files when when value start with _file:_  but this can be omitted.
+
+Also the properties files that supplied with the `--datafile` command line property is used as MicroProfile Config source with a default priority of 200.

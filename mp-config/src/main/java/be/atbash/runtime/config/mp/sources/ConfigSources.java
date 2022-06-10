@@ -19,10 +19,14 @@ import be.atbash.runtime.config.mp.AtbashConfigBuilder;
 import be.atbash.runtime.config.mp.ConfigValueImpl;
 import be.atbash.runtime.config.mp.sources.interceptor.*;
 import be.atbash.runtime.config.mp.util.AnnotationUtil;
+import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.CurrentArchiveDeployment;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import org.eclipse.microprofile.config.ConfigValue;
 import org.eclipse.microprofile.config.spi.ConfigSource;
 import org.eclipse.microprofile.config.spi.ConfigSourceProvider;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Logger;
@@ -118,6 +122,16 @@ public class ConfigSources implements Serializable {
         }
         if (builder.isAddDefaultSources()) {
             result.addAll(getDefaultSources(builder.getClassLoader()));
+        }
+
+        ArchiveDeployment deployment = CurrentArchiveDeployment.getInstance().getCurrent();
+        if (deployment.getConfigDataFile() != null) {
+            try {
+                // Default ordinal 200, read from config_ordinal within file.
+                result.add(new PropertiesConfigSource(deployment.getConfigDataFile().toURI().toURL(), 200));
+            } catch (IOException e) {
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+            }
         }
 
         return result;
