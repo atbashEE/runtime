@@ -8,6 +8,54 @@ Within the Runtime itself, the logging is performed through SLF4J API.  A bridge
 
 By default, only some important messages are written to the console and if needed, the `--logToConsole` is required to view logging entries also on the console.
 
+=== Log format
+
+Atbash Runtim comes included with 4 different log formats.  The default one is the SimpleLogFormat but the formatter can be changed by defining the fully qualified class name within the _logging.properties_ file.
+
+[source]
+----
+be.atbash.runtime.logging.handler.LogFileHandler.formatter=be.atbash.runtime.logging.handler.formatter.SimpleLogFormatter
+----
+
+==== SimpleLogFormatter
+
+The SimpleLogFormatter shows the basic information of the log records like this
+
+[source]
+----
+Jun 11, 2022 22:33:45 be.atbash.runtime.MainRunnerHelper#logStartupTime INFO: CLI-103: Started Atbash Runtime in 0.882 secs
+----
+
+which corresponds to the following String format that is used by the logger.
+
+[source]
+----
+%1$tb %1$td, %1$tY %1$tT %2$s %4$s: %5$s%6$s%n
+----
+
+parameter 1 -> Timestamp of the log entry
+parameter 2 -> Name of the logger or the Class#Method name where the log entry is created.
+parameter 3 -> Name of the logger (not shown in the default format)
+parameter 4 -> Name of the log Level
+parameter 5 -> Code of the log message
+parameter 6 -> log message, includes the stacktrace in case the log entry is associated with a Throwable.
+
+When you or the system, is making use of the Mapped Diagnostic Context (MDC) the entries are shown just before the actual message and can be configured by referencing parameter 7.
+
+You can customise the output of the log format by the Simple Log formatter by defining the desired layout through the _log.properties_ file content
+
+[source]
+----
+be.atbash.runtime.logging.handler.formatter.SimpleLogFormatter.format=%1$tb %1$td, %1$tY %1$tT %2$s %4$s: %5$s%6$s%n
+be.atbash.runtime.logging.handler.formatter.SimpleLogFormatter.format.mdc=%1$tb %1$td, %1$tY %1$tT %2$s %4$s: [%7$s]%5$s%6$s%n
+----
+
+==== JSONLogger
+
+==== ODLLogger
+
+==== Uniform Logger
+
 === Features
 
 When the runtime starts, a rotation of the log file happens (if the instance has already a log file from the previous run).

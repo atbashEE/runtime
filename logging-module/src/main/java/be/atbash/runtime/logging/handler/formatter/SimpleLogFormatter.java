@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.logging.handler.formatter;
 
+import be.atbash.runtime.logging.EnhancedLogRecord;
 import be.atbash.runtime.logging.util.LogUtil;
 
 import java.io.PrintWriter;
@@ -23,15 +24,19 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
+import java.util.stream.Collectors;
 
 public class SimpleLogFormatter extends Formatter {
 
     private final String DEFAULT_FORMAT = "%1$tb %1$td, %1$tY %1$tT %2$s %4$s: %5$s%6$s%n";
+    private final String DEFAULT_FORMAT_WITH_MDC = "%1$tb %1$td, %1$tY %1$tT %2$s %4$s: [%7$s]%5$s%6$s%n";
 
     private final String format;
+    private final String formatWithMDC;
 
     public SimpleLogFormatter() {
         format = LogUtil.getStringProperty(this.getClass().getName() + ".format").orElse(DEFAULT_FORMAT);
+        formatWithMDC = LogUtil.getStringProperty(this.getClass().getName() + ".format.mdc").orElse(DEFAULT_FORMAT_WITH_MDC);
     }
 
     /**
@@ -71,12 +76,35 @@ public class SimpleLogFormatter extends Formatter {
             throwable = sw.toString();
         }
 
-        return String.format(format,
-                zdt,
-                source,
-                record.getLoggerName(),
-                record.getLevel().getName(),
-                message,
-                throwable);
+        String mdcValue = null;
+
+        if (record instanceof EnhancedLogRecord) {
+            EnhancedLogRecord enhancedLogRecord = (EnhancedLogRecord) record;
+            if (enhancedLogRecord.getMdc() != null) {
+                mdcValue = enhancedLogRecord.getMdc().entrySet().stream()
+                        .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
+                        .collect(Collectors.joining(", "));
+            }
+        }
+
+        if (mdcValue == null) {
+            return String.format(format,
+                    zdt,
+                    source,
+                    record.getLoggerName(),
+                    record.getLevel().getName(),
+                    message,
+                    throwable);
+
+        } else {
+            return String.format(formatWithMDC,
+                    zdt,
+                    source,
+                    record.getLoggerName(),
+                    record.getLevel().getName(),
+                    message,
+                    throwable,
+                    mdcValue);
+        }
     }
 }
