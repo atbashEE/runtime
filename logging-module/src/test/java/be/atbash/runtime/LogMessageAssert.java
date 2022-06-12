@@ -15,9 +15,17 @@
  */
 package be.atbash.runtime;
 
+import be.atbash.json.JSONObject;
+import be.atbash.json.parser.JSONParser;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractMapAssert;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.MapAssert;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
     protected LogMessageAssert(String actual) {
@@ -27,6 +35,27 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
 
     public static LogMessageAssert assertThat(String actual) {
         return new LogMessageAssert(actual);
+    }
+
+    public LogMessageAssert isSimpleFormat() {
+        isNotNull();
+        if (isJson()) {
+            failWithMessage("Expected log message is not in Simple format");
+        }
+        return this;
+
+    }
+
+    public LogMessageAssert isJsonFormat() {
+        isNotNull();
+        if (!isJson()) {
+            failWithMessage("Expected log message is not in JSON format");
+        }
+        return this;
+    }
+
+    private boolean isJson() {
+        return actual.startsWith("{") && actual.endsWith("}\n");
     }
 
     /**
@@ -42,6 +71,18 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
         // We check if the log message has a matching timestamp that xas taken before OR after the test method was
         // executed (since it does no take > 1 sec, this always matches one of them)
         isNotNull();
+        if (!isJson()) {
+            // TODO Later on with other formats we have more tests
+            hasTimeStampSimple(start, end);
+        }
+        if (isJson()) {
+            // TODO Later on with other formats we have more tests
+            hasTimeStampJSON(start, end);
+        }
+        return this;
+    }
+
+    private void hasTimeStampSimple(ZonedDateTime start, ZonedDateTime end) {
         String defaultTimestampFormat = "%1$tb %1$td, %1$tY %1$tT";
         String startTimeStamp = String.format(defaultTimestampFormat, start);
         String endTimeStamp = String.format(defaultTimestampFormat, end);
@@ -49,7 +90,35 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
         if (!actual.startsWith(startTimeStamp) && !actual.startsWith(endTimeStamp)) {
             failWithMessage("Expected timestamp on log message does not match");
         }
-        return this;
+    }
+
+    private void hasTimeStampJSON(ZonedDateTime start, ZonedDateTime end) {
+
+        JSONObject jsonObject = getAsJsonObject();
+        if (!jsonObject.containsKey("TimeMillis") || !jsonObject.containsKey("Timestamp")) {
+            failWithMessage("The JSON structure is missing the keys 'TimeMillis' and/or 'Timestamp'");
+        }
+
+        Object timeMillis = jsonObject.get("TimeMillis");
+
+        long millis = Long.parseLong(timeMillis.toString());
+        if (millis < start.toInstant().toEpochMilli() || millis > end.toInstant().toEpochMilli()) {
+            failWithMessage("Expected TimeMillis value on log message does not match");
+        }
+
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+
+        try {
+            Date timestamp = dateFormatter.parse(jsonObject.get("Timestamp").toString());
+
+            if (timestamp.getTime() < start.toInstant().toEpochMilli() || timestamp.getTime() > end.toInstant().toEpochMilli()) {
+                failWithMessage("Expected TimeMillis value on log message does not match");
+            }
+
+        } catch (ParseException e) {
+            Assertions.fail(e.getMessage());
+        }
+
     }
 
     /**
@@ -80,5 +149,22 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
             failWithMessage("Expected log message must have Stacktrace %s but found %s", throwable.getStackTrace()[0].toString(), lines[2]);
         }
         return this;
+    }
+
+    public AbstractMapAssert asMap() {
+        isNotNull();
+        isJsonFormat();
+
+        JSONObject jsonObject = getAsJsonObject();
+        return new MapAssert<>(jsonObject);
+
+    }
+
+    private JSONObject getAsJsonObject() {
+        Object parsed = new JSONParser().parse(actual);
+        Assertions.assertThat(parsed).isInstanceOf(JSONObject.class);
+
+        JSONObject jsonObject = (JSONObject) parsed;
+        return jsonObject;
     }
 }

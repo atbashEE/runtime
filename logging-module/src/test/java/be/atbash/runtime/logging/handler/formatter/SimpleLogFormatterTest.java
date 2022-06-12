@@ -43,6 +43,7 @@ class SimpleLogFormatterTest {
         String message = logFormatter.format(record);
         ZonedDateTime zdtEnd = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
 
+        CustomAssertions.assertThat(message).isSimpleFormat();
         CustomAssertions.assertThat(message).hasMessage("JUnit.test INFO: Just a message\n");
         CustomAssertions.assertThat(message).hasTimeStamp(zdtStart, zdtEnd);
     }
@@ -56,6 +57,7 @@ class SimpleLogFormatterTest {
 
         String message = logFormatter.format(record);
 
+        CustomAssertions.assertThat(message).isSimpleFormat();
         CustomAssertions.assertThat(message).hasMessage("be.atbash.runtime.Foo#bar INFO: Just a message\n");
     }
 
@@ -69,6 +71,7 @@ class SimpleLogFormatterTest {
 
         String message = logFormatter.format(record);
 
+        CustomAssertions.assertThat(message).isSimpleFormat();
         CustomAssertions.assertThat(message).hasException(exception);
 
     }
@@ -85,6 +88,7 @@ class SimpleLogFormatterTest {
 
         String message = logFormatter.format(enhancedLogRecord);
 
+        CustomAssertions.assertThat(message).isSimpleFormat();
         CustomAssertions.assertThat(message).hasMessage("JUnit.test INFO: [key=value]Log message contains Context info\n");
 
     }
@@ -102,6 +106,7 @@ class SimpleLogFormatterTest {
 
         String message = logFormatter.format(enhancedLogRecord);
 
+        CustomAssertions.assertThat(message).isSimpleFormat();
         CustomAssertions.assertThat(message).hasMessage("JUnit.test INFO: [uid=UniqueValue, key=value]Log message contains Context info\n");
 
     }

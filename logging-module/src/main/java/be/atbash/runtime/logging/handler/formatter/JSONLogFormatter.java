@@ -18,6 +18,7 @@ package be.atbash.runtime.logging.handler.formatter;
 import be.atbash.json.JSONValue;
 import be.atbash.runtime.logging.EnhancedLogRecord;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -76,6 +77,7 @@ public class JSONLogFormatter extends CommonFormatter {
 
     @Override
     public String formatMessage(LogRecord record) {
+        // TODO Is this correct that we override this?
         return jsonLogFormat(record);
     }
 
@@ -176,25 +178,32 @@ public class JSONLogFormatter extends CommonFormatter {
                 }
             }
 
-            Object[] parameters = record.getParameters();
-            if (parameters != null) {
-                for (Object parameter : parameters) {
-                    if (parameter instanceof Map) {
-                        for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) parameter).entrySet()) {
-                            // there are implementations that allow <null> keys...
-                            String key;
-                            if (entry.getKey() != null) {
-                                key = entry.getKey().toString();
-                            } else {
-                                key = "null";
-                            }
+            List<Object> parameters = new ArrayList<>();
 
-                            // also handle <null> values...
-                            if (entry.getValue() != null) {
-                                eventObject.put(key, entry.getValue().toString());
-                            } else {
-                                eventObject.put(key, "null");
-                            }
+            if (record.getParameters() != null) {
+                parameters.addAll(Arrays.asList(record.getParameters()));
+            }
+            if (record instanceof EnhancedLogRecord) {
+                // We need to add MDC as a Map since there is specific support for Map parameters.
+                parameters.add(((EnhancedLogRecord) record).getMdc());
+            }
+
+            for (Object parameter : parameters) {
+                if (parameter instanceof Map) {
+                    for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) parameter).entrySet()) {
+                        // there are implementations that allow <null> keys...
+                        String key;
+                        if (entry.getKey() != null) {
+                            key = entry.getKey().toString();
+                        } else {
+                            key = "null";
+                        }
+
+                        // also handle <null> values...
+                        if (entry.getValue() != null) {
+                            eventObject.put(key, entry.getValue().toString());
+                        } else {
+                            eventObject.put(key, "null");
                         }
                     }
                 }
