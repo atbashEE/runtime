@@ -85,7 +85,7 @@ public class JSONLogFormatter extends CommonFormatter {
      */
     private String jsonLogFormat(LogRecord record) {
         try {
-            Map<String, String> eventObject = new TreeMap<>();
+            Map<String, Object> eventObject = new TreeMap<>();
 
             /*
              * Create the timestamp field and append to object.
@@ -202,47 +202,24 @@ public class JSONLogFormatter extends CommonFormatter {
 
             String logMessage = record.getMessage();
 
-            if (null == logMessage || logMessage.trim().equals("")) {
-                Throwable throwable = record.getThrown();
-                if (null != throwable) {
-                    Map<String, String> traceObject = new TreeMap<>();
-
-                    try (StringWriter stringWriter = new StringWriter();
-                         PrintWriter printWriter = new PrintWriter(stringWriter)) {
-                        throwable.printStackTrace(printWriter);
-                        if (throwable.getMessage() != null) {
-                            traceObject.put(EXCEPTION_KEY, throwable.getMessage());
-                        }
-                        logMessage = stringWriter.toString();
-
-                        traceObject.put(STACK_TRACE_KEY, logMessage);
-                        eventObject.put(THROWABLE_KEY, JSONValue.toJSONString(traceObject));
-                    }
-                }
-            } else {
+            if (logMessage != null && !logMessage.isBlank()) {
                 logMessage = formatLogMessage(logMessage, record, this::getResourceBundle);
-                StringBuilder logMessageBuilder = new StringBuilder();
-                logMessageBuilder.append(logMessage);
-
-                Throwable throwable = getThrowable(record);
-                if (null != throwable) {
-                    try (StringWriter stringWriter = new StringWriter();
-                         PrintWriter printWriter = new PrintWriter(stringWriter)) {
-
-                        Map<String, String> traceObject = new TreeMap<>();
-
-                        throwable.printStackTrace(printWriter);
-                        logMessage = stringWriter.toString();
-                        traceObject.put(EXCEPTION_KEY, logMessageBuilder.toString());
-                        traceObject.put(STACK_TRACE_KEY, logMessage);
-                        eventObject.put(THROWABLE_KEY, JSONValue.toJSONString(traceObject));
-
-                    }
-                } else {
-                    logMessage = logMessageBuilder.toString();
-                    eventObject.put(LOG_MESSAGE_KEY, logMessage);
-                }
+                eventObject.put(LOG_MESSAGE_KEY, logMessage);
             }
+
+            Throwable throwable = getThrowable(record);
+            if (null != throwable) {
+                String stacktraceText = getStacktraceAsText(throwable);
+                Map<String, String> traceObject = new TreeMap<>();
+
+                if (throwable.getMessage() != null) {
+                    traceObject.put(EXCEPTION_KEY, throwable.getMessage());
+                }
+                traceObject.put(STACK_TRACE_KEY, stacktraceText);
+                eventObject.put(THROWABLE_KEY, traceObject);
+
+            }
+
 
             return JSONValue.toJSONString(eventObject) + LINE_SEPARATOR;
 
@@ -252,6 +229,17 @@ public class JSONLogFormatter extends CommonFormatter {
                     ErrorManager.FORMAT_FAILURE);
             return "";
         }
+    }
+
+    private static String getStacktraceAsText(Throwable throwable) throws IOException {
+        String logMessage;
+        try (StringWriter stringWriter = new StringWriter();
+             PrintWriter printWriter = new PrintWriter(stringWriter)) {
+
+            throwable.printStackTrace(printWriter);
+            logMessage = stringWriter.toString();
+        }
+        return logMessage;
     }
 
     /**
