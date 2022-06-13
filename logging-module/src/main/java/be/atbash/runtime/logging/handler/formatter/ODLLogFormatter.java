@@ -199,6 +199,23 @@ public class ODLLogFormatter extends AnsiColorFormatter {
                 }
             }
 
+            if (record instanceof EnhancedLogRecord) {
+                EnhancedLogRecord logRecord = (EnhancedLogRecord) record;
+                Map<String, String> mdc = logRecord.getMdc();
+                if (mdc != null) {
+                    for (Map.Entry<String, String> entry : mdc.entrySet()) {
+                        recordBuffer.append(FIELD_BEGIN_MARKER);
+                        recordBuffer.append(entry.getKey());
+                        recordBuffer.append(": ");
+                        recordBuffer.append(entry.getValue());
+                        recordBuffer.append(FIELD_END_MARKER);
+                        recordBuffer.append(FIELD_SEPARATOR);
+                    }
+
+
+                }
+            }
+
             recordBuffer.append(message);
             recordBuffer.append(LINE_SEPARATOR);
             return recordBuffer.toString();

@@ -41,7 +41,7 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
 
     public LogMessageAssert isSimpleFormat() {
         isNotNull();
-        if (isJson()) {
+        if (!isSimple()) {
             failWithMessage("Expected log message is not in Simple format");
         }
         return this;
@@ -51,6 +51,15 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
     public LogMessageAssert isUniformFormat() {
         isNotNull();
         if (!isUniform()) {
+            failWithMessage("Expected log message is not in Simple format");
+        }
+        return this;
+
+    }
+
+    public LogMessageAssert isODLFormat() {
+        isNotNull();
+        if (!isODL()) {
             failWithMessage("Expected log message is not in Simple format");
         }
         return this;
@@ -73,6 +82,14 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
         return actual.startsWith("[#|") && actual.endsWith("|#]\n");
     }
 
+    private boolean isODL() {
+        return actual.startsWith("[") && !actual.endsWith("]\n");
+    }
+
+    private boolean isSimple() {
+        return !isJson() && !isUniform() && !isODL();
+    }
+
     /**
      * Verifies the timestamp of the message.
      *
@@ -86,8 +103,7 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
         // We check if the log message has a matching timestamp that xas taken before OR after the test method was
         // executed (since it does no take > 1 sec, this always matches one of them)
         isNotNull();
-        if (!isJson() && !isUniform()) {
-            // TODO Later on with other formats we have more tests
+        if (isSimple()) {
             hasTimeStampSimple(start, end);
         }
         if (isJson()) {
@@ -95,6 +111,9 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
         }
         if (isUniform()) {
             hasTimeStampUniform(start, end);
+        }
+        if (isODL()) {
+            hasTimeStampODL(start, end);
         }
         return this;
     }
@@ -164,6 +183,30 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
 
     }
 
+    private void hasTimeStampODL(ZonedDateTime start, ZonedDateTime end) {
+
+        String[] parts = actual.split("]");
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        try {
+            Date timestamp = dateFormatter.parse(parts[0].substring(1));  // First field but skip first character = [
+            if (timestamp.getTime() < start.toInstant().toEpochMilli() || timestamp.getTime() > end.toInstant().toEpochMilli()) {
+                failWithMessage("Expected time stamp value on log message does not match");
+            }
+
+        } catch (ParseException e) {
+            Assertions.fail(e.getMessage());
+        }
+
+        Map<String, String> extraFields = retrieveAdditionalPartsAsMap();
+        if (extraFields.containsKey("timeMillis")) {
+            long timeMillis = Long.parseLong(extraFields.get("timeMillis"));
+            if (timeMillis < start.toInstant().toEpochMilli() || timeMillis > end.toInstant().toEpochMilli()) {
+                failWithMessage("Expected TimeMillis value on log message does not match");
+            }
+        }
+
+    }
+
     /**
      * Verifies the log message, except the time stamp (endsWith)
      *
@@ -180,12 +223,52 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
                 failWithMessage("Expected log message '%s' does not match the value '%s'", expected, actual);
             }
 
-        } else {
+        }
+        if (isODL()) {
+            String mainParts = retrieveMainParts();
+            if (!mainParts.startsWith(expected)) {
+                failWithMessage("Expected log message '%s' does not match the value '%s'", expected, actual);
+            }
+        }
+
+        if (isSimple()) {
             if (!actual.endsWith(expected)) {
                 failWithMessage("Expected log message '%s' does not match the value '%s'", expected, actual);
             }
         }
+        if (isJson()) {
+            failWithMessage("You can't check the message when it is in JSON format using this method. Use `asMap()` for this purpose.");
+        }
+
         return this;
+    }
+
+    private String retrieveMainParts() {
+        StringBuilder result = new StringBuilder();
+        int previousIdx = -1;
+        int lastIdx = -1;
+        boolean additionalField = false;
+        for (int i = 0; i < actual.length(); i++) {
+            if (actual.charAt(i) == '[') {
+                previousIdx = i;
+            }
+            if (actual.charAt(i) == ':') {
+                additionalField = true;
+            }
+            if (actual.charAt(i) == ']') {
+                if (!additionalField) {
+                    result.append(actual, previousIdx, i + 1);
+                    result.append(" ");
+                }
+                additionalField = false;  // reset
+                lastIdx = i;
+            }
+
+        }
+        if (lastIdx != -1) {
+            result.append(actual.substring(lastIdx + 2));
+        }
+        return result.toString();
     }
 
     private String reassembleMainParts(String[] parts) {
@@ -234,16 +317,47 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
             return new MapAssert<>(result);
         }
 
+        if (isODL()) {
+            return new MapAssert<>(retrieveAdditionalPartsAsMap());
+        }
+
         failWithMessage("Not supported for this log format");
         return null;
+    }
+
+    private Map<String, String> retrieveAdditionalPartsAsMap() {
+        // ODL
+        Map<String, String> result = new HashMap<>();
+        int previousIdx = -1;
+        int colonIdx = -1;
+        boolean firstField = true;  // First field is the date having :
+        for (int i = 0; i < actual.length(); i++) {
+            if (actual.charAt(i) == '[') {
+                previousIdx = i;
+            }
+            if (actual.charAt(i) == ':') {
+                colonIdx = i;
+            }
+
+            if (actual.charAt(i) == ']') {
+                if (colonIdx != -1 && !firstField) {
+                    String key = actual.substring(previousIdx + 1, colonIdx);
+                    String value = actual.substring(colonIdx + 1, i);
+                    result.put(key, value.trim());
+                }
+                colonIdx = -1;  // reset
+                firstField = false;
+            }
+
+        }
+        return result;
     }
 
     private JSONObject getAsJsonObject() {
         Object parsed = new JSONParser().parse(actual);
         Assertions.assertThat(parsed).isInstanceOf(JSONObject.class);
 
-        JSONObject jsonObject = (JSONObject) parsed;
-        return jsonObject;
+        return (JSONObject) parsed;
     }
 
 }
