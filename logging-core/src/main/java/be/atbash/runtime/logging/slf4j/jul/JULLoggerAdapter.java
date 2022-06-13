@@ -199,7 +199,7 @@ public final class JULLoggerAdapter extends LegacyAbstractLogger implements Loca
     static String SUBSTITUE = SubstituteLogger.class.getName();
     static String FLUENT = DefaultLoggingEventBuilder.class.getName();
 
-    static String[] BARRIER_CLASSES = new String[]{SUPER_OF_SUPER, SUPER, SELF, SUBSTITUE, FLUENT};
+    static String[] BARRIER_CLASSES = new String[]{SUPER_OF_SUPER, SUPER, SELF, SUBSTITUE, FLUENT, "be.atbash.runtime.core.data.watcher.WatcherService"};
 
     private boolean barrierMatch(String callerFQCN, String candidateClassName) {
         if (candidateClassName.equals(callerFQCN)) {

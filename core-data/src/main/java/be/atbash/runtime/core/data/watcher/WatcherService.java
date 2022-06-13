@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WatcherService {
+    // Class name and package used in JULLoggerAdapter so change also over there when refactored.
 
     private boolean jmxActive;
     private boolean flightRecorderActive;
@@ -64,8 +65,7 @@ public class WatcherService {
             FlightRecorderUtil.getInstance().emitEvent(module, message);
 
         }
-        // FIXME the slf4j -> jdk logging overwrites the logger name based on the
-        // stacktrace. So we need a customer version of slf4j -> jdk (4 CLASSES)
+
         String callingClassName = Thread.currentThread().getStackTrace()[2].getClassName();
         Logger logger = LoggerFactory.getLogger(callingClassName);
         if (asInfo) {
