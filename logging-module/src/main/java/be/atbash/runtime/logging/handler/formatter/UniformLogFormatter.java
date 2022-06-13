@@ -42,16 +42,6 @@ import java.util.regex.Pattern;
  * MESSAGE|#]\n"
  *
  * @author Hemanth Puttaswamy
- * <p/>
- *         TODO:
- *         1. Performance improvement. We can Cache the LOG_LEVEL|PRODUCT_ID strings
- *         and minimize the concatenations and revisit for more performance
- *         improvements
- *         2. Need to use Product Name and Version based on the version string
- *         that is part of the product.
- *         3. Stress testing
- *         4. If there is a Map as the last element, need to scan the message to
- *         distinguish key values with the message argument.
  */
 public class UniformLogFormatter extends AnsiColorFormatter {
 
@@ -200,7 +190,6 @@ public class UniformLogFormatter extends AnsiColorFormatter {
             // included for FINER and FINEST log levels.
             if (level.intValue() <= Level.FINE.intValue()) {
                 String sourceClassName = record.getSourceClassName();
-                // sourceClassName = (sourceClassName == null) ? "" : sourceClassName;
                 if (sourceClassName != null && !sourceClassName.isEmpty()) {
                     recordBuffer.append(CLASS_NAME).append(NV_SEPARATOR);
                     recordBuffer.append(sourceClassName);
@@ -208,11 +197,22 @@ public class UniformLogFormatter extends AnsiColorFormatter {
                 }
 
                 String sourceMethodName = record.getSourceMethodName();
-                // sourceMethodName = (sourceMethodName == null) ? "" : sourceMethodName;
                 if (sourceMethodName != null && !sourceMethodName.isEmpty()) {
                     recordBuffer.append(METHOD_NAME).append(NV_SEPARATOR);
                     recordBuffer.append(sourceMethodName);
                     recordBuffer.append(NVPAIR_SEPARATOR);
+                }
+            }
+
+            if (record instanceof EnhancedLogRecord){
+                EnhancedLogRecord enhancedRecord = (EnhancedLogRecord) record;
+                Map<String, String> mdc = enhancedRecord.getMdc();
+                if (mdc != null) {
+                    for (Map.Entry<String, String> entry : mdc.entrySet()) {
+                        recordBuffer.append(entry.getKey()).append(NV_SEPARATOR);
+                        recordBuffer.append(entry.getValue());
+                        recordBuffer.append(NVPAIR_SEPARATOR);
+                    }
                 }
             }
 
@@ -258,7 +258,7 @@ public class UniformLogFormatter extends AnsiColorFormatter {
                 logMessage = logMessageBuffer.toString();
                 recordBuffer.append(logMessage);
             }
-            recordBuffer.append(recordEndMarker).append(LINE_SEPARATOR).append(LINE_SEPARATOR);
+            recordBuffer.append(recordEndMarker).append(LINE_SEPARATOR);//.append(LINE_SEPARATOR);
             return recordBuffer.toString();
 
         } catch (Exception ex) {

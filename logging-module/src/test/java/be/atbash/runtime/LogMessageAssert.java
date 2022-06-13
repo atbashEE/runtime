@@ -26,6 +26,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
     protected LogMessageAssert(String actual) {
@@ -46,6 +48,15 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
 
     }
 
+    public LogMessageAssert isUniformFormat() {
+        isNotNull();
+        if (!isUniform()) {
+            failWithMessage("Expected log message is not in Simple format");
+        }
+        return this;
+
+    }
+
     public LogMessageAssert isJsonFormat() {
         isNotNull();
         if (!isJson()) {
@@ -56,6 +67,10 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
 
     private boolean isJson() {
         return actual.startsWith("{") && actual.endsWith("}\n");
+    }
+
+    private boolean isUniform() {
+        return actual.startsWith("[#|") && actual.endsWith("|#]\n");
     }
 
     /**
@@ -71,13 +86,15 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
         // We check if the log message has a matching timestamp that xas taken before OR after the test method was
         // executed (since it does no take > 1 sec, this always matches one of them)
         isNotNull();
-        if (!isJson()) {
+        if (!isJson() && !isUniform()) {
             // TODO Later on with other formats we have more tests
             hasTimeStampSimple(start, end);
         }
         if (isJson()) {
-            // TODO Later on with other formats we have more tests
             hasTimeStampJSON(start, end);
+        }
+        if (isUniform()) {
+            hasTimeStampUniform(start, end);
         }
         return this;
     }
@@ -121,6 +138,32 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
 
     }
 
+    private void hasTimeStampUniform(ZonedDateTime start, ZonedDateTime end) {
+
+        String[] parts = actual.split("\\|");
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        try {
+            Date timestamp = dateFormatter.parse(parts[1]);
+            if (timestamp.getTime() < start.toInstant().toEpochMilli() || timestamp.getTime() > end.toInstant().toEpochMilli()) {
+                failWithMessage("Expected time stamp value on log message does not match");
+            }
+
+        } catch (ParseException e) {
+            Assertions.fail(e.getMessage());
+        }
+
+        String[] subParts = parts[4].split(";");
+        for (String subPart : subParts) {
+            if (subPart.startsWith("_TimeMillis")) {
+                Long timeMillis = Long.parseLong(subPart.split("=")[1]);
+                if (timeMillis < start.toInstant().toEpochMilli() || timeMillis > end.toInstant().toEpochMilli()) {
+                    failWithMessage("Expected TimeMillis value on log message does not match");
+                }
+            }
+        }
+
+    }
+
     /**
      * Verifies the log message, except the time stamp (endsWith)
      *
@@ -130,10 +173,29 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
     public LogMessageAssert hasMessage(String expected) {
 
         isNotNull();
-        if (!actual.endsWith(expected)) {
-            failWithMessage("Expected log message '%s' does not match the value '%s'", expected, actual);
+        if (isUniform()) {
+            String[] parts = actual.split("\\|");
+            String mainMessage = reassembleMainParts(parts);
+            if (!mainMessage.contains(expected)) {
+                failWithMessage("Expected log message '%s' does not match the value '%s'", expected, actual);
+            }
+
+        } else {
+            if (!actual.endsWith(expected)) {
+                failWithMessage("Expected log message '%s' does not match the value '%s'", expected, actual);
+            }
         }
         return this;
+    }
+
+    private String reassembleMainParts(String[] parts) {
+        String result = parts[1] + "|" +
+                parts[2] + "|" +
+                parts[3] + "|" +
+                parts[5];
+
+        return result;
+
     }
 
     public LogMessageAssert hasException(Throwable throwable) {
@@ -153,11 +215,27 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
 
     public AbstractMapAssert asMap() {
         isNotNull();
-        isJsonFormat();
+        if (isJson()) {
 
-        JSONObject jsonObject = getAsJsonObject();
-        return new MapAssert<>(jsonObject);
+            JSONObject jsonObject = getAsJsonObject();
+            return new MapAssert<>(jsonObject);
+        }
+        if (isUniform()) {
 
+            String[] parts = actual.split("\\|");
+            String[] subParts = parts[4].split(";");
+            Map<String, String> result = new HashMap<>();
+            for (String subPart : subParts) {
+                if (!subPart.isBlank()) {
+                    String[] split = subPart.split("=");
+                    result.put(split[0], split[1]);
+                }
+            }
+            return new MapAssert<>(result);
+        }
+
+        failWithMessage("Not supported for this log format");
+        return null;
     }
 
     private JSONObject getAsJsonObject() {
@@ -167,4 +245,5 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
         JSONObject jsonObject = (JSONObject) parsed;
         return jsonObject;
     }
+
 }

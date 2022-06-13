@@ -95,6 +95,54 @@ As indicated in the example, the keys needs to be separated by a `,` and the fol
 
 ==== Uniform Logger
 
+Atbash Runtime has a Uniform Log formatter included based on te Glassfish and Payara products. It can be selected by defining its fully qualified class name in the _logging.properties_ file for the formatter key.
+
+[source]
+----
+be.atbash.runtime.logging.handler.LogFileHandler.formatter=be.atbash.runtime.logging.handler.formatter.UniformLogFormatter
+----
+
+The generated log entries looks like
+
+[source]
+----
+[#|2022-06-13T13:20:50.690+0200|INFO|be.atbash.runtime.RuntimeMain|_ThreadID=1;_ThreadName=main;_TimeMillis=1655119250690;_LevelValue=800;|CLI-103: Started Atbash Runtime in 0.984 secs|#]
+----
+
+Fields are seperated by `|` (but this can be configured) and there is one single field containing the optional fields and the MDC values.
+
+By default, following information is included
+
+- The Log Level name and value
+- The Log message
+- The Thread id and name where the log entry is generated
+- The time information (as millis since 1 Jan 1970 and as String according to RFC3339)
+- When an Exception is associated with the entry, the exception message and the Stacktrace is part of the log message.
+
+When the Log Level is FINE or lower, the class and method name are included in the output (within the single field containing several log field entries).
+
+Some values can be excluded by defining it as an exclude field.
+
+[source]
+----
+be.atbash.runtime.logging.handler.LogFileHandler.excludeFields=x,y,z
+----
+
+As indicated in the example, the keys needs to be separated by a `,` and the following keys are supported
+
+- `tid`: no Thread Id and Thread name in the log entry
+- `timeMillis`  The field _TimeMillis_  is omitted in the output.
+- `levelValue`  The field _LevelValue_  is omitted in the output.
+
+The UniformLogger also supports colored output which is only useful for console output as the log entries otherwise contain some 'special' characters.
+
+The activation can be done by having the following entry within _logging.properties_ file
+
+[source]
+----
+be.atbash.runtime.logging.handler.formatter.UniformLogFormatter.ansiColor=true
+----
+
 === Features
 
 When the runtime starts, a rotation of the log file happens (if the instance has already a log file from the previous run).
