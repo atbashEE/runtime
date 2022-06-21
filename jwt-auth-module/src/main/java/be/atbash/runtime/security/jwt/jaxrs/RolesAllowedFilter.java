@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.security.jwt.jaxrs;
 
+import be.atbash.runtime.security.jwt.module.LogTracingHelper;
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotAuthorizedException;
@@ -49,12 +50,26 @@ public class RolesAllowedFilter implements ContainerRequestFilter {
         } else {
             isForbidden = allowedRoles.stream().noneMatch(securityContext::isUserInRole);
         }
+        LogTracingHelper logTracingHelper = LogTracingHelper.getInstance();
         if (isForbidden) {
             if (requestContext.getSecurityContext().getUserPrincipal() == null) {
+
+                logTracingHelper.logTraceMessage("Request was denied access by RolesFilter because there was no Bearer Token.");
                 throw new NotAuthorizedException("Bearer");
             } else {
+                logTracingHelper.logTraceMessage("Request was denied access by RolesFilter because there was no role matching (required role(s) '%s').", () -> new Object[]{getRolesForLogging()});
                 throw new ForbiddenException();
             }
+        } else {
+            logTracingHelper.logTraceMessage("Request is permitted as there was a matching role (required role(s) '%s').", () -> new Object[]{getRolesForLogging()});
+        }
+    }
+
+    private String getRolesForLogging() {
+        if (allRolesAllowed) {
+            return "Any role allowed (a role contained '*')";
+        } else {
+            return String.join(",", allowedRoles);
         }
     }
 }

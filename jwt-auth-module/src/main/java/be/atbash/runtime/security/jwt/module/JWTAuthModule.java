@@ -28,11 +28,9 @@ import be.atbash.runtime.jersey.util.ExtraPackagesUtil;
 import be.atbash.runtime.security.jwt.MPJWTModuleConstant;
 
 import java.util.List;
-import java.util.Optional;
 
 import static be.atbash.runtime.config.mp.MPConfigModuleConstant.ENABLED_FORCED;
 import static be.atbash.runtime.config.mp.module.MPConfigModule.MP_CONFIG_MODULE_NAME;
-import static be.atbash.runtime.jersey.JerseyModuleConstant.EXTRA_PACKAGE_NAMES;
 
 public class JWTAuthModule implements Module<RuntimeConfiguration> {
 
@@ -73,12 +71,20 @@ public class JWTAuthModule implements Module<RuntimeConfiguration> {
     @Override
     public void onEvent(EventPayload eventPayload) {
         if (Events.PRE_DEPLOYMENT.equals(eventPayload.getEventCode())) {
-            checkModuleActive(eventPayload.getPayload());
+
+            ArchiveDeployment deployment = eventPayload.getPayload();
+            checkModuleActive(deployment);
+            checkLogTracing(deployment);
         }
     }
 
-    private void checkModuleActive(Object payload) {
-        ArchiveDeployment deployment = (ArchiveDeployment) payload;
+    private void checkLogTracing(ArchiveDeployment deployment) {
+
+        boolean tracingActive = Boolean.parseBoolean(deployment.getDeploymentData("jwt-auth.tracing.active"));
+        LogTracingHelper.getInstance().storeLogTracingActive(deployment.getContextRoot(), tracingActive);
+    }
+
+    private void checkModuleActive(ArchiveDeployment deployment) {
         String realmName = deployment.getDeploymentData(MPJWTModuleConstant.REALM_NAME);
         boolean moduleActive = Boolean.FALSE;
         if (realmName != null) {

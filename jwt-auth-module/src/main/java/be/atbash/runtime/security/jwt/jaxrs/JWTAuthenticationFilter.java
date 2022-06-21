@@ -20,6 +20,7 @@ import be.atbash.ee.security.octopus.jwt.InvalidJWTException;
 import be.atbash.ee.security.octopus.nimbus.jose.JOSEException;
 import be.atbash.runtime.security.jwt.JWTAuthContextInfoProvider;
 import be.atbash.runtime.security.jwt.inject.PrincipalProducer;
+import be.atbash.runtime.security.jwt.module.LogTracingHelper;
 import be.atbash.runtime.security.jwt.principal.JWTCallerPrincipal;
 import be.atbash.runtime.security.jwt.principal.JWTCallerPrincipalFactory;
 import jakarta.annotation.Priority;
@@ -60,13 +61,20 @@ public class JWTAuthenticationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        LogTracingHelper logTracingHelper = LogTracingHelper.getInstance();
+        logTracingHelper.startTracing(requestContext);
+
         SecurityContext securityContext = requestContext.getSecurityContext();
         Principal principal = securityContext.getUserPrincipal();
         // If principal already a JsonWebToken means the entire authentication is already performed.
+
+        logTracingHelper.logTraceMessage("Received request on %s", () -> new Object[]{requestContext.getUriInfo().getRequestUri().toString()});
         if (!(principal instanceof JsonWebToken)) {
 
             BearerTokenExtractor extractor = new BearerTokenExtractor(requestContext, authContextInfoProvider.getContextInfo());
             String bearerToken = extractor.getBearerToken();
+
+            logTracingHelper.logTraceMessage("Bearer token '%s'", bearerToken);
 
             if (bearerToken != null) {
                 try {
@@ -74,10 +82,13 @@ public class JWTAuthenticationFilter implements ContainerRequestFilter {
 
                     producer.setJsonWebToken(callerPrincipal);
 
+                    logTracingHelper.logTraceMessage("The Token was accepted and has name = '%s' and roles = '%s'", () -> new Object[]{callerPrincipal.getName(), callerPrincipal.getGroups()});
+
                     // Install the JWT principal as the caller
                     JWTSecurityContext jwtSecurityContext = new JWTSecurityContext(securityContext, callerPrincipal);
                     requestContext.setSecurityContext(jwtSecurityContext);
                 } catch (InvalidJWTException | IllegalArgumentException | JOSEException e) {
+                    // IllegalArgumentException Not able to determine the format of the provided Bearer token. So not a valid token.
                     // TODO Should we use ContainerRequestContext.abortWith instead of throwing exceptions?
                     throw new NotAuthorizedException(e, "Bearer");
                 } catch (Exception e) {
@@ -87,5 +98,4 @@ public class JWTAuthenticationFilter implements ContainerRequestFilter {
             }
         }
     }
-
 }

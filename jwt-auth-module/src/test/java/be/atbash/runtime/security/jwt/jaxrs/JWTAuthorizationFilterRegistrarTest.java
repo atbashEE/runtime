@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.security.jwt.jaxrs;
 
+import be.atbash.runtime.logging.testing.TestLogMessages;
 import be.atbash.runtime.security.jwt.jaxrs.testclasses.Class1;
 import be.atbash.runtime.security.jwt.jaxrs.testclasses.Class2;
 import be.atbash.util.TestReflectionUtils;
@@ -22,6 +23,7 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.FeatureContext;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -45,6 +47,11 @@ class JWTAuthorizationFilterRegistrarTest {
 
     @Captor
     private ArgumentCaptor<ContainerRequestFilter> containerRequestFilterCaptor;
+
+    @AfterEach
+    public void cleanup() {
+        TestLogMessages.reset();
+    }
 
     @Test
     void configure() throws NoSuchMethodException, NoSuchFieldException {

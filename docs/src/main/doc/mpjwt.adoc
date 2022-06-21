@@ -36,6 +36,12 @@ Some parameter's interpretation is changed so that the application to be functio
 - The property `mp.jwt.verify.issuer` is also interpreted as a List (comma separated values) and the issuer found in the token must be present in this list. This is part of the support for the multi-tenancy / multi-source support.
 - As encryption algorithm, RSA-OAEP is not supported as it uses the SHA-1 hashing which is indicated as insecure since 2017.  RSA-OAEP might not be affected but as a precaution, only RSA-OAEP-256 is supported (containing the SHA 2 family hashing algorithm)
 
+== Tracing
+
+When the Deployment Data `jwt-auth.tracing.active` is set to true, additional logging is added to indicate why the authentication failed. It gives you detailed info about what part (signature validation failed, missing claims, ...) resulted in the authentication or authorization failure.
+
+It also assigns a unique id to dach request and places that in the MDC context of SLF4J. So any log entry that you make within your application also has this unique identification of the request.
+
 == Additional functionality
 
 - The Claims that specify a date value (like _exp_, _iat_, etc) but also custom claims that are transmitted as a number but actually represent the number of seconds since 1 Jan 1970, can be injected as a Date.
