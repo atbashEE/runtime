@@ -157,6 +157,8 @@
         <module>docs</module>
         <module>jwt-auth-module</module>
         <module>microstream-module</module>
+        <module>bom</module>
+        <module>core-api</module>
     </modules>
 
     <build>

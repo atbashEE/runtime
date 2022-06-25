@@ -44,6 +44,8 @@ include::mpjwt.adoc[]
 
 include::microstream.adoc[]
 
+include::bom.adoc[]
+
 include::packager.adoc[]
 
 include::integrations.adoc[]

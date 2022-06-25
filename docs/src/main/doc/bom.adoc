@@ -1,0 +1,62 @@
+== BOM
+
+=== Reasoning
+
+Since there is no real artifact available, like the Web Profile API of Jakarta EE, that provide you with all your classes required during the compilation of your application, a specific artifact is created.
+
+There are 2 types of artifacts created
+
+- A BOM that allows you to include exactly those dependencies that you use in your application like, Servlet JAX-RS, JSON and MicroProfile Config for example.
+- An artifact that includes all api classes that correspond with the Core profile. It contains all specifications that would have appeared in Jakarta EE 10.
+
+=== Using the BOM
+
+To use specify each specification separately, use the following steps.
+
+Within the `<dependencyManagement>` section of the _pom.xml_, define the following dependency.
+
+[source]
+----
+            <dependency>
+                <groupId>be.atbash.runtime.api</groupId>
+                <artifactId>bom</artifactId>
+                <version>${atbash.runtime.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+----
+
+Each specification you need can then be defined within the  `<dependencies>` section. For example;
+
+[source]
+----
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+----
+
+=== Using the core-api artifacts
+
+The core-api artifact is similar to the Jakarta EE Web Profile artifact.  A single JAR file contains all classes of all specifications within that profile.
+
+By adding this dependency to your _pom.xml_ file
+
+[source]
+----
+            <dependency>
+                <groupId>be.atbash.runtime.api</groupId>
+                <artifactId>core-api</artifactId>
+                <version>${atbash.runtime.version}</version>
+                <scope>provided</scope>
+            </dependency>
+----
+
+You can use the Servlet API, CDI api classes, JAX-RS, JSON-P, JSON-B, Jakarta Interceptor, Jakarta Annotations and the MicroProfile Config classes within your application. This corresponds to the specifications that are supported by the _default_ profile of the Atbash runtime.
