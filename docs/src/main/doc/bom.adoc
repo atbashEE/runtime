@@ -45,7 +45,7 @@ Each specification you need can then be defined within the  `<dependencies>` sec
 
 === Using the core-api artifacts
 
-The core-api artifact is similar to the Jakarta EE Web Profile artifact.  A single JAR file contains all classes of all specifications within that profile.
+The `core-api` artifact is similar to the Jakarta EE Web Profile artifact.  A single JAR file contains all classes of all specifications within that profile.
 
 By adding this dependency to your _pom.xml_ file
 
@@ -60,3 +60,22 @@ By adding this dependency to your _pom.xml_ file
 ----
 
 You can use the Servlet API, CDI api classes, JAX-RS, JSON-P, JSON-B, Jakarta Interceptor, Jakarta Annotations and the MicroProfile Config classes within your application. This corresponds to the specifications that are supported by the _default_ profile of the Atbash runtime.
+
+
+=== Using the full-api artifacts
+
+The `full-api` artifact is similar to the Jakarta EE Web Profile artifact.  A single JAR file contains all classes of all specifications within that profile.
+
+By adding this dependency to your _pom.xml_ file
+
+[source]
+----
+            <dependency>
+                <groupId>be.atbash.runtime.api</groupId>
+                <artifactId>full-api</artifactId>
+                <version>${atbash.runtime.version}</version>
+                <scope>provided</scope>
+            </dependency>
+----
+
+On top of the specifications available within the _core-api_, you have the MicroProfile JWT Auth API, MicroStream integration classes, MicroStream v7 and the SLF4J API classes available for your application code.

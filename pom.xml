@@ -156,9 +156,11 @@
         <module>testing</module>
         <module>docs</module>
         <module>jwt-auth-module</module>
+        <module>microstream-api</module>
         <module>microstream-module</module>
         <module>bom</module>
         <module>core-api</module>
+        <module>full-api</module>
     </modules>
 
     <build>

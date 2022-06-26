@@ -26,7 +26,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>microstream-module</artifactId>
+    <artifactId>microstream-api</artifactId>
 
     <properties>
         <microstream.version>07.00.00-MS-GA</microstream.version>
@@ -35,42 +35,29 @@
     <dependencies>
 
         <dependency>
-            <groupId>be.atbash.runtime</groupId>
-            <artifactId>microstream-api</artifactId>
-            <version>${project.parent.version}</version>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>be.atbash.runtime</groupId>
-            <artifactId>core-data</artifactId>
-            <version>${project.parent.version}</version>
+            <groupId>jakarta.interceptor</groupId>
+            <artifactId>jakarta.interceptor-api</artifactId>
+            <version>2.0.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>be.atbash.runtime</groupId>
-            <artifactId>mp-config</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-
-        <!-- because we have a ContainerResponseFilter-->
-        <dependency>
-            <groupId>be.atbash.runtime</groupId>
-            <artifactId>jersey-module</artifactId>
-            <version>${project.parent.version}</version>
+            <groupId>one.microstream</groupId>
+            <artifactId>microstream-storage-embedded</artifactId>
+            <version>${microstream.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>${jakarta.rest.api.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
+            <groupId>one.microstream</groupId>
+            <artifactId>microstream-storage-embedded-configuration</artifactId>
+            <version>${microstream.version}</version>
         </dependency>
 
     </dependencies>

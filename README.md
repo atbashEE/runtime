@@ -26,7 +26,7 @@ Added Features
 - `Sniffer` is no longer a singleton but instantiated for each deployment.
 - Implementation of MicroProfile JWT specification (use profile _all_ or module mpjwt) but in a multi-tenancy way (as it should for microservices).  So it does not pass all TCK tests (95% is achieved)
 - Experimental integration of MicroStream StorageManager.
-- BOM and core-api artifacts to use in your application.
+- BOM, core-api and full-api artifacts to use in your application.
 
 - Fix issue for certain values of `@ApplicationPath.value`
 - Fix issue with `@Provider` when no JAX-RS resources in same package.
