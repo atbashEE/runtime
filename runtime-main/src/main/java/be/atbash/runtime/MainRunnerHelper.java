@@ -265,9 +265,11 @@ public class MainRunnerHelper {
 
             deployment = null;
         } else {
-            File configDataFile = new File(metadata.getConfigDataFile());
-            if (configDataFile.exists()) {
-                deployment.setConfigDataFile(configDataFile);
+            if (metadata.getConfigDataFile() != null) {
+                File configDataFile = new File(metadata.getConfigDataFile());
+                if (configDataFile.exists()) {
+                    deployment.setConfigDataFile(configDataFile);
+                }
             }
         }
         return deployment;
