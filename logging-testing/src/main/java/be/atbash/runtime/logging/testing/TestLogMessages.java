@@ -47,6 +47,9 @@ public final class TestLogMessages {
     }
 
     private List<LoggingEvent> getEvents() {
+        if (handler == null) {
+            throw new IllegalStateException("The `TestLogMessages.init()` method is not called");
+        }
         return handler.getLogEvents();
     }
 

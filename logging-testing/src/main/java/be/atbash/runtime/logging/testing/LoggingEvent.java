@@ -86,4 +86,18 @@ public class LoggingEvent {
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
     }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", LoggingEvent.class.getSimpleName() + "[", "]")
+                .add("level=" + level)
+                .add("mdc=" + mdc)
+                .add("throwable=" + ((throwable == null) ? "null" : throwable.getClass().getName()))
+                .add("message='" + message + "'")
+                .add("arguments=" + arguments)
+                .add("creatingLogger='" + creatingLogger + "'")
+                .add("timestamp=" + timestamp)
+                .add("resourceBundle=" + ((resourceBundle == null) ? "null" : resourceBundle.getBaseBundleName()))
+                .toString();
+    }
 }

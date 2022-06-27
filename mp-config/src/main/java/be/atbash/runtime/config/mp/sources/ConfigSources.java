@@ -125,7 +125,8 @@ public class ConfigSources implements Serializable {
         }
 
         ArchiveDeployment deployment = CurrentArchiveDeployment.getInstance().getCurrent();
-        if (deployment.getConfigDataFile() != null) {
+        // deployment != null to be sure (and because tests don't have a current deployment
+        if (deployment != null && deployment.getConfigDataFile() != null) {
             try {
                 // Default ordinal 200, read from config_ordinal within file.
                 result.add(new PropertiesConfigSource(deployment.getConfigDataFile().toURI().toURL(), 200));

@@ -18,6 +18,7 @@ package be.atbash.runtime.core.deployment;
 import be.atbash.runtime.core.data.WebAppClassLoader;
 import be.atbash.runtime.core.data.deployment.ArchiveContent;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.util.exception.AtbashUnexpectedException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public final class SnifferManager {
             return snifferClass.getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new AtbashUnexpectedException(e);
         }
     }
 

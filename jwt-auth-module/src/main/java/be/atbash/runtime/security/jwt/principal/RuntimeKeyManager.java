@@ -21,7 +21,9 @@ import be.atbash.ee.security.octopus.keys.KeyManager;
 import be.atbash.ee.security.octopus.keys.ListKeyManager;
 import be.atbash.ee.security.octopus.keys.reader.KeyReader;
 import be.atbash.ee.security.octopus.keys.reader.UnknownKeyResourceTypeException;
+import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
+import be.atbash.ee.security.octopus.keys.selector.filter.AsymmetricPartKeyFilter;
 import be.atbash.runtime.security.jwt.JWTAuthContextInfoProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -120,8 +122,8 @@ public class RuntimeKeyManager extends AbstractKeyManager implements KeyManager 
             List<AtbashKey> decryptionKeys = keyReader.tryToReadKeyResource(location, null);
             // Only add the private key as we have otherwise multiple public ones and TCK doesn't use key Ids and thus confusion which one.
             // And in general the public one is not needed as this location is for decryption, and thus by definition we need the private key.
-            // FIXME We need a filter for all private ones if we have http or JWK which can contain multiple.
-            keys.add(decryptionKeys.get(0));
+            AsymmetricPartKeyFilter keyFilter = new AsymmetricPartKeyFilter(AsymmetricPart.PRIVATE);
+            keys.addAll(keyFilter.filter(decryptionKeys));
         }
 
         keyManager = new ListKeyManager(keys);

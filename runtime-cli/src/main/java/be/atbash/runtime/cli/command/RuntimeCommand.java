@@ -37,7 +37,7 @@ public class RuntimeCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
 
-        throw new UnsupportedOperationException("Need to implmeent the start of the runtime through the CLI");
+        throw new UnsupportedOperationException("Need to implement the start of the runtime through the CLI");
 
     }
 
