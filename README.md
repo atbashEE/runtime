@@ -19,6 +19,17 @@ Current status
 
 **version 0.4**
 
+Powered By
+
+- Jetty : 11.0.11
+- Jersey : 3.0.4
+- Weld : 4.0.3
+- Picocli : 4.6.3
+- Jackson Databind : 2.13.3
+
+- Testcontainers : 1.17.2
+- MicroStream : 7.0
+
 Added Features
 
 - Packager for creating custom runtimes.
@@ -32,7 +43,6 @@ Added Features
 - Fix issue with `@Provider` when no JAX-RS resources in same package.
 
 - **version 0.3**
-
 
 Powered By
 

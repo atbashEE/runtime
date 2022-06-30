@@ -52,13 +52,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <junit.jupiter.version>5.8.2</junit.jupiter.version>
-        <assertj.version>3.22.0</assertj.version>
-        <slf4j.version>2.0.0-alpha1</slf4j.version> <!-- So that it is aligned with the Jetty version -->
+        <assertj.version>3.23.1</assertj.version>
+        <slf4j.version>2.0.0-alpha6</slf4j.version> <!-- So that it is aligned with the Jetty version -->
         <jersey.version>3.0.4</jersey.version>
-        <jetty.version>11.0.8</jetty.version>
+        <jetty.version>11.0.11</jetty.version>
         <jakarta.rest.api.version>3.0.0</jakarta.rest.api.version>
         <atbash.utils-se.version>1.1.0</atbash.utils-se.version>
-        <mockito.version>4.3.1</mockito.version>
+        <jackson.version>2.13.3</jackson.version>
+        <mockito.version>4.6.1</mockito.version>
 
         <license.skip>true</license.skip>
     </properties>
@@ -80,7 +81,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.13.1</version>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>be.atbash.json</groupId>
@@ -104,7 +105,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.13.1</version>
+                <version>${jackson.version}</version>
             </dependency>
 
             <dependency>

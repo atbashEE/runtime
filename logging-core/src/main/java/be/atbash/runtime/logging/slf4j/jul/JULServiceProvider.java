@@ -51,8 +51,8 @@ public class JULServiceProvider implements SLF4JServiceProvider {
     }
 
     @Override
-    public String getRequesteApiVersion() {
-        return "1.8"; //  "2.0.99"; slf4j-api:2.0.alpha1 still says API 1.7 and 1.8
+    public String getRequestedApiVersion() {
+        return "2.0.99";
     }
 
     @Override
