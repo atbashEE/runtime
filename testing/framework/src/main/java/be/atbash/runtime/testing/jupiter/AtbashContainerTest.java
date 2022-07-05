@@ -70,4 +70,12 @@ public @interface AtbashContainerTest {
      * @return true when JVM needs to be started in debug mode.
      */
     boolean debug() default false;
+
+    /**
+     * Defines a volume mapping between the host and the container in read-write mode. The array most always contain
+     * a multiple of 2 items. The first one is the directory on the host, the second in the container.
+     * An exception on the multiple of 2 is when there is only 1 but is an empty String
+     * @return Mapping pairs for the volume mapping.
+     */
+    String[] volumeMapping() default "";
 }

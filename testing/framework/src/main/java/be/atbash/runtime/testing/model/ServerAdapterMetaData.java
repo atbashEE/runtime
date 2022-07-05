@@ -19,6 +19,7 @@ import be.atbash.runtime.testing.config.Config;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ServerAdapterMetaData {
 
@@ -30,6 +31,8 @@ public class ServerAdapterMetaData {
     private boolean testStartupFailure;
     private String[] startupParameters;
     private boolean debugMode;
+
+    private Map<String, String> volumeMappings;
 
     private ServerAdapterMetaData() {
     }
@@ -68,6 +71,14 @@ public class ServerAdapterMetaData {
 
     public void setTestStartupFailure(boolean testStartupFailure) {
         this.testStartupFailure = testStartupFailure;
+    }
+
+    public Map<String, String> getVolumeMappings() {
+        return volumeMappings;
+    }
+
+    public void setVolumeMappings(Map<String, String> volumeMappings) {
+        this.volumeMappings = volumeMappings;
     }
 
     public static ServerAdapterMetaData parse(String data) {

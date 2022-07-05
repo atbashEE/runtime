@@ -98,7 +98,7 @@ In case the Dockerfile contains these lines
 
 [source]
 ----
-FROM runtime-main:0.3
+FROM runtime-main:0.4
 ...
 ----
 
@@ -124,6 +124,19 @@ The _<name>_ is already explained in the previous section. If not specified or `
 The _<version>_  determines the version of the docker image that is being used. If not specified, it is the version of the Test framework or the System property as indicated in previous section. But we can also define a version hardcoded in the string value and in that case this value is used. This version can contain a `-` itself when followed by `SNAPSHOT` or `RC`.
 
 The _<jdk>_ value indicates the JDK version of the Docker Image. When no value specified, the jdk11 image is used. There is also a JDK 17, 18 and 19 based image available.
+
+=== Volume mapping
+
+With the `volumeMapping` member, it is possible to define mappings of directories between the host running the test and the container.
+
+[source, java]
+----
+@AtbashContainerTest(volumeMapping = {"target/storage", "/opt/atbash/storage"})
+----
+
+The member accepts an array of Strings, but they always need to specified in pairs.  If not, a JUnit Assertion Exception will be thrown.
+
+Of each pair, the first one denotes the directory on the host.This can be an absolute or relative path against the directory used for running the test.  This path will be converted to an absolute path and together with the second path which denotes an absolute path within the container it is used to create a volume mapping.
 
 
 === Runtime Log

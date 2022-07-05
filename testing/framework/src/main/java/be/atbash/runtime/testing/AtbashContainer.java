@@ -21,8 +21,11 @@ import be.atbash.runtime.testing.utils.DockerImageProcessor;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.containers.Network;
+
+import java.util.Map;
 
 public class AtbashContainer extends AbstractContainer<AtbashContainer> {
 
@@ -43,6 +46,7 @@ public class AtbashContainer extends AbstractContainer<AtbashContainer> {
         super.configure();
 
         containerConfiguration(LOGGER, liveLogging);
+        defineVolumeMapping();
 
         int appStartTimeout = Config.getAppStartTimeout();
         if (adapterMetaData.isDebugMode()) {
@@ -64,6 +68,11 @@ public class AtbashContainer extends AbstractContainer<AtbashContainer> {
             withEnv("JVM_ARGS", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005");
             addFixedExposedPort(5005, 5005);
         }
+    }
+
+    private void defineVolumeMapping() {
+        adapterMetaData.getVolumeMappings()
+                .forEach((key, value) -> addFileSystemBind(key, value, BindMode.READ_WRITE));
     }
 
     @Override
