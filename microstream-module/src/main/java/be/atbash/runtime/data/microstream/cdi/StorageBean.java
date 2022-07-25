@@ -21,6 +21,9 @@ import be.atbash.runtime.data.microstream.exception.StorageTypeException;
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Default;
+import jakarta.enterprise.inject.spi.AnnotatedType;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.InjectionPoint;
 import one.microstream.reflect.XReflect;
 import one.microstream.storage.types.StorageManager;
 
@@ -38,12 +41,16 @@ import java.util.Set;
  */
 
 public class StorageBean<T> extends AbstractBean<T> {
+    private final BeanManager beanManager;
     private final Class<T> type;
     private final Set<Type> types;
+    private final Set<InjectionPoint> injectionPoints;
     private final Set<Annotation> qualifiers;
 
-    public StorageBean(Class<T> type) {
+    public StorageBean(BeanManager beanManager, Class<T> type, Set<InjectionPoint> injectionPoints) {
+        this.beanManager = beanManager;
         this.type = type;
+        this.injectionPoints = injectionPoints;
         types = Collections.singleton(type);
         qualifiers = new HashSet<>();
         qualifiers.add(new Default.Literal());
@@ -55,27 +62,41 @@ public class StorageBean<T> extends AbstractBean<T> {
         return type;
     }
 
+    @Override
+    public Set<InjectionPoint> getInjectionPoints() {
+        return injectionPoints;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public T create(CreationalContext<T> context) {
         StorageManager manager = getInstance(StorageManager.class);
         Object root = manager.root();
-        T entity;
+        T result;
         if (Objects.isNull(root)) {
             // When storage is empty, create and store the root
-            entity = XReflect.defaultInstantiate(type);
-            manager.setRoot(entity);
+            result = XReflect.defaultInstantiate(type);
+            manager.setRoot(result);
             manager.storeRoot();
         } else {
             if (this.type.isInstance(root)) {
-                entity = (T) root;
+                result = (T) root;
             } else {
                 throw new StorageTypeException(type, root.getClass());
                 // The type of @Storage does not match the one that is found in the storage by the Storage manager.
 
             }
         }
-        return entity;
+        injectDependencies(result);
+        return result;
+    }
+
+    private void injectDependencies(T root) {
+        AnnotatedType<T> type = (AnnotatedType<T>) beanManager.createAnnotatedType(root.getClass());
+        CreationalContext<T> context = beanManager.createCreationalContext(null);
+        beanManager.getInjectionTargetFactory(type)
+                .createInjectionTarget(this)
+                .inject(root, context);
     }
 
     @Override

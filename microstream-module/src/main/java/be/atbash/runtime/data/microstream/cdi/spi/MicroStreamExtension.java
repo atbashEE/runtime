@@ -27,8 +27,7 @@ import be.atbash.runtime.data.microstream.dirty.DirtyMarkerImpl;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.spi.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class MicroStreamExtension implements Extension {
@@ -36,6 +35,8 @@ public class MicroStreamExtension implements Extension {
     private static final Logger LOGGER = Logger.getLogger(MicroStreamExtension.class.getName());
 
     private final Set<Class<?>> storageRoot = new HashSet<>();
+
+    private final Map<Class<?>, Set<InjectionPoint>> storageInjectionPoints = new HashMap<>();
 
     private boolean moduleActive;
 
@@ -73,6 +74,18 @@ public class MicroStreamExtension implements Extension {
         }
     }
 
+    void collectInjectionsFromStorageBean(@Observes ProcessInjectionPoint<?, ?> pip) {
+        InjectionPoint ip = pip.getInjectionPoint();
+        if (ip.getBean() != null && ip.getBean()
+                .getBeanClass()
+                .getAnnotation(Storage.class) != null) {
+            storageInjectionPoints
+                    .computeIfAbsent(ip.getBean()
+                            .getBeanClass(), k -> new HashSet<>())
+                    .add(ip);
+        }
+    }
+
     void afterBeanDiscovery(@Observes AfterBeanDiscovery afterBeanDiscovery, BeanManager beanManager) {
         if (!moduleActive) {
             return;
@@ -86,8 +99,13 @@ public class MicroStreamExtension implements Extension {
         }
 
         if (!storageRoot.isEmpty()) {
+            Class<?> rootClass = storageRoot.iterator().next();
+            Set<InjectionPoint> injectionPoints = this.storageInjectionPoints.get(rootClass);
+            if (injectionPoints == null) {
+                injectionPoints = Collections.emptySet();
+            }
 
-            StorageBean<?> bean = new StorageBean<>(storageRoot.iterator().next());
+            StorageBean<?> bean = new StorageBean<>(beanManager, rootClass, injectionPoints);
             afterBeanDiscovery.addBean(bean);
         }
     }

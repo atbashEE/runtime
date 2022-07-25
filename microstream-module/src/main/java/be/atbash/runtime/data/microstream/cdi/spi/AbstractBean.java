@@ -36,12 +36,6 @@ public abstract class AbstractBean<T> implements Bean<T>, PassivationCapable {
         return CDI.current().select(clazz).get();
     }
 
-
-    @Override
-    public Set<InjectionPoint> getInjectionPoints() {
-        return Collections.emptySet();
-    }
-
     @Override
     public boolean isNullable() {
         return false;
