@@ -21,6 +21,7 @@ import jakarta.inject.Inject;
 import one.microstream.reference.Lazy;
 import one.microstream.storage.types.StorageManager;
 
+import java.util.ConcurrentModificationException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +54,7 @@ public class InstanceStorer {
                         // Re-interrupt the current thread to have proper cleanup.
                         Thread.currentThread().interrupt();
                     }
-                    storeChanged(data.getDirtyInstance(), data.isClearLazy());
+                    storeChangedWithRetry(data.getDirtyInstance(), data.isClearLazy());
                 } else {
                     try {
                         // TODO is there a better alternative for this busy waiting loop
@@ -73,7 +74,19 @@ public class InstanceStorer {
         pump.start();
     }
 
-    public void storeChanged(Object dirtyInstance, boolean clearLazy) {
+    public void storeChangedWithRetry(Object dirtyInstance, boolean clearLazy) {
+        try {
+            storeChanged(dirtyInstance, clearLazy);
+        } catch (ConcurrentModificationException e) {
+            // Due to the design of MicroStream, the Persister assumes a single threaded environment due to the usage of Iterator.
+            // If the application modifies a collection in the root that is also stored at the same time we have this exception
+            // Lets try again and see if it is successful. Under high load this retry might also fail and then @Store and DirtyMarker should not be
+            // used.
+            storeChanged(dirtyInstance, clearLazy);
+        }
+    }
+
+    private void storeChanged(Object dirtyInstance, boolean clearLazy) {
         if (dirtyInstance instanceof Lazy) {
             // When a Lazy is marked, the developer probably wants to store the referenced instance in the Lazy.
             Object instance = ((Lazy<?>) dirtyInstance).peek();

@@ -55,7 +55,7 @@ public class StoreInterceptor {
             if (store.asynchronous()) {
                 instanceStorer.queueForProcessing(new InstanceData(dirtyInstance, store.clearLazy()));
             } else {
-                instanceStorer.storeChanged(dirtyInstance, store.clearLazy());
+                instanceStorer.storeChangedWithRetry(dirtyInstance, store.clearLazy());
             }
         }
 
