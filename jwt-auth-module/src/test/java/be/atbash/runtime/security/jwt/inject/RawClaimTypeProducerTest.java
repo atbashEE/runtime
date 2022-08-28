@@ -16,14 +16,11 @@
 package be.atbash.runtime.security.jwt.inject;
 
 import jakarta.enterprise.inject.spi.InjectionPoint;
-import jakarta.enterprise.util.AnnotationLiteral;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonValue;
 import org.assertj.core.api.Assertions;
-import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.ClaimLiteral;
-import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

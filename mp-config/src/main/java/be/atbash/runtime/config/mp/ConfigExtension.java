@@ -17,7 +17,6 @@ package be.atbash.runtime.config.mp;
 
 import be.atbash.runtime.config.mp.inject.ConfigInjectionBean;
 import be.atbash.runtime.config.mp.inject.ConfigProducer;
-import be.atbash.runtime.config.mp.module.MPConfigModule;
 import be.atbash.runtime.config.mp.prefix.ConfigPropertiesProducer;
 import be.atbash.runtime.config.mp.prefix.TypesBeanAttributes;
 import be.atbash.runtime.config.mp.util.AnnotationUtil;

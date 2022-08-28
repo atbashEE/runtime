@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package be.atbash.runtime.core.data.deployment;
 
 /**
  * This is different from the Deployment/Undeployment Event. The Event says that an archive needs to be deployed/undeployed.
- *
+ * <p>
  * This listener is called when the deployment/undeployment is actually performed and successful.
- *
+ * <p>
  * Listeners are called in another thread, not the thread that performed the registration (so that handling can be done in
  * parallel)
  */

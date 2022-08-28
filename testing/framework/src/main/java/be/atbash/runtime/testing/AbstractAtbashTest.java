@@ -60,7 +60,7 @@ public class AbstractAtbashTest {
     protected WebTarget getClientWebTarget(AbstractContainer<?> container) {
         defineClient();
         // getContainerIpAddress and getMappedApplicationPort since we run this locally
-        return client.target("http://" + container.getContainerIpAddress() + ":" + container.getMappedApplicationPort());
+        return client.target("http://" + container.getHost() + ":" + container.getMappedApplicationPort());
     }
 
     /**
@@ -71,7 +71,7 @@ public class AbstractAtbashTest {
     protected WebTarget getClientWebTargetApplication(AbstractContainer<?> container) {
         defineClient();
         // getContainerIpAddress and getMappedApplicationPort since we run this locally
-        return client.target("http://" + container.getContainerIpAddress() + ":" + container.getMappedApplicationPort() + "/test");
+        return client.target("http://" + container.getHost() + ":" + container.getMappedApplicationPort() + "/test");
     }
 
     /**

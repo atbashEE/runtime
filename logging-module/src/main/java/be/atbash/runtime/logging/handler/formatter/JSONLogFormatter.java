@@ -27,7 +27,7 @@ import java.util.logging.*;
 
 /**
  * Class for converting a {@link LogRecord} to Json format.
- *
+ * <p>
  * Based on Payara code.
  */
 

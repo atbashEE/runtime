@@ -146,7 +146,7 @@ public final class ModuleManager {
             try {
                 allModulesStarted = new CountDownLatch(1);  // init the synchronizer.
                 if (traceModuleStartProcessing) {
-                    System.err.println(String.format("Requested Modules %s", String.join(",", requestedModules)));
+                    System.err.printf("Requested Modules %s%n", String.join(",", requestedModules));
                 }
                 findAndStartModules();
 
@@ -176,11 +176,11 @@ public final class ModuleManager {
 
     private void traceModuleStartProcessing(String step) {
         String threadName = Thread.currentThread().getName();
-        System.err.println(String.format("Trace Module start [%s] - allModulesStarted %s - numberOfStartsRunning %s - %s"
+        System.err.printf("Trace Module start [%s] - allModulesStarted %s - numberOfStartsRunning %s - %s%n"
                 , threadName
                 , allModulesStarted
                 , numberOfStartsRunning
-                , step));
+                , step);
 
     }
 

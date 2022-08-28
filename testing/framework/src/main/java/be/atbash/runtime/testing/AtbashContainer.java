@@ -25,8 +25,6 @@ import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.ContainerLaunchException;
 import org.testcontainers.containers.Network;
 
-import java.util.Map;
-
 public class AtbashContainer extends AbstractContainer<AtbashContainer> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AtbashContainer.class);

@@ -48,6 +48,18 @@ class ConfigInstanceUtilTest {
     public void captureOutputAndRestoreOutput() {
         System.out.flush();
         System.setOut(oldOut);
+
+        deleteDirectory(new File(TEST_DIRECTORY, "target/testconfig"));
+    }
+
+    private boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
     }
 
     @Test
@@ -85,7 +97,7 @@ class ConfigInstanceUtilTest {
 
     @Test
     public void test_ProcessConfigInstance_HappyCase() {
-        // This test fails when you run it a second time without clearing the target directory.
+
         ConfigInstance configInstance = new ConfigInstance(new File(TEST_DIRECTORY, "target/").getAbsolutePath(), "testconfig", false, true);
         ConfigInstanceUtil.processConfigInstance(configInstance);
 

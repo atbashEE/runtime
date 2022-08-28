@@ -27,7 +27,7 @@ import java.util.logging.Level;
 class AdditionalLogFieldsSupportTest {
 
     @AfterEach
-    private void teardown() {
+    public void teardown() {
         TestLogMessages.reset();
     }
 

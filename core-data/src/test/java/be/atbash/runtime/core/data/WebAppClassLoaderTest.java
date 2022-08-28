@@ -53,7 +53,7 @@ class WebAppClassLoaderTest {
 
     private String readStringFromURL(URL requestURL) throws IOException {
         try (Scanner scanner = new Scanner(requestURL.openStream(),
-                StandardCharsets.UTF_8.toString())) {
+                StandardCharsets.UTF_8)) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : "";
         }

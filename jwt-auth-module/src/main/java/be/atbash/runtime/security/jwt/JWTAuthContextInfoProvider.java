@@ -124,7 +124,7 @@ public class JWTAuthContextInfoProvider {
 
     /**
      * Interval for the keys from the locations.  The format is
-     *
+     * <p>
      * <v><unit>
      * <p>
      * * v : A positive integral number
@@ -140,7 +140,7 @@ public class JWTAuthContextInfoProvider {
      * When the key is not found, the locations are reread to see if the information is updated with rotating
      * key information.  To avoid constant reloading by malicious sources, this forced refresh is limited to the period specified
      * in this parameter.  The format is defined as
-     *
+     * <p>
      * <v><unit>
      * <p>
      * * v : A positive integral number

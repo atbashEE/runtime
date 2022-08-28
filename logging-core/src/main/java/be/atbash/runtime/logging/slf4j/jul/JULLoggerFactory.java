@@ -35,9 +35,9 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * JULLoggerFactory is an implementation of {@link ILoggerFactory} returning
  * the appropriately named {@link JULLoggerAdapter} instance.
- *
+ * <p>
  * Changed for Atbash Runtime
- *
+ * <p>
  * - Returns the JDK logger that also has a resourceBundle (if exists) with the name 'msg.<loggername>'.
  *
  * @author Ceki G&uuml;lc&uuml;

@@ -47,7 +47,6 @@ public class MainCLI {
             actualCommand.call();
         } catch (AtbashRuntimeException e) {
             // actually, this was just a way to jump to here :)
-            return;
         } catch (Exception e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }

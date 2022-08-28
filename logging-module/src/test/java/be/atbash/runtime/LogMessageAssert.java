@@ -174,7 +174,7 @@ public class LogMessageAssert extends AbstractAssert<LogMessageAssert, String> {
         String[] subParts = parts[4].split(";");
         for (String subPart : subParts) {
             if (subPart.startsWith("_TimeMillis")) {
-                Long timeMillis = Long.parseLong(subPart.split("=")[1]);
+                long timeMillis = Long.parseLong(subPart.split("=")[1]);
                 if (timeMillis < start.toInstant().toEpochMilli() || timeMillis > end.toInstant().toEpochMilli()) {
                     failWithMessage("Expected TimeMillis value on log message does not match");
                 }

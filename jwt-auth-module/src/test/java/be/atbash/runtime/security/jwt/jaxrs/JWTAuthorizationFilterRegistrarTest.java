@@ -34,7 +34,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 class JWTAuthorizationFilterRegistrarTest {

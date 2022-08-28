@@ -46,9 +46,7 @@ public class RuntimeApplicationEventListener implements ApplicationEventListener
             applicationPath = CurrentArchiveDeployment.getInstance().getCurrent().getDeploymentData(JerseyModuleConstant.APPLICATION_PATH);
             ResourceModel resourceModel = event.getResourceModel();
             final ResourceLogDetails logDetails = new ResourceLogDetails();
-            resourceModel.getResources().forEach((resource) -> {
-                logDetails.addEndpointLogLines(getLinesFromResource(resource));
-            });
+            resourceModel.getResources().forEach((resource) -> logDetails.addEndpointLogLines(getLinesFromResource(resource)));
 
             logDetails.log();
         }
@@ -120,9 +118,7 @@ public class RuntimeApplicationEventListener implements ApplicationEventListener
         private void log() {
             // FIXME Better logging indicating the
             StringBuilder sb = new StringBuilder("All endpoints for Jersey application\n");
-            logLines.forEach((line) -> {
-                sb.append(line).append("\n");
-            });
+            logLines.forEach((line) -> sb.append(line).append("\n"));
 
             LOGGER.info(sb.toString());
         }

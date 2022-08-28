@@ -464,7 +464,7 @@ public final class Converters {
                 return OptionalInt.empty();
             } else {
                 Integer converted = getDelegate().convert(value);
-                return converted == null ? OptionalInt.empty() : OptionalInt.of(converted.intValue());
+                return converted == null ? OptionalInt.empty() : OptionalInt.of(converted);
             }
         }
     }
@@ -481,7 +481,7 @@ public final class Converters {
                 return OptionalLong.empty();
             } else {
                 Long converted = getDelegate().convert(value);
-                return converted == null ? OptionalLong.empty() : OptionalLong.of(converted.longValue());
+                return converted == null ? OptionalLong.empty() : OptionalLong.of(converted);
             }
         }
     }
@@ -498,7 +498,7 @@ public final class Converters {
                 return OptionalDouble.empty();
             } else {
                 Double converted = getDelegate().convert(value);
-                return converted == null ? OptionalDouble.empty() : OptionalDouble.of(converted.doubleValue());
+                return converted == null ? OptionalDouble.empty() : OptionalDouble.of(converted);
             }
         }
     }

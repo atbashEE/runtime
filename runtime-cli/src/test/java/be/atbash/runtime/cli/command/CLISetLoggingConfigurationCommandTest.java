@@ -53,7 +53,7 @@ class CLISetLoggingConfigurationCommandTest {
     }
 
     @AfterEach
-    private void teardown() {
+    public void teardown() {
         TestLogMessages.reset();
         client.reset();
     }

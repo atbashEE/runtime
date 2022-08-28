@@ -22,7 +22,7 @@ import java.security.Principal;
 
 /**
  * A delegating JAX-RS SecurityContext that provides access to the JsonWebToken.
- *
+ * <p>
  * Based on SmallRye JWT.
  */
 public class JWTSecurityContext implements SecurityContext {

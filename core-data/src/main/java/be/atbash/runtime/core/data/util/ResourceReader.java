@@ -16,6 +16,7 @@
 package be.atbash.runtime.core.data.util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -29,13 +30,16 @@ public final class ResourceReader {
 
     public static String readResource(String location) throws IOException {
         InputStream stream = ResourceReader.class.getResourceAsStream(location);
+        if (stream == null) {
+            throw new FileNotFoundException("Unable to read resource " + location);
+        }
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
         for (int length; (length = stream.read(buffer)) != -1; ) {
             result.write(buffer, 0, length);
         }
         stream.close();
-        return result.toString(StandardCharsets.UTF_8.name());
+        return result.toString(StandardCharsets.UTF_8);
     }
 
     public static boolean existsResource(String location)  {
@@ -45,7 +49,7 @@ public final class ResourceReader {
 
     public static String readStringFromURL(URL requestURL) throws IOException {
         try (Scanner scanner = new Scanner(requestURL.openStream(),
-                StandardCharsets.UTF_8.toString())) {
+                StandardCharsets.UTF_8)) {
             scanner.useDelimiter("\\A");
             return scanner.hasNext() ? scanner.next() : "";
         }
