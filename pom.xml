@@ -34,7 +34,7 @@
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
             <comments>A business-friendly OSS license</comments>
         </license>
@@ -43,7 +43,7 @@
     <scm>
         <connection>scm:git:git://github.com/atbashEE/runtime.git</connection>
         <developerConnection>scm:git:ssh://github.com/atbashEE/runtime.git</developerConnection>
-        <url>http://github.com/atbashEE/atbash-utils/tree/master</url>
+        <url>https://github.com/atbashEE/runtime/tree/main</url>
     </scm>
 
     <properties>
@@ -51,15 +51,15 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <junit.jupiter.version>5.8.2</junit.jupiter.version>
+        <junit.jupiter.version>5.9.0</junit.jupiter.version>
         <assertj.version>3.23.1</assertj.version>
         <slf4j.version>2.0.0-alpha6</slf4j.version> <!-- So that it is aligned with the Jetty version -->
-        <jersey.version>3.0.4</jersey.version>
+        <jersey.version>3.0.6</jersey.version>
         <jetty.version>11.0.11</jetty.version>
         <jakarta.rest.api.version>3.0.0</jakarta.rest.api.version>
         <atbash.utils-se.version>1.1.0</atbash.utils-se.version>
         <jackson.version>2.13.3</jackson.version>
-        <mockito.version>4.6.1</mockito.version>
+        <mockito.version>4.7.0</mockito.version>
 
         <license.skip>true</license.skip>
     </properties>
@@ -86,7 +86,7 @@
             <dependency>
                 <groupId>be.atbash.json</groupId>
                 <artifactId>octopus-json-smart</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.1</version>
             </dependency>
 
             <dependency>
