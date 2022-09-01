@@ -65,7 +65,6 @@
         <dependency>
             <groupId>be.atbash.runtime</groupId>
             <artifactId>microstream-api</artifactId>
-            <version>0.4-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

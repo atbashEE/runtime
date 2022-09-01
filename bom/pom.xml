@@ -89,6 +89,13 @@
                 <version>2.0</version>
                 <scope>provided</scope>
             </dependency>
+
+            <dependency>
+                <groupId>be.atbash.runtime</groupId>
+                <artifactId>microstream-api</artifactId>
+                <version>${project.parent.version}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
