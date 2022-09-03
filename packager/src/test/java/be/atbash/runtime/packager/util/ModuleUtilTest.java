@@ -50,13 +50,13 @@ class ModuleUtilTest {
 
         Set<Module> moduleSet = ModuleUtil.determineModules("jersey", modules);
 
-        Assertions.assertThat(moduleSet).hasSize(required.size() + 3);
-        //+3 -> jersey, jetty and jersey-weld
+        Assertions.assertThat(moduleSet).hasSize(required.size() + 2);
+        //+2 -> jersey, jetty
 
         required.forEach(moduleSet::remove);
 
         List<String> names = moduleSet.stream().map(Module::getName).collect(Collectors.toList());
-        Assertions.assertThat(names).containsExactlyInAnyOrderElementsOf(List.of("jersey", "jetty", "jersey-weld"));
+        Assertions.assertThat(names).containsExactlyInAnyOrderElementsOf(List.of("jersey", "jetty"));
     }
 
     @Test
@@ -68,12 +68,12 @@ class ModuleUtilTest {
 
         Set<Module> moduleSet = ModuleUtil.determineModules("jersey   , jetty", modules);
 
-        Assertions.assertThat(moduleSet).hasSize(required.size() + 3);
+        Assertions.assertThat(moduleSet).hasSize(required.size() + 2);
 
         required.forEach(moduleSet::remove);
 
         List<String> names = moduleSet.stream().map(Module::getName).collect(Collectors.toList());
-        Assertions.assertThat(names).containsExactlyInAnyOrderElementsOf(List.of("jersey", "jetty", "jersey-weld"));
+        Assertions.assertThat(names).containsExactlyInAnyOrderElementsOf(List.of("jersey", "jetty"));
     }
 
     @Test

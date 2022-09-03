@@ -94,7 +94,7 @@ public final class MavenCreator {
         pomFile.setPackaging("jar");
 
         // As the first dependency to force the correct version.
-        mavenHelper.addDependency(pomFile, "org.slf4j", "slf4j-api", "2.0.0-alpha1");
+        mavenHelper.addDependency(pomFile, "org.slf4j", "slf4j-api", "2.0.0-alpha6");
 
         mavenHelper.addDependency(pomFile, "be.atbash.runtime", "runtime-main", version, List.of("*:*"));
         // The next one is required due to the exclusion of *:*  But it also excludes all modules from runtime-main itself (the main packaging)

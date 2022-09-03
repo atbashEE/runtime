@@ -22,7 +22,7 @@ import java.util.Set;
 
 public class PackagerOptions {
 
-    @CommandLine.Option(names = {"-r", "--root"}, required = true, description = "Location of the Atbash runtime installation, current directory by default")
+    @CommandLine.Option(names = {"-r", "--root"}, required = true, description = "Location where the project will be generated to build custom version.")
     private File targetDirectory;
 
     @CommandLine.Option(names = {"-m", "--modules"}, required = true, description = "Comma separated list of modules that needs to be included.")

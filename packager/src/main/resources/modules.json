@@ -32,7 +32,7 @@
   {
     "name": "jersey-weld",
     "artifactId": "jersey-weld-module",
-    "required": false,
+    "required": true,
     "dependencies": [
     ]
   },
@@ -53,6 +53,26 @@
       "jersey",
       "jetty"
 
+    ]
+  },
+  {
+    "name": "jwt-auth",
+    "artifactId": "jwt-auth-module",
+    "required": false,
+    "dependencies": [
+      "jersey",
+      "jetty",
+      "mp-config"
+    ]
+  },
+  {
+    "name": "microstream",
+    "artifactId": "microstream-module",
+    "required": false,
+    "dependencies": [
+      "jersey",
+      "jetty",
+      "mp-config"
     ]
   },
   {
