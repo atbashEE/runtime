@@ -19,10 +19,12 @@ java -jar atbash-packager.jar -r <path> -a <artifact> -m <modules>
 
 -a/--artifact: Name of the custom packaging. It will be the name of the zip file that is created when you execute the generated project and also the name of the main executable jar file.
 
--main/--modules: A comma separated list of modules names that must be included in the packaging. The supported module names are
+-m/--modules: A comma separated list of modules names that must be included in the packaging. The supported module names are
 
 * jetty: Handles user requests and provides Servlet Specification
 * jersey: Brings the JAX-RS support but also the JSON-P and JSON-B
 * mp-config: Brings in the MicroProfile Config support.
+* jwt-auth: Brings in the MicroProfile JWT Authentication support.
+* microstream: Brings in the MicroStream support.
 
 The modules for the core, configuration, logging, and CDI (Weld) are always included.

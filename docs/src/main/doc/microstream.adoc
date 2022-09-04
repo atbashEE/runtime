@@ -2,7 +2,7 @@
 
 === Activation
 
-This module is not active by default as it is not art of the Jakarta Core Profile.  You can activate it in two ways
+This module is not active by default as it is not part of the Jakarta Core Profile.  You can activate it in two ways
 
 - -m +microstream
 - -p all
@@ -53,6 +53,23 @@ Storing will happen by default in a separate thread, asynchronous. If you do not
 When you have marked a Lazy reference, it will be cleared by the interceptor unless you specify the value _false_ for the member.
 
 You do not need to use the `@Store` annotation.  At the end of the request, all objects that are marked will be stored anyway, asynchronous and when it is a Lazy reference it will also be cleared.
+
+=== Customizer and Initializer
+
+The _StorageManager_ configuration and Root object can be customized and initialized.
+
+When you define one or more CDI beans that implement the  `EmbeddedStorageFoundationCustomizer` interface, the code within the `customize` method will be executed after the _EmbeddedStorageFoundation_ is created based on the values found in the configuration.
+
+The initial data of the root object can be added when you define a CDI bean that implements `StorageManagerInitializer` interface.  The `initialize` method is called just before the StorageManager object is handed over to the CDI container.
+
+Depending on the fact if you have defined a class with `@Storage` , the root object will always be available (when you have used the annotation) or only when there are already data in the storage.
+
+These are the steps that are performed
+
+- Create the _EmbeddedStorageFoundation_  based on the configuration values
+- Execute the customizer, CDI beans having _EmbeddedStorageFoundationCustomizer_ interface.
+- Start the Storage Manager
+- Execute the initializers, CDI beans having _StorageManagerInitializer_ interface.
 
 === Limitations
 

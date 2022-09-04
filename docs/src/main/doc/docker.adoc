@@ -6,7 +6,7 @@ A Docker image is available to run the Atbash Runtime containerized.  It is base
 
 [source]
 ----
-FROM runtime-main:0.3-SNAPSHOT
+FROM runtime-main:0.4
 COPY myservice.war $DEPLOYMENT_DIR
 ----
 

@@ -36,7 +36,7 @@ Added Features
 - Support for _microprofile-config.properties_ files at alternative locations.
 - `Sniffer` is no longer a singleton but instantiated for each deployment.
 - Implementation of MicroProfile JWT specification (use profile _all_ or module mpjwt) but in a multi-tenancy way (as it should for microservices).  So it does not pass all TCK tests (95% is achieved)
-- Experimental integration of MicroStream StorageManager (use profile _all_ or module microstream).
+- Experimental integration of MicroStream StorageManager (use profile _all_ or module _microstream_).
 - Possibility to define a volume mapping for the container running the test (within testing framework)
 - BOM, core-api and full-api artifacts to use in your application.
 
