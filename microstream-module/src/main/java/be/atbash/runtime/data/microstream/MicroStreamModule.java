@@ -16,6 +16,7 @@
 package be.atbash.runtime.data.microstream;
 
 import be.atbash.runtime.config.mp.module.MPConfigModule;
+import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.module.Module;
@@ -29,15 +30,21 @@ import jakarta.enterprise.inject.spi.CDI;
 import java.util.Collections;
 import java.util.List;
 
+import static be.atbash.runtime.config.mp.MPConfigModuleConstant.ENABLED_FORCED;
+import static be.atbash.runtime.config.mp.module.MPConfigModule.MP_CONFIG_MODULE_NAME;
 
-public class MicroStreamModule implements Module<Void> {
+
+public class MicroStreamModule implements Module<RuntimeConfiguration> {
 
     public static final String MICROSTREAM_MODULE_NAME = "microstream";
+
+    private RuntimeConfiguration configuration;
 
     @Override
     public String name() {
         return MICROSTREAM_MODULE_NAME;
     }
+
 
     @Override
     public String[] dependencies() {
@@ -77,9 +84,21 @@ public class MicroStreamModule implements Module<Void> {
         ExtraPackagesUtil.addPackages(deployment, "be.atbash.runtime.data.microstream.jaxrs");
     }
 
+    @Override
+    public Class<RuntimeConfiguration> getModuleConfigClass() {
+        return RuntimeConfiguration.class;
+    }
+
+    @Override
+    public void setConfig(RuntimeConfiguration configuration) {
+        this.configuration = configuration;
+    }
 
     @Override
     public void run() {
+        // We force that MPConfig module is always active .
+        configuration.getConfig().getModules().writeConfigValue(MP_CONFIG_MODULE_NAME, ENABLED_FORCED, "true");
+
     }
 
     @Override

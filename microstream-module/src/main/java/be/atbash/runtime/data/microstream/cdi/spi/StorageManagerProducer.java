@@ -17,13 +17,17 @@
 package be.atbash.runtime.data.microstream.cdi.spi;
 
 
+import be.atbash.runtime.data.microstream.config.EmbeddedStorageFoundationCustomizer;
+import be.atbash.runtime.data.microstream.config.StorageManagerInitializer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Disposes;
+import jakarta.enterprise.inject.Instance;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 import one.microstream.reflect.ClassLoaderProvider;
 import one.microstream.storage.embedded.configuration.types.EmbeddedStorageConfigurationBuilder;
 import one.microstream.storage.embedded.types.EmbeddedStorageFoundation;
+import one.microstream.storage.embedded.types.EmbeddedStorageManager;
 import one.microstream.storage.types.StorageManager;
 import org.eclipse.microprofile.config.Config;
 
@@ -40,6 +44,15 @@ class StorageManagerProducer {
 
     @Inject
     private Config config;
+
+    @Inject
+    private MicroStreamExtension storageExtension;
+
+    @Inject
+    private Instance<EmbeddedStorageFoundationCustomizer> customizers;
+
+    @Inject
+    private Instance<StorageManagerInitializer> initializers;
 
     @Produces
     @ApplicationScoped
@@ -63,10 +76,23 @@ class StorageManagerProducer {
         embeddedStorageFoundation.onConnectionFoundation(cf -> cf.setClassLoaderProvider(ClassLoaderProvider.New(
                 Thread.currentThread().getContextClassLoader())));
 
-        return embeddedStorageFoundation.start();
+        customizers.stream()
+                .forEach(customizer -> customizer.customize(embeddedStorageFoundation));
+
+        EmbeddedStorageManager storageManager = embeddedStorageFoundation.start();
+
+        if (!storageExtension.hasStorageRoot())
+        {
+            // Only execute at this point when no storage root bean has defined with @Storage
+            // Initializers are called from StorageBean.create if user has defined @Storage and root is read.
+            initializers.stream()
+                    .forEach(initializer -> initializer.initialize(storageManager));
+        }
+
+        return storageManager;
     }
 
-    public void dispose(@Disposes final StorageManager manager) {
+    public void dispose(@Disposes StorageManager manager) {
         LOGGER.info("Closing the default StorageManager");
         manager.close();
     }

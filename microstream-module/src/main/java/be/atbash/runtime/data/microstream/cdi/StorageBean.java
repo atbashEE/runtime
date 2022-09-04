@@ -17,11 +17,13 @@ package be.atbash.runtime.data.microstream.cdi;
 
 
 import be.atbash.runtime.data.microstream.cdi.spi.AbstractBean;
+import be.atbash.runtime.data.microstream.config.StorageManagerInitializer;
 import be.atbash.runtime.data.microstream.exception.StorageTypeException;
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.spi.AnnotatedType;
+import jakarta.enterprise.inject.spi.Bean;
 import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import one.microstream.reflect.XReflect;
@@ -88,6 +90,17 @@ public class StorageBean<T> extends AbstractBean<T> {
             }
         }
         injectDependencies(result);
+
+        Set<Bean<?>> initializerBeans = beanManager.getBeans(StorageManagerInitializer.class);
+        for (Bean<?> initializerBean : initializerBeans)
+        {
+            StorageManagerInitializer initializer = (StorageManagerInitializer) beanManager.getReference(initializerBean
+                    , initializerBean.getBeanClass()
+                    , beanManager.createCreationalContext(initializerBean));
+
+            initializer.initialize(manager);
+        }
+
         return result;
     }
 

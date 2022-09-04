@@ -126,4 +126,10 @@ public class MicroStreamExtension implements Extension {
         event.addAnnotatedType(beanManager.createAnnotatedType(type), id);
     }
 
+    public boolean hasStorageRoot()
+    {
+        return !storageRoot.isEmpty();
+    }
+
+
 }
