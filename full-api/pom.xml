@@ -22,7 +22,7 @@
     <parent>
         <groupId>be.atbash.runtime</groupId>
         <artifactId>parent</artifactId>
-        <version>0.4-SNAPSHOT</version>
+        <version>0.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -36,7 +36,7 @@
             <dependency>
                 <groupId>be.atbash.runtime.api</groupId>
                 <artifactId>bom</artifactId>
-                <version>0.4-SNAPSHOT</version>
+                <version>0.4</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>be.atbash.runtime.api</groupId>
             <artifactId>core-api</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.4</version>
         </dependency>
 
         <dependency>
@@ -86,6 +86,33 @@
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
                             <createSourcesJar>true</createSourcesJar>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- we need a Javadoc and sources artificate for Maven Central -->
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>javadoc-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>javadoc</classifier>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>sources-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>sources</classifier>
                         </configuration>
                     </execution>
                 </executions>
