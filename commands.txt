@@ -39,7 +39,7 @@ mvn clean install -PlicenseCheck
 
 
 # Setting versions
-mvn versions:set -DnewVersion=0.4 -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=0.4.1-SNAPSHOT -DgenerateBackupPoms=false
 
 # Run application with defaults
 java -jar target/atbash-runtime.jar <path-to>/<application>.war
