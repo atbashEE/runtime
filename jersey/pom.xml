@@ -83,7 +83,7 @@
         <!-- JSON-B Support -->
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
+            <artifactId>jersey-media-json-binding</artifactId>
             <version>${jersey.version}</version>
         </dependency>
 

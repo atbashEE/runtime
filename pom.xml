@@ -54,11 +54,12 @@
         <junit.jupiter.version>5.9.0</junit.jupiter.version>
         <assertj.version>3.23.1</assertj.version>
         <slf4j.version>2.0.0-alpha6</slf4j.version> <!-- So that it is aligned with the Jetty version -->
-        <jersey.version>3.0.6</jersey.version>
+        <jersey.version>3.0.8</jersey.version>
         <jetty.version>11.0.11</jetty.version>
         <jakarta.rest.api.version>3.0.0</jakarta.rest.api.version>
         <atbash.utils-se.version>1.1.0</atbash.utils-se.version>
-        <jackson.version>2.13.3</jackson.version>
+        <yasson.version>2.0.4</yasson.version> <!-- within runtime -->
+        <jackson.version>2.13.3</jackson.version> <!-- within CLI -->
         <mockito.version>4.7.0</mockito.version>
 
         <license.skip>true</license.skip>

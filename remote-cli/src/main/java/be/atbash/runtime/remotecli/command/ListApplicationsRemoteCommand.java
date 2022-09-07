@@ -20,8 +20,11 @@ import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.deployment.monitor.ApplicationInfo;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import be.atbash.util.exception.AtbashUnexpectedException;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.JsonbException;
 
 import java.util.Map;
 
@@ -34,20 +37,24 @@ public class ListApplicationsRemoteCommand implements ServerRemoteCommand {
 
         RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
 
-        ObjectMapper mapper = new ObjectMapper();
-        if (runData.getDeployments().isEmpty()) {
-            result.addData(" RC-102 ", "No applications deployed");  // FIXME not really an error/info message but it is helpful I guess
-        } else {
-            runData.getDeployments()
-                    .forEach(ad -> {
-                        try {
-                            ApplicationInfo info = new ApplicationInfo(ad);
-                            result.addData(ad.getDeploymentName(), mapper.writeValueAsString(info));
-                        } catch (JsonProcessingException e) {
-                            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
-                        }
-                    });
-            result.addData(CLASS_INFO_MARKER, ApplicationInfo.class.getName());
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig())) {
+
+            if (runData.getDeployments().isEmpty()) {
+                result.addData(" RC-102 ", "No applications deployed");  // FIXME not really an error/info message but it is helpful I guess
+            } else {
+                runData.getDeployments()
+                        .forEach(ad -> {
+                            try {
+                                ApplicationInfo info = new ApplicationInfo(ad);
+                                result.addData(ad.getDeploymentName(), jsonb.toJson(info));
+                            } catch (JsonbException e) {
+                                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+                            }
+                        });
+                result.addData(CLASS_INFO_MARKER, ApplicationInfo.class.getName());
+            }
+        } catch (Exception e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
         return result;
     }

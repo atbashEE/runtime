@@ -17,6 +17,26 @@ Details:
 
 Current status
 
+**version 0.4.1**
+
+Powered By
+
+- Jetty : 11.0.11
+- Jersey : 3.0.4
+- Weld : 4.0.3
+- Yasson : 2.0.4
+- Picocli : 4.6.3
+
+- Testcontainers : 1.17.2
+- MicroStream : 7.0
+
+
+Added Features
+
+Fixes
+
+- Removed Jackson from Runtime as we have already Yasson. (This might lead to changed JSON structure like different order of properties and not having null properties but data is identical)
+
 **version 0.4**
 
 Powered By

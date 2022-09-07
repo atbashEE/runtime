@@ -16,10 +16,13 @@
 package be.atbash.runtime.remotecli;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.remotecli.command.*;
 import be.atbash.runtime.remotecli.exception.IncorrectContentTypeWithCommandException;
 import be.atbash.runtime.remotecli.exception.UnknownCommandException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -114,8 +117,14 @@ public class DomainHandler extends AbstractHandler {
             LOGGER.warn("RC-011", remoteCommand.getClass().getName(), errorMessage);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        response.getOutputStream().println(mapper.writeValueAsString(result));
+        String json;
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig())) {
+            json = jsonb.toJson(result);
+        } catch (Exception e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        }
+
+        response.getOutputStream().println(json);
     }
 
     private Map<String, String> retrieveOptionsFromURL(HttpServletRequest request) {
