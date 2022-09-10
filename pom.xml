@@ -51,7 +51,9 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <junit.jupiter.version>5.9.0</junit.jupiter.version>
+        <!-- Keep in sync with JUnit version of testcontainers to have no issues when using testing framework-->
+        <junit.jupiter.version>5.8.2</junit.jupiter.version>
+
         <assertj.version>3.23.1</assertj.version>
         <slf4j.version>2.0.0-alpha6</slf4j.version> <!-- So that it is aligned with the Jetty version -->
         <jersey.version>3.0.8</jersey.version>
@@ -115,6 +117,14 @@
                 <version>3.0.1</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -123,8 +133,7 @@
         <!-- testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
 

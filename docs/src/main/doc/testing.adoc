@@ -25,6 +25,8 @@ Add the following dependency to your project.
     </dependency>
 ----
 
+Note that the JUnit5 dependency is brought into your project as a transitive dependency from this testing framework dependency. It is the same version as the one used by TestContainers.
+
 And create a class that extends from `be.atbash.runtime.testing.AbstractAtbashTest` and annotate it with `@AtbashContainerTest`.
 
 [source,java]
