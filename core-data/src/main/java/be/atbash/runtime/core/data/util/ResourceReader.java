@@ -15,44 +15,42 @@
  */
 package be.atbash.runtime.core.data.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
+import be.atbash.util.resource.ResourceUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
+import java.util.List;
 
+/**
+ * Centralised access to the ResourceUtil class from utils-se library.
+ */
 public final class ResourceReader {
+
+    private static final ResourceUtil resourceUtil = ResourceUtil.getInstance();
 
     private ResourceReader() {
     }
 
     public static String readResource(String location) throws IOException {
-        InputStream stream = ResourceReader.class.getResourceAsStream(location);
-        if (stream == null) {
-            throw new FileNotFoundException("Unable to read resource " + location);
-        }
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        for (int length; (length = stream.read(buffer)) != -1; ) {
-            result.write(buffer, 0, length);
-        }
-        stream.close();
-        return result.toString(StandardCharsets.UTF_8);
+        return resourceUtil.getContent(location);
     }
 
-    public static boolean existsResource(String location)  {
-        URL resourceURL = ResourceReader.class.getResource(location);
-        return resourceURL != null;
+    public static InputStream getStream(String location) throws IOException {
+        return resourceUtil.getStream(location);
+    }
+
+    public static List<URI> getResources(String location) {
+        return resourceUtil.getResources(location);
+    }
+
+    public static boolean existsResource(String location) {
+        return resourceUtil.resourceExists(location);
     }
 
     public static String readStringFromURL(URL requestURL) throws IOException {
-        try (Scanner scanner = new Scanner(requestURL.openStream(),
-                StandardCharsets.UTF_8)) {
-            scanner.useDelimiter("\\A");
-            return scanner.hasNext() ? scanner.next() : "";
-        }
+        return resourceUtil.getContent(requestURL.toExternalForm());
     }
 
 }

@@ -22,11 +22,13 @@ import be.atbash.runtime.core.data.util.ResourceReader;
 import java.io.IOException;
 import java.util.Map;
 
+import static be.atbash.util.resource.ResourceUtil.CLASSPATH_PREFIX;
+
 public class TemplateEngine {
 
     public void processTemplateFile(String directory, String templateFileName, String fileName,
                                     Map<String, String> variables) {
-        String templateContent = readTemplateFile("/templates/" + templateFileName);
+        String templateContent = readTemplateFile(CLASSPATH_PREFIX + "templates/" + templateFileName);
         String content = resolveVariables(templateContent, variables);
 
         FileCreator fileCreator = new FileCreator();

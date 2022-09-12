@@ -19,6 +19,7 @@ package be.atbash.runtime.security.jwt;
 import be.atbash.config.exception.ConfigurationException;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.util.PeriodUtil;
+import be.atbash.runtime.core.data.util.ResourceReader;
 import be.atbash.runtime.core.data.util.SystemPropertyUtil;
 import be.atbash.runtime.security.jwt.principal.JWTAuthContextInfo;
 import be.atbash.util.resource.ResourceUtil;
@@ -237,12 +238,12 @@ public class JWTAuthContextInfoProvider {
                     result.add(resolvedVerifyKeyLocation);
                 } else {
                     // File or classpath, let us check if it exists.
-                    if (ResourceUtil.getInstance().resourceExists(resolvedVerifyKeyLocation)) {
+                    if (ResourceReader.existsResource(resolvedVerifyKeyLocation)) {
                         result.add(resolvedVerifyKeyLocation);
                     } else {
                         // See if we can find it within classpath.
                         String classpathResource = getClassPathResource(resolvedVerifyKeyLocation);
-                        if (ResourceUtil.getInstance().resourceExists(classpathResource)) {
+                        if (ResourceReader.existsResource(classpathResource)) {
                             result.add(classpathResource);
                         } else {
                             // Nope, not found, log the message.

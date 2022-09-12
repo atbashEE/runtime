@@ -15,7 +15,7 @@
  */
 package be.atbash.runtime.config.mp.sources;
 
-import be.atbash.util.resource.ResourceUtil;
+import be.atbash.runtime.core.data.util.ResourceReader;
 import org.eclipse.microprofile.config.spi.ConfigSource;
 
 import java.io.FileNotFoundException;
@@ -53,8 +53,6 @@ import java.util.List;
  */
 public abstract class AbstractLocationConfigSourceLoader {
 
-    private final ResourceUtil resourceUtil = ResourceUtil.getInstance();
-
     /**
      * Loads a {@link ConfigSource} from an {@link URL}. Implementations must construct the {@link ConfigSource} to
      * load.
@@ -73,7 +71,7 @@ public abstract class AbstractLocationConfigSourceLoader {
 
         List<ConfigSource> configSources = new ArrayList<>();
         for (String location : locations) {
-            List<URI> resources = resourceUtil.getResources(location);
+            List<URI> resources = ResourceReader.getResources(location);
             for (URI resource : resources) {
                 ConfigSource mainSource = addConfigSource(resource, ordinal, configSources);
                 configSources.addAll(tryProfiles(resource, mainSource));

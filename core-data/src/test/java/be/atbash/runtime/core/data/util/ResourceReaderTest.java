@@ -20,21 +20,23 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static be.atbash.util.resource.ResourceUtil.CLASSPATH_PREFIX;
+
 class ResourceReaderTest {
 
     @Test
     void readResource() throws IOException {
-        String text = ResourceReader.readResource("/test.txt");
+        String text = ResourceReader.readResource(CLASSPATH_PREFIX + "test.txt");
         Assertions.assertThat(text).isEqualTo("The content of the resource");
     }
 
     @Test
     void existsResource() {
-        Assertions.assertThat(ResourceReader.existsResource("/test.txt")).isTrue();
+        Assertions.assertThat(ResourceReader.existsResource(CLASSPATH_PREFIX + "test.txt")).isTrue();
     }
 
     @Test
     void existsResource_nonExisting() {
-        Assertions.assertThat(ResourceReader.existsResource("/someRandomFile.txt")).isFalse();
+        Assertions.assertThat(ResourceReader.existsResource(CLASSPATH_PREFIX + "someRandomFile.txt")).isFalse();
     }
 }

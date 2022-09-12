@@ -59,7 +59,7 @@
         <jersey.version>3.0.8</jersey.version>
         <jetty.version>11.0.11</jetty.version>
         <jakarta.rest.api.version>3.0.0</jakarta.rest.api.version>
-        <atbash.utils-se.version>1.1.0</atbash.utils-se.version>
+        <atbash.utils-se.version>1.2.0-SNAPSHOT</atbash.utils-se.version>
         <yasson.version>2.0.4</yasson.version> <!-- within runtime -->
         <jackson.version>2.13.3</jackson.version> <!-- within CLI -->
         <mockito.version>4.7.0</mockito.version>

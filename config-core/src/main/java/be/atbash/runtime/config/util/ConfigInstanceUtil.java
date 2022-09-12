@@ -29,6 +29,7 @@ import java.nio.file.Files;
 
 import static be.atbash.runtime.config.RuntimeConfigConstants.CONFIG_FILE;
 import static be.atbash.runtime.config.RuntimeConfigConstants.DEFAULT_CONFIG_FILE;
+import static be.atbash.util.resource.ResourceUtil.CLASSPATH_PREFIX;
 
 public final class ConfigInstanceUtil {
 
@@ -125,7 +126,7 @@ public final class ConfigInstanceUtil {
         } else {
             targetFile = "/logging.properties";
         }
-        String loggingConfigFile = writeFile(configInstance, "/logging.properties", targetFile, configInstance.isStateless());
+        String loggingConfigFile = writeFile(configInstance, CLASSPATH_PREFIX + "logging.properties", targetFile, configInstance.isStateless());
         configInstance.setLoggingConfigurationFile(loggingConfigFile);
     }
 

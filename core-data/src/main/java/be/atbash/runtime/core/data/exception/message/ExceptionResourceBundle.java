@@ -16,9 +16,11 @@
 package be.atbash.runtime.core.data.exception.message;
 
 import be.atbash.runtime.core.data.exception.UnexpectedException;
+import be.atbash.runtime.core.data.util.ResourceReader;
 import be.atbash.util.resource.ResourceUtil;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,10 +77,12 @@ class ExceptionResourceBundle extends ResourceBundle {
     }
 
     private void addResourceBundle(String moduleName, String path, Map<String, ResourceBundle> bundles) {
-        if (ResourceUtil.getInstance().resourceExists(path)) {
+        if (ResourceReader.existsResource(path)) {
             PropertyResourceBundle bundle;
             try {
-                bundle = new PropertyResourceBundle(ResourceUtil.getInstance().getStream(path));
+                InputStream inputStream = ResourceReader.getStream(path);
+                bundle = new PropertyResourceBundle(inputStream);
+                inputStream.close();
             } catch (IOException e) {
                 throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }

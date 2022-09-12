@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static be.atbash.util.resource.ResourceUtil.CLASSPATH_PREFIX;
+
 public final class ModuleUtil {
 
     private ModuleUtil() {
@@ -34,7 +36,7 @@ public final class ModuleUtil {
     public static List<Module> loadModuleInformation() {
         String content;
         try {
-            content = ResourceReader.readResource("/modules.json");
+            content = ResourceReader.readResource(CLASSPATH_PREFIX + "modules.json");
         } catch (IOException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
