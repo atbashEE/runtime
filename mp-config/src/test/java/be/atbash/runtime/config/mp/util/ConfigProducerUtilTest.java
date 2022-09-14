@@ -15,7 +15,7 @@
  */
 package be.atbash.runtime.config.mp.util;
 
-import be.atbash.runtime.config.mp.ConfigValueImpl;
+import be.atbash.config.mp.ConfigValueImpl;
 import be.atbash.runtime.config.mp.inject.ConfigPropertyLiteral;
 import be.atbash.runtime.config.mp.util.testclass.SomeClass;
 import jakarta.enterprise.inject.spi.AnnotatedMember;
@@ -36,8 +36,8 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static be.atbash.runtime.config.mp.converter.Converters.INTEGER_CONVERTER;
-import static be.atbash.runtime.config.mp.converter.Converters.STRING_CONVERTER;
+import static be.atbash.config.mp.converter.Converters.INTEGER_CONVERTER;
+import static be.atbash.config.mp.converter.Converters.STRING_CONVERTER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 

@@ -15,7 +15,7 @@
  */
 package be.atbash.runtime.config.mp.inject;
 
-import be.atbash.runtime.config.mp.AtbashConfig;
+import be.atbash.config.mp.AtbashConfig;
 import be.atbash.runtime.config.mp.util.ConfigProducerUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Dependent;

@@ -15,13 +15,11 @@
  */
 package be.atbash.runtime.config.mp.util;
 
-import jakarta.annotation.Priority;
 import jakarta.enterprise.inject.spi.Annotated;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import org.eclipse.microprofile.config.inject.ConfigProperties;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 
 import static org.eclipse.microprofile.config.inject.ConfigProperties.UNCONFIGURED_PREFIX;
 
@@ -52,17 +50,5 @@ public final class AnnotationUtil {
             return Optional.of("");
         }
         return Optional.of(value + ".");
-    }
-
-    public static OptionalInt getPriority(Class<?> aClass) {
-        Priority priorityAnnotation = aClass.getAnnotation(Priority.class);
-        if (priorityAnnotation != null) {
-            return OptionalInt.of(priorityAnnotation.value());
-        } else {
-            if (aClass != Object.class) {
-                return getPriority(aClass.getSuperclass());
-            }
-            return OptionalInt.empty();
-        }
     }
 }

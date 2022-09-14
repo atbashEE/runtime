@@ -15,9 +15,6 @@
  */
 package be.atbash.runtime.config.mp.util;
 
-import be.atbash.runtime.config.mp.util.testclass.ClassWithPriority;
-import be.atbash.runtime.config.mp.util.testclass.SomeClass;
-import be.atbash.runtime.config.mp.util.testclass.SubClass;
 import jakarta.enterprise.inject.spi.Annotated;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import org.assertj.core.api.Assertions;
@@ -28,7 +25,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 
 import static org.mockito.Mockito.when;
 
@@ -82,27 +78,6 @@ class AnnotationUtilTest {
         Optional<String> prefix = AnnotationUtil.parsePrefix(ConfigProperties.Literal.of(ConfigProperties.UNCONFIGURED_PREFIX));
         Assertions.assertThat(prefix).isEmpty();
 
-    }
-
-    @Test
-    void getPriority() {
-        OptionalInt priority = AnnotationUtil.getPriority(ClassWithPriority.class);
-        Assertions.assertThat(priority).isPresent();
-        Assertions.assertThat(priority.getAsInt()).isEqualTo(200);
-    }
-
-    @Test
-    void getPriority_noPriority() {
-        OptionalInt priority = AnnotationUtil.getPriority(SomeClass.class);
-        Assertions.assertThat(priority).isEmpty();
-    }
-
-
-    @Test
-    void getPriority_onSuperClass() {
-        OptionalInt priority = AnnotationUtil.getPriority(SubClass.class);
-        Assertions.assertThat(priority).isPresent();
-        Assertions.assertThat(priority.getAsInt()).isEqualTo(123);
     }
 
 

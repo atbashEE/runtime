@@ -15,8 +15,9 @@
  */
 package be.atbash.runtime.config.mp.util;
 
-import be.atbash.runtime.config.mp.ConfigValueImpl;
-import be.atbash.runtime.config.mp.converter.Converters;
+import be.atbash.config.mp.ConfigValueImpl;
+import be.atbash.config.mp.converter.Converters;
+import be.atbash.config.mp.util.ConvertValueUtil;
 import jakarta.enterprise.inject.spi.AnnotatedMember;
 import jakarta.enterprise.inject.spi.AnnotatedType;
 import jakarta.enterprise.inject.spi.InjectionPoint;

@@ -15,7 +15,7 @@
  */
 package be.atbash.runtime.config.mp.prefix;
 
-import be.atbash.runtime.config.mp.AtbashConfig;
+import be.atbash.config.mp.AtbashConfig;
 import be.atbash.runtime.config.mp.util.AnnotationUtil;
 import be.atbash.runtime.config.mp.util.ConfigProducerUtil;
 import jakarta.enterprise.inject.Instance;
