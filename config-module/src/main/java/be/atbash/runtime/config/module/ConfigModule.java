@@ -40,6 +40,7 @@ import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.logging.LoggingUtil;
 import be.atbash.runtime.logging.mapping.BundleMapping;
+import be.atbash.util.resource.ResourceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +126,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         String msg = LoggingUtil.formatMessage(LOGGER, "CONFIG-1001");
         watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, msg, false);
 
-        profiles = ConfigUtil.readProfiles("/profiles.json", false);
+        profiles = ConfigUtil.readProfiles(ResourceUtil.CLASSPATH_PREFIX + "profiles.json", false);
         List<Profile> customProfiles = ConfigUtil.readProfiles("/custom-profile.json", true);
         if (!customProfiles.isEmpty()) {
             profiles = customProfiles;
