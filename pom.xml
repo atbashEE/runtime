@@ -23,7 +23,7 @@
 
     <groupId>be.atbash.runtime</groupId>
     <artifactId>parent</artifactId>
-    <version>0.4.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Atbash Runtime for Jakarta EE Core Profile</name>

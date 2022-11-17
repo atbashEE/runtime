@@ -22,7 +22,7 @@
     <parent>
         <groupId>be.atbash.runtime</groupId>
         <artifactId>parent</artifactId>
-        <version>0.4.1-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -36,7 +36,7 @@
             <dependency>
                 <groupId>be.atbash.runtime.api</groupId>
                 <artifactId>bom</artifactId>
-                <version>0.4.1-SNAPSHOT</version>
+                <version>1.0.0-SNAPSHOT</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>be.atbash.runtime.api</groupId>
             <artifactId>core-api</artifactId>
-            <version>0.4.1-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
