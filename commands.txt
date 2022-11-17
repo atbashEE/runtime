@@ -25,6 +25,9 @@ mvn clean package -Ddocumentation.skip
 # Fast artifact generation
 mvn clean install -Ddocumentation.skip -DskipTests
 
+# Fast code only artifact generation
+mvn clean install -Ddocker.skip -Ddocumentation.skip -DskipTests
+
 # Skip Docker image creation
 mvn clean install -Ddocker.skip
 
