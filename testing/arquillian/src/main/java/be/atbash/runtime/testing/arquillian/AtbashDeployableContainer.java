@@ -119,7 +119,9 @@ public class AtbashDeployableContainer implements DeployableContainer<AtbashCont
         eventManager.publishEvent(Events.DEPLOYMENT, deployment);
 
         // Somehow, we need to set the CDI BeanManager into the Arquillian Manager so that CDI testEnricher finds it
+        // FIXME This will fail if we switch to a real CDI lite implementation that doesn't has BeanManager implemented?
         beanManagerInstance.set(CDI.current().getBeanManager());
+        // TODO Should we use org.jboss.arquillian.testenricher.cdi.container.BeanManagerProducer?
 
         // Check if the deployment was successful.
         Exception deploymentException = deployment.getDeploymentException();
