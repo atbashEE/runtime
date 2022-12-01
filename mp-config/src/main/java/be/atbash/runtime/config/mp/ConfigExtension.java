@@ -21,8 +21,8 @@ import be.atbash.runtime.config.mp.prefix.ConfigPropertiesProducer;
 import be.atbash.runtime.config.mp.prefix.TypesBeanAttributes;
 import be.atbash.runtime.config.mp.util.AnnotationUtil;
 import be.atbash.runtime.config.mp.util.ConfigProducerUtil;
-import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
-import be.atbash.runtime.core.data.deployment.CurrentArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
+import be.atbash.runtime.core.data.deployment.CurrentDeployment;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.spi.AnnotatedType;
 import jakarta.enterprise.inject.spi.*;
@@ -60,8 +60,8 @@ public class ConfigExtension implements Extension {
     private final Set<Type> configPropertiesBeanTypes = new HashSet<>();
 
     protected void beforeBeanDiscovery(@Observes BeforeBeanDiscovery event, BeanManager bm) {
-        ArchiveDeployment archiveDeployment = CurrentArchiveDeployment.getInstance().getCurrent();
-        boolean configDisabled = !getBooleanFromData(archiveDeployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
+        AbstractDeployment deployment = CurrentDeployment.getInstance().getCurrent();
+        boolean configDisabled = !getBooleanFromData(deployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
 
         if (configDisabled) {
             return;
@@ -106,8 +106,8 @@ public class ConfigExtension implements Extension {
     }
 
     private boolean validTypeForConfigProperties(Type type, InjectionPoint injectionPoint) {
-        ArchiveDeployment archiveDeployment = CurrentArchiveDeployment.getInstance().getCurrent();
-        boolean configDisabled = !getBooleanFromData(archiveDeployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
+        AbstractDeployment deployment = CurrentDeployment.getInstance().getCurrent();
+        boolean configDisabled = !getBooleanFromData(deployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
 
         if (configDisabled) {
             // Don't do the checks when validation is disabled.
@@ -134,8 +134,8 @@ public class ConfigExtension implements Extension {
     }
 
     protected void registerCustomBeans(@Observes AfterBeanDiscovery event, BeanManager bm) {
-        ArchiveDeployment archiveDeployment = CurrentArchiveDeployment.getInstance().getCurrent();
-        boolean configDisabled = !getBooleanFromData(archiveDeployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
+        AbstractDeployment deployment = CurrentDeployment.getInstance().getCurrent();
+        boolean configDisabled = !getBooleanFromData(deployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
 
         if (configDisabled) {
             // Don't perform this since MPConfig is disabled.
@@ -191,9 +191,9 @@ public class ConfigExtension implements Extension {
     }
 
     protected void validate(@Observes AfterDeploymentValidation event) {
-        ArchiveDeployment archiveDeployment = CurrentArchiveDeployment.getInstance().getCurrent();
-        boolean validationDisabled = getBooleanFromData(archiveDeployment, MPConfigModuleConstant.MPCONFIG_VALIDATION_DISABLED);
-        boolean configDisabled = !getBooleanFromData(archiveDeployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
+        AbstractDeployment deployment = CurrentDeployment.getInstance().getCurrent();
+        boolean validationDisabled = getBooleanFromData(deployment, MPConfigModuleConstant.MPCONFIG_VALIDATION_DISABLED);
+        boolean configDisabled = !getBooleanFromData(deployment, MPConfigModuleConstant.MPCONFIG_ENABLED);
         if (validationDisabled || configDisabled) {
             // We don't want validation to happen or MPConfig is not enabled at all (sniffer or config based).
             return;
@@ -205,8 +205,8 @@ public class ConfigExtension implements Extension {
 
     }
 
-    private boolean getBooleanFromData(ArchiveDeployment archiveDeployment, String key) {
-        return Boolean.parseBoolean(archiveDeployment.getDeploymentData(key));
+    private boolean getBooleanFromData(AbstractDeployment deployment, String key) {
+        return Boolean.parseBoolean(deployment.getDeploymentData(key));
     }
 
     private void validateConfigProperties(AfterDeploymentValidation adv, Config config) {

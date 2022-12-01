@@ -83,7 +83,7 @@ public final class ModuleManager {
         ExceptionMessageUtil.addModule("core-data");  // initialize Exception messages for core-data module.
     }
 
-    private boolean init(ConfigurationParameters configurationParameters) {
+    private boolean init() {
         executorService = Executors.newFixedThreadPool(5);
 
         modules = findAllModules();
@@ -136,7 +136,7 @@ public final class ModuleManager {
             throw new AtbashStartupAbortException();
         }
 
-        if (!init(configurationParameters)) {
+        if (!init()) {
             throw new AtbashStartupAbortException();
         }
 
@@ -441,6 +441,7 @@ public final class ModuleManager {
      * @return
      */
     public static ModuleManager initModuleManager(ConfigurationParameters configurationParameters) {
+        // FIXME Review these ConfigurationParameters as the Jakarta Runner does not use all of them.
         INSTANCE = new ModuleManager(configurationParameters);
         return INSTANCE;
     }

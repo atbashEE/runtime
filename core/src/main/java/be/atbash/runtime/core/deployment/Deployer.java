@@ -19,9 +19,7 @@ import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.WebAppClassLoader;
-import be.atbash.runtime.core.data.deployment.ArchiveContent;
-import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
-import be.atbash.runtime.core.data.deployment.CurrentArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.*;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
@@ -73,11 +71,61 @@ public class Deployer implements ModuleEventListener {
         if (Events.UNDEPLOYMENT.equals(eventPayload.getEventCode())) {
             undeploy(eventPayload.getPayload());
         }
+
+        if (Events.EXECUTION.equals(eventPayload.getEventCode())) {
+            executeApplication(eventPayload.getPayload());
+        }
+
+    }
+
+    private void executeApplication(ApplicationExecution applicationExecution) {
+        WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
+
+        String msg = LoggingUtil.formatMessage(LOGGER, "DEPLOY-101", applicationExecution.getDeploymentName());
+        watcherService.logWatcherEvent("Deployer", msg, true);
+
+        CurrentDeployment.getInstance().setCurrent(applicationExecution);
+
+        // We read deployment data.
+        addDeploymentData(applicationExecution);
+
+        applicationExecution.setDeploymentModule(determineDeploymentModule(Specification.REST));
+
+        if (applicationExecution.getDeploymentModule() == null) {
+            Logger logger = LoggingUtil.getMainLogger(Deployer.class);
+            logger.atError().addArgument(applicationExecution.getDeploymentName()).log("DEPLOY-107");
+
+            return;
+        }
+
+        EventManager eventManager = EventManager.getInstance();
+        eventManager.publishEvent(Events.PRE_DEPLOYMENT, applicationExecution);
+
+        applicationExecution.getDeploymentModule().executeDeployment(applicationExecution);
+        if (applicationExecution.getDeploymentException() == null) {
+
+
+            RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+            runData.deployed(applicationExecution);
+
+            applicationMon.registerApplication(applicationExecution);
+        } else {
+            Logger logger = LoggingUtil.getMainLogger(Deployer.class);
+            logger.atError()
+                    .addArgument(applicationExecution.getDeploymentName())
+                    .addArgument(applicationExecution.getDeploymentException().getMessage())
+                    .log("DEPLOY-108");
+
+        }
+        eventManager.publishEvent(Events.POST_DEPLOYMENT, applicationExecution);
+        msg = LoggingUtil.formatMessage(LOGGER, "DEPLOY-102", applicationExecution.getDeploymentName());
+        watcherService.logWatcherEvent("Deployer", msg, true);
+
     }
 
     private void undeploy(String deploymentName) {
         RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
-        Optional<ArchiveDeployment> archiveDeployment = runData.getDeployments()
+        Optional<AbstractDeployment> archiveDeployment = runData.getDeployments()
                 .stream()
                 .filter(ad -> ad.getDeploymentName().equals(deploymentName))
                 .findAny();
@@ -85,7 +133,11 @@ public class Deployer implements ModuleEventListener {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, String.format("Unable to fine deployment with name '%s'", deploymentName));
         }
 
-        ArchiveDeployment deployment = archiveDeployment.get();
+        if (!(archiveDeployment.get() instanceof ArchiveDeployment)) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, String.format("Unable to fine deployment with name '%s'", deploymentName));
+        }
+
+        ArchiveDeployment deployment = (ArchiveDeployment) archiveDeployment.get();
         deployment.getDeploymentModule().unregisterDeployment(deployment);
 
         runData.undeployed(deployment);
@@ -124,7 +176,7 @@ public class Deployer implements ModuleEventListener {
         String msg = LoggingUtil.formatMessage(LOGGER, "DEPLOY-101", deployment.getDeploymentName());
         watcherService.logWatcherEvent("Deployer", msg, true);
 
-        CurrentArchiveDeployment.getInstance().setCurrent(deployment);
+        CurrentDeployment.getInstance().setCurrent(deployment);
 
         if (deployment.getArchiveFile() == null) {
             // Deploy an application that was deployed during a previous run.
@@ -175,7 +227,7 @@ public class Deployer implements ModuleEventListener {
 
     }
 
-    private void addDeploymentData(ArchiveDeployment deployment) {
+    private void addDeploymentData(AbstractDeployment deployment) {
         ServiceLoader<DeploymentDataRetriever> loader = ServiceLoader.load(DeploymentDataRetriever.class);
         for (DeploymentDataRetriever deploymentDataRetriever : loader) {
             Map<String, String> data = deploymentDataRetriever.getDeploymentData(deployment);
@@ -202,6 +254,17 @@ public class Deployer implements ModuleEventListener {
         // App with Servlets and JAX-RS started but when we de a restart of the instance, we limit the modules to Jetty.
         // But the app also needs Jersey module.
         deployment.setDeploymentModule(deployerModule);
+    }
+
+    private Module<?> determineDeploymentModule(Specification specification) {
+        Module<?> result = null;
+        for (Module<?> module : modules) {
+            if (Arrays.stream(module.provideSpecifications()).anyMatch(s -> s == specification)) {
+                result = module;
+                // No bean needed as the list of modules is small.
+            }
+        }
+        return result;
     }
 
     private boolean matchesSpecification(Module<?> module, Set<Specification> specifications) {

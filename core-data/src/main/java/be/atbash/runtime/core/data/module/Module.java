@@ -16,6 +16,7 @@
 package be.atbash.runtime.core.data.module;
 
 import be.atbash.runtime.core.data.Specification;
+import be.atbash.runtime.core.data.deployment.ApplicationExecution;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.module.event.ModuleEventListener;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
@@ -82,9 +83,26 @@ public interface Module<C> extends Runnable, ModuleEventListener {
 
     <T> T getRuntimeObject(Class<T> exposedObjectType);
 
-    default void stop() {}
+    default void stop() {
+    }
 
-    default void registerDeployment(ArchiveDeployment archiveDeployment) {}
+    /**
+     * Deploys the WAR application analysed in the ArchiveDeployment parameter. Requires the Servlet approach.
+     *
+     * @param archiveDeployment
+     */
+    default void registerDeployment(ArchiveDeployment archiveDeployment) {
+    }
 
-    default void unregisterDeployment(ArchiveDeployment archiveDeployment) {}
+    default void unregisterDeployment(ArchiveDeployment archiveDeployment) {
+    }
+
+    /**
+     * Execute the application (running JAX-RS and CDI in SE mode) where the resources are
+     * the JAX-RS resources.
+     *
+     * @param applicationExecution info about application that needs to be executed.
+     */
+    default void executeDeployment(ApplicationExecution applicationExecution) {
+    }
 }

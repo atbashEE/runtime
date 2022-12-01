@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.core.data;
 
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.ArchiveDeploymentListener;
 
@@ -25,7 +26,7 @@ import java.util.List;
 public class RunData {
 
     private List<String> startedModules;
-    private final List<ArchiveDeployment> deployments = new ArrayList<>();
+    private final List<AbstractDeployment> deployments = new ArrayList<>();
     private final List<ArchiveDeploymentListener> listeners = new ArrayList<>();
     private boolean domainMode;
     private boolean embeddedMode;
@@ -42,17 +43,20 @@ public class RunData {
         this.startedModules = Collections.unmodifiableList(startedModules);
     }
 
-    public void deployed(ArchiveDeployment deployment) {
+    public void deployed(AbstractDeployment deployment) {
         deployments.add(deployment);
-        listeners.forEach(listener -> {
-            CriticalThreadCount.getInstance().newCriticalThreadStarted();
-            new Thread(
-                    () -> listener.archiveDeploymentDone(deployment)
-            ).start();
-        });
+        if (deployment instanceof ArchiveDeployment) {
+            // Listeners only for ArchiveDeployment.
+            listeners.forEach(listener -> {
+                CriticalThreadCount.getInstance().newCriticalThreadStarted();
+                new Thread(
+                        () -> listener.archiveDeploymentDone((ArchiveDeployment) deployment)
+                ).start();
+            });
+        }
     }
 
-    public List<ArchiveDeployment> getDeployments() {
+    public List<AbstractDeployment> getDeployments() {
         return deployments;
     }
 

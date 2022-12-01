@@ -17,7 +17,6 @@ package be.atbash.runtime.core.data.deployment;
 
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.WebAppClassLoader;
-import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.util.StringUtil;
 
@@ -27,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ArchiveDeployment {
+public class ArchiveDeployment extends AbstractDeployment {
 
     private File archiveFile;
-    private final String deploymentName;
+
     // verified means the deploymentLocation points to a valid expanded war
     // or archiveFile is specified
     private boolean verified;
@@ -45,35 +44,26 @@ public class ArchiveDeployment {
     private ArchiveContent archiveContent;
     private WebAppClassLoader classLoader;
     private Set<Specification> specifications;
-    private Module<?> deploymentModule;
     private List<Sniffer> sniffers;
-
-    private final Map<String, String> deploymentData;
-
-    private File configDataFile;
-
-    private Exception deploymentException;
 
     public ArchiveDeployment(File archiveFile) {
         this(archiveFile, StringUtil.determineDeploymentName(archiveFile));
     }
 
     public ArchiveDeployment(File archiveFile, String deploymentName) {
+        super(deploymentName, new HashMap<>());
         this.archiveFile = archiveFile;
-        this.deploymentName = deploymentName;
         this.verified = true;
-        this.deploymentData = new HashMap<>();
     }
 
     public ArchiveDeployment(String deploymentLocation, String deploymentName, Set<Specification> specifications,
                              List<Sniffer> sniffers, String contextRoot, Map<String, String> deploymentData) {
+        super(deploymentName, deploymentData);
         this.deploymentLocation = new File(deploymentLocation);
-        this.deploymentName = deploymentName;
         this.specifications = specifications;
         this.sniffers = sniffers;
         this.contextRoot = contextRoot;
         this.verified = false;
-        this.deploymentData = deploymentData;
     }
 
     public File getArchiveFile() {
@@ -96,12 +86,8 @@ public class ArchiveDeployment {
         return verified && archiveContent != null &&
                 classLoader != null &&
                 specifications != null &&
-                deploymentModule != null &&
+                getDeploymentModule() != null &&
                 sniffers != null;
-    }
-
-    public String getDeploymentName() {
-        return deploymentName;
     }
 
     public File getDeploymentLocation() {
@@ -139,14 +125,6 @@ public class ArchiveDeployment {
         return specifications;
     }
 
-    public Module<?> getDeploymentModule() {
-        return deploymentModule;
-    }
-
-    public void setDeploymentModule(Module<?> deploymentModule) {
-        this.deploymentModule = deploymentModule;
-    }
-
     public void setSniffers(List<Sniffer> sniffers) {
         this.sniffers = sniffers;
     }
@@ -156,7 +134,7 @@ public class ArchiveDeployment {
     }
 
     public String getContextRoot() {
-        return contextRoot == null ? "/" + deploymentName : contextRoot;
+        return contextRoot == null ? "/" + getDeploymentName() : contextRoot;
     }
 
     public void setContextRoot(String contextRoot) {
@@ -167,34 +145,6 @@ public class ArchiveDeployment {
         if (this.contextRoot.endsWith("/")) {
             this.contextRoot = this.contextRoot.substring(0, this.contextRoot.length() - 1);
         }
-    }
-
-    public String getDeploymentData(String key) {
-        return deploymentData.get(key);
-    }
-
-    public Map<String, String> getDeploymentData() {
-        return new HashMap<>(deploymentData);
-    }
-
-    public void addDeploymentData(String key, String value) {
-        deploymentData.put(key, value);
-    }
-
-    public File getConfigDataFile() {
-        return configDataFile;
-    }
-
-    public void setConfigDataFile(File configDataFile) {
-        this.configDataFile = configDataFile;
-    }
-
-    public Exception getDeploymentException() {
-        return deploymentException;
-    }
-
-    public void setDeploymentException(Exception deploymentException) {
-        this.deploymentException = deploymentException;
     }
 
     // archiveDeployments are identified by context root.

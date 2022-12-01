@@ -78,6 +78,8 @@ public class ConfigurationParameters {
 
     private boolean embeddedMode;
 
+    private boolean jakartaRunner;
+
     public boolean isDaemon() {
         return daemon;
     }
@@ -204,6 +206,14 @@ public class ConfigurationParameters {
 
     public void setEmbeddedMode() {
         this.embeddedMode = true;
+    }
+
+    public boolean isJakartaRunner() {
+        return jakartaRunner;
+    }
+
+    public void setJakartaRunner() {
+        this.jakartaRunner = true;
     }
 
     public File getConfigFile() {

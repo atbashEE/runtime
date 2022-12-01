@@ -33,7 +33,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>Demo Rest</name>
+    <name>Demo Rest JSON</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 

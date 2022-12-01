@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.core.deployment.monitor;
 
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 
 import java.util.ArrayList;
@@ -30,11 +31,11 @@ public class ApplicationMon implements ApplicationMonMBean {
         return applications;
     }
 
-    public void registerApplication(ArchiveDeployment deployment) {
-        applications.add(new ApplicationInfo(deployment));
+    public void registerApplication(AbstractDeployment deployment) {
+        applications.add(ApplicationInfo.createFor(deployment));
     }
 
     public void unregisterApplication(ArchiveDeployment deployment) {
-        applications.remove(new ApplicationInfo(deployment));
+        applications.remove(ApplicationInfo.createFor(deployment));
     }
 }

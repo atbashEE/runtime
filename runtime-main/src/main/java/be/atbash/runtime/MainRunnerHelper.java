@@ -20,6 +20,7 @@ import be.atbash.runtime.common.command.AbstractAtbashCommand;
 import be.atbash.runtime.config.ConfigurationManager;
 import be.atbash.runtime.core.data.CriticalThreadCount;
 import be.atbash.runtime.core.data.RunData;
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
@@ -240,7 +241,7 @@ public class MainRunnerHelper {
         ArchiveDeploymentUtil.assignContextRoots(archives, actualCommand.getConfigurationParameters().getContextRoot());
 
         for (ArchiveDeployment deployment : archives) {
-            Optional<ArchiveDeployment> otherDeployment = runData.getDeployments().stream()
+            Optional<AbstractDeployment> otherDeployment = runData.getDeployments().stream()
                     .filter(ad -> ad.getDeploymentName().equals(deployment.getDeploymentName()))
                     .findAny();
             if (otherDeployment.isPresent()) {

@@ -16,8 +16,11 @@
 package be.atbash.runtime.core.deployment.monitor;
 
 import be.atbash.runtime.core.data.Specification;
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
+import be.atbash.runtime.core.data.deployment.ApplicationExecution;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,11 +32,18 @@ public class ApplicationInfo {
     private Set<Specification> specifications;
     private List<String> sniffers;
 
-    public ApplicationInfo(ArchiveDeployment deployment) {
+    private ApplicationInfo(ArchiveDeployment deployment) {
         name = deployment.getDeploymentName();
         contextRoot = deployment.getContextRoot();
         specifications = deployment.getSpecifications();
         sniffers = deployment.getSniffers().stream().map(s -> s.getClass().getSimpleName()).collect(Collectors.toList());
+    }
+
+    private ApplicationInfo(ApplicationExecution deployment) {
+        name = deployment.getDeploymentName();
+        contextRoot = "/";
+        specifications = Set.of(deployment.getDeploymentModule().provideSpecifications());
+        sniffers = Collections.emptyList();
     }
 
     // JSONB
@@ -78,5 +88,13 @@ public class ApplicationInfo {
                 , contextRoot
                 , specifications.stream().map(Enum::name).collect(Collectors.joining(", "))
                 , String.join(", ", sniffers));
+    }
+
+    public static ApplicationInfo createFor(AbstractDeployment deployment) {
+        if (deployment instanceof ArchiveDeployment) {
+            return new ApplicationInfo((ArchiveDeployment) deployment);
+        } else {
+            return new ApplicationInfo((ApplicationExecution) deployment);
+        }
     }
 }

@@ -18,7 +18,7 @@ package be.atbash.runtime.config.mp.module;
 import be.atbash.runtime.config.mp.MPConfigModuleConstant;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
-import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.Events;
@@ -91,7 +91,7 @@ public class MPConfigModule implements Module<RuntimeConfiguration> {
 
     }
 
-    private void checkConfigActive(ArchiveDeployment deployment) {
+    private void checkConfigActive(AbstractDeployment deployment) {
         deployment.addDeploymentData(MPConfigModuleConstant.MPCONFIG_VALIDATION_DISABLED, validationDisabled.toString());
 
         // This is at the runtime level.

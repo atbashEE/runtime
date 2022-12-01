@@ -20,7 +20,6 @@ import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.deployment.monitor.ApplicationInfo;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
-import be.atbash.util.exception.AtbashUnexpectedException;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
@@ -45,7 +44,7 @@ public class ListApplicationsRemoteCommand implements ServerRemoteCommand {
                 runData.getDeployments()
                         .forEach(ad -> {
                             try {
-                                ApplicationInfo info = new ApplicationInfo(ad);
+                                ApplicationInfo info = ApplicationInfo.createFor(ad);
                                 result.addData(ad.getDeploymentName(), jsonb.toJson(info));
                             } catch (JsonbException e) {
                                 throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);

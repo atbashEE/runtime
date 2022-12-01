@@ -36,6 +36,7 @@
         <module>demo-servlet</module> <!-- Used in one of the Unit tests-->
         <module>demo-rest</module> <!-- Used in one of the Unit tests-->
         <module>demo-rest-json</module>
+        <module>demo-executable</module>
     </modules>
 
     <build>

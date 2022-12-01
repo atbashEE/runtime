@@ -26,5 +26,12 @@
       "microstream",
       "remote-cli"
     ]
+  },
+  {
+    "name": "runner",
+    "modules": [
+      "jersey-se",
+      "mp-config"
+    ]
   }
 ]

@@ -15,11 +15,11 @@
  */
 package be.atbash.runtime.core.deployment.data;
 
-import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 
 import java.util.Map;
 
 public interface DeploymentDataRetriever {
 
-    Map<String, String> getDeploymentData(ArchiveDeployment deployment);
+    Map<String, String> getDeploymentData(AbstractDeployment deployment);
 }

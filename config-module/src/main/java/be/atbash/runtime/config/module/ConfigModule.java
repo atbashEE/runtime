@@ -54,7 +54,8 @@ public class ConfigModule implements Module<ConfigurationParameters> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigModule.class);
 
     private ConfigurationParameters parameters;
-    private RuntimeConfiguration runtimeConfiguration;
+    private RuntimeConfiguration runtimeConfiguration;  // FIXME Review the usage of the parameters as the JakartaRunner
+    // is not all values from this Object
 
     private Config config;
 
@@ -136,37 +137,44 @@ public class ConfigModule implements Module<ConfigurationParameters> {
             LOGGER.atInfo().log(LoggingUtil.formatMessage(LOGGER, "CONFIG-021"));
         }
         Profile profile = findProfile();
+        ProfileManager profileManager = new ProfileManager(parameters, profile);
 
-        ConfigInstance configInstance = new ConfigInstance(parameters.getRootDirectory(), parameters.getConfigName()
-                , parameters.isStateless(), false);
-        ConfigInstanceUtil.processConfigInstance(configInstance);
+        ConfigInstance configInstance;
+        if (!parameters.isJakartaRunner()) {
+            configInstance = new ConfigInstance(parameters.getRootDirectory(), parameters.getConfigName()
+                    , parameters.isStateless(), false);
+            ConfigInstanceUtil.processConfigInstance(configInstance);
 
-        if (!configInstance.isValid()) {
-            throw new AtbashStartupAbortException();
+            if (!configInstance.isValid()) {
+                throw new AtbashStartupAbortException();
+            } else {
+                ConfigInstanceUtil.storeRuntimeConfig(configInstance);
+                ConfigInstanceUtil.storeLoggingConfig(configInstance);
+            }
+
         } else {
-            ConfigInstanceUtil.storeRuntimeConfig(configInstance);
-            ConfigInstanceUtil.storeLoggingConfig(configInstance);
+            configInstance = new ConfigInstance(null, null,
+                    true, false);
         }
 
-
-        ProfileManager profileManager = new ProfileManager(parameters, profile);
         config = ConfigUtil.readConfiguration(configInstance);
         updateConfiguration();
 
         ConfigUtil.writeConfiguration(configInstance, config);
 
-        // Handle log to file correctly
-        System.setProperty(LoggingUtil.SYSTEM_PROPERTY_FILE_LOGGING, Boolean.toString(config.getLogging().isLogToFile()));
-
         RuntimeConfiguration.Builder builder;
-        if (parameters.isStateless()) {
-            if (configInstance.getConfigName() != null) {
-                builder = new RuntimeConfiguration.Builder(configInstance.getConfigDirectory(), configInstance.getLoggingConfigurationFile(), true);
-            } else {
-                builder = new RuntimeConfiguration.Builder(configInstance.getLoggingConfigurationFile());
-            }
+        if (parameters.isJakartaRunner()) {
+            builder = new RuntimeConfiguration.Builder(null, null, true);
         } else {
-            builder = new RuntimeConfiguration.Builder(configInstance.getConfigDirectory(), parameters.getConfigName());
+            if (parameters.isStateless()) {
+                if (configInstance.getConfigName() != null) {
+                    builder = new RuntimeConfiguration.Builder(configInstance.getConfigDirectory(), configInstance.getLoggingConfigurationFile(), true);
+                } else {
+                    builder = new RuntimeConfiguration.Builder(configInstance.getLoggingConfigurationFile());
+                }
+            } else {
+                builder = new RuntimeConfiguration.Builder(configInstance.getConfigDirectory(), parameters.getConfigName());
+            }
         }
         builder.setRequestedModules(profileManager.getRequestedModules());
         builder.setConfig(config);

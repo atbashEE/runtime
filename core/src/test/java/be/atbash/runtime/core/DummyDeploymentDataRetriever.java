@@ -15,7 +15,7 @@
  */
 package be.atbash.runtime.core;
 
-import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 import be.atbash.runtime.core.deployment.data.DeploymentDataRetriever;
 
 import java.util.HashMap;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class DummyDeploymentDataRetriever implements DeploymentDataRetriever {
     @Override
-    public Map<String, String> getDeploymentData(ArchiveDeployment deployment) {
+    public Map<String, String> getDeploymentData(AbstractDeployment deployment) {
         Map<String, String> result = new HashMap<>();
         result.put("deployment-name", deployment.getDeploymentName());
         return result;

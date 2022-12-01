@@ -17,6 +17,7 @@ package be.atbash.runtime.remotecli.command;
 
 import be.atbash.runtime.common.command.data.CommandResponse;
 import be.atbash.runtime.core.data.RunData;
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.event.EventManager;
@@ -59,7 +60,7 @@ public class DeployRemoteCommand implements ServerRemoteCommand, HandleFileUploa
         int applicationCount = runData.getDeployments().size();
 
         for (ArchiveDeployment deployment : deployments) {
-            Optional<ArchiveDeployment> otherDeployment = runData.getDeployments().stream()
+            Optional<AbstractDeployment> otherDeployment = runData.getDeployments().stream()
                     .filter(ad -> ad.getDeploymentName().equals(deployment.getDeploymentName()))
                     .findAny();
             if (otherDeployment.isPresent()) {

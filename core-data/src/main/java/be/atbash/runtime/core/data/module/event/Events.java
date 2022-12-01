@@ -21,6 +21,8 @@ public final class Events {
     public static final String VERIFY_DEPLOYMENT = "VerifyDeployment";  // For the core to verify if PersistedDeployment is still valid.
     public static final String UNDEPLOYMENT = "Undeployment";  // For the core to remove the deployment
 
+    public static final String EXECUTION = "EXECUTION";  // For the core to start Jakarta Runner
+
     public static final String PRE_DEPLOYMENT = "PreDeployment";  // All modules get informed of the start of a deployment
     public static final String POST_DEPLOYMENT = "PostDeployment";  // All modules get informed of the end of the deployment
 

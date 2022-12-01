@@ -38,7 +38,7 @@ class ApplicationInfoTest {
         ArchiveDeployment deployment = new ArchiveDeployment("locationNotImportant"
                 , "name", specifications, sniffers, "/root", new HashMap<>());
 
-        ApplicationInfo info = new ApplicationInfo(deployment);
+        ApplicationInfo info = ApplicationInfo.createFor(deployment);
         assertThat(info.getSniffers()).containsExactly("SingleTriggeredSniffer");
         assertThat(info.getSpecifications()).containsExactly(Specification.SERVLET);
     }
@@ -51,7 +51,7 @@ class ApplicationInfoTest {
         ArchiveDeployment deployment = new ArchiveDeployment("locationNotImportant"
                 , "name", specifications, sniffers, "/root", new HashMap<>());
 
-        ApplicationInfo info = new ApplicationInfo(deployment);
+        ApplicationInfo info = ApplicationInfo.createFor(deployment);
         assertThat(info.toString()).isEqualTo("context root for application /root, detected specifications SERVLET, triggered sniffers SingleTriggeredSniffer");
 
     }

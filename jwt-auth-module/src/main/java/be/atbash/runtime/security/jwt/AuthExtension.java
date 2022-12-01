@@ -15,8 +15,8 @@
  */
 package be.atbash.runtime.security.jwt;
 
-import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
-import be.atbash.runtime.core.data.deployment.CurrentArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
+import be.atbash.runtime.core.data.deployment.CurrentDeployment;
 import be.atbash.runtime.security.jwt.cdi.ValidateJWTConfiguration;
 import be.atbash.runtime.security.jwt.inject.*;
 import be.atbash.runtime.security.jwt.principal.JWTCallerPrincipalFactory;
@@ -34,15 +34,15 @@ public class AuthExtension implements Extension {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthExtension.class);
 
     void beforeBeanDiscovery(@Observes BeforeBeanDiscovery event, BeanManager beanManager) {
-        ArchiveDeployment archiveDeployment = CurrentArchiveDeployment.getInstance().getCurrent();
-        boolean moduleActive = Boolean.parseBoolean(archiveDeployment.getDeploymentData(MPJWTModuleConstant.JWTAUTH_ENABLED));
+        AbstractDeployment deployment = CurrentDeployment.getInstance().getCurrent();
+        boolean moduleActive = Boolean.parseBoolean(deployment.getDeploymentData(MPJWTModuleConstant.JWTAUTH_ENABLED));
 
         if (!moduleActive) {
             return;
         }
 
         LOGGER.atInfo()
-                .addArgument(archiveDeployment.getDeploymentName())
+                .addArgument(deployment.getDeploymentName())
                 .log("JWT-100");
 
         addAnnotatedType(event, beanManager, ClaimValueProducer.class);
