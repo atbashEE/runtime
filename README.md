@@ -17,6 +17,29 @@ Details:
 
 Current status
 
+**version 1.0.0 (in progress)**
+
+[Alpha tag](https://github.com/atbashEE/runtime/releases/tag/1.0.0.Alpha)
+
+Powered By
+
+- Jetty : 11.0.11 (Servlet 5.0 / Jakarta EE 9.1)
+- Jersey : 3.1.0
+- Weld : 5.1.0
+- Yasson : 2.0.4
+- Picocli : 4.6.3
+
+- Testcontainers : 1.17.2
+- MicroStream : 7.0
+
+
+Added Features
+
+- Jakarta EE 10 Core Profile
+- Jakarta Runner (Using `public static void main` to run application)
+
+Jakarta EE 9.1 based version is continued on the `Jakarta9.1` branch (https://github.com/atbashEE/runtime/tree/jakarta9.1)
+
 **version 0.4.1**
 
 Powered By
