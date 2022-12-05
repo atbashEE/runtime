@@ -42,8 +42,8 @@
 
         <dependency>
             <groupId>be.atbash</groupId>
-            <artifactId>mp-config-se</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <artifactId>atbash-delivery</artifactId>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>

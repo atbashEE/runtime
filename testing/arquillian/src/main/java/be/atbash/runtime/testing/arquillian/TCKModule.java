@@ -104,6 +104,9 @@ public class TCKModule implements Module<RuntimeConfiguration> {
     @Override
     public void registerDeployment(ArchiveDeployment deployment) {
         WebAppContext handler = new WebAppContext();
+        // MPConfig TCK for example still assumes empty bean.xml -> Discovery ALL
+        handler.setInitParameter("org.jboss.weld.environment.servlet.emptyBeansXmlModeAll", "true");
+
         // If an exception happens during deployment (like CDI issue) make sure we can handle the exception
         //and deployment can be handled as failed from our code.
         handler.setThrowUnavailableOnStartupException(true);
@@ -171,7 +174,9 @@ public class TCKModule implements Module<RuntimeConfiguration> {
                 webAppContextHandler.stop();
                 handlers.removeHandler(webAppContextHandler);
             } catch (Exception e) {
-                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+                //throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+                // FIXME Jersey 11 problem (ELContextCleaner ) with EL Spec 5.0
+
             }
         }
         LOGGER.info("JERSEY-105: Unregistration of WebApp " + deployment.getDeploymentName() + " done");

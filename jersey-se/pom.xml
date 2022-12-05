@@ -60,7 +60,7 @@
         </dependency>
 
 
-        <!-- This is te simple HTTP server-->
+        <!-- This is the simple HTTP server-->
         <!-- TODO Should we allow for selection of JDK HTTP Server or Grizzly?? -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>

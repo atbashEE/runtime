@@ -38,7 +38,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- for the jakarta namespace -->
-        <version.arquillian_core>1.7.0.Alpha10</version.arquillian_core>
+        <version.arquillian_core>1.7.0.Alpha12</version.arquillian_core>
 
     </properties>
 
