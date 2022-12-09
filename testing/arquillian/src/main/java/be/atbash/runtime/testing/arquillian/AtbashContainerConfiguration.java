@@ -32,21 +32,23 @@ public class AtbashContainerConfiguration implements ContainerConfiguration {
 
     private String profile;
 
+    private String modules;
+
     @Override
     public void validate() throws ConfigurationException {
-
-        if (notValidProfile()) {
-            throw new ConfigurationException("Profile parameter is not valid");
-        }
-        profile = profile.toLowerCase(Locale.ENGLISH);
-    }
-
-    private boolean notValidProfile() {
         if (profile == null || profile.isBlank()) {
             profile = "default";
         }
+
+        profile = profile.toLowerCase(Locale.ENGLISH);
+        if (notValidProfile()) {
+            throw new ConfigurationException("Profile parameter is not valid");
+        }
+    }
+
+    private boolean notValidProfile() {
         // Instead of reading profiles.json, we define here the valid names.
-        return !Arrays.asList("default", "domain", "all").contains(profile.toLowerCase(Locale.ENGLISH));
+        return !Arrays.asList("default", "domain", "all").contains(profile);
     }
 
     public boolean isKeepArchive() {
@@ -63,5 +65,13 @@ public class AtbashContainerConfiguration implements ContainerConfiguration {
 
     public void setProfile(String profile) {
         this.profile = profile;
+    }
+
+    public String getModules() {
+        return modules;
+    }
+
+    public void setModules(String modules) {
+        this.modules = modules;
     }
 }

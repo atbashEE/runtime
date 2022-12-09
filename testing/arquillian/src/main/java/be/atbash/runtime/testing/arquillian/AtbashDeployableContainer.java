@@ -86,6 +86,7 @@ public class AtbashDeployableContainer implements DeployableContainer<AtbashCont
         configurationParameters.setStateless(true);
         configurationParameters.setWatcher(WatcherType.OFF);
         configurationParameters.setProfile(atbashContainerConfiguration.getProfile());
+        configurationParameters.setModules(atbashContainerConfiguration.getModules());
 
         embedded = new AtbashEmbedded(configurationParameters);
         embedded.withTCKModule();  // TCK module defines a specific deployer.
