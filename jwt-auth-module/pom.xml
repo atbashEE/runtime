@@ -29,7 +29,7 @@
     <artifactId>jwt-auth-module</artifactId>
 
     <properties>
-        <yasson.version>2.0.4</yasson.version>
+        <yasson.version>3.0.2</yasson.version>
 
     </properties>
     <dependencies>

@@ -53,12 +53,12 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- core profile does not contain Servlet -->
-        <!-- FIXME Should we make Servlet an optional module now that JAX-RS and CDI can be pure Java SE based? -->
+        <!-- Core Profile does not contain Servlet -->
+        <!-- Still version 5.0.0 (and not 6) since we are using Jetty 11 for the moment -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
+            <version>5.0.0</version>
             <scope>test</scope>
         </dependency>
 

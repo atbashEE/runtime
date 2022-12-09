@@ -62,7 +62,7 @@
 
         <jetty.version>11.0.11</jetty.version>
         <atbash.utils-se.version>1.2.0</atbash.utils-se.version>
-        <yasson.version>2.0.4</yasson.version> <!-- within runtime -->
+        <yasson.version>3.0.2</yasson.version> <!-- within runtime -->
         <jackson.version>2.13.3</jackson.version> <!-- within CLI -->
         <mockito.version>4.7.0</mockito.version>
 
