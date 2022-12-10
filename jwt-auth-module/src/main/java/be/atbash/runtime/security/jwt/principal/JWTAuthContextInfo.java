@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.security.jwt.principal;
 
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import jakarta.enterprise.inject.Vetoed;
 
@@ -39,6 +40,7 @@ public class JWTAuthContextInfo {
     private String tokenCookie;
     private String groupsClaimName;
     private List<JWSAlgorithm> signatureAlgorithms;
+    private List<JWEAlgorithm> encryptionAlgorithms;
     private Set<String> expectedAudience;
     private Set<String> requiredClaims;
 
@@ -140,6 +142,14 @@ public class JWTAuthContextInfo {
 
     public void setSignatureAlgorithms(List<JWSAlgorithm> signatureAlgorithms) {
         this.signatureAlgorithms = signatureAlgorithms;
+    }
+
+    public List<JWEAlgorithm> getEncryptionAlgorithms() {
+        return encryptionAlgorithms;
+    }
+
+    public void setEncryptionAlgorithms(List<JWEAlgorithm> encryptionAlgorithms) {
+        this.encryptionAlgorithms = encryptionAlgorithms;
     }
 
     public Set<String> getRequiredClaims() {

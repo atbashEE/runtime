@@ -31,6 +31,7 @@ public class RuntimeJWTProcessor extends DefaultJWTProcessor {
                         .getContextInfo();
 
         setJWSVerifierFactory(new RuntimeJWSVerifierFactory(authContextInfo));
+        setJweDecrypterFactory(new RuntimeJWEDecrypterFactory(authContextInfo));
     }
 
 }

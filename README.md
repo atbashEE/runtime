@@ -37,6 +37,7 @@ Added Features
 
 - Jakarta EE 10 Core Profile
 - Jakarta Runner (Using `public static void main` to run application)
+- Extensions for MicroProfile Config 3.0.2, JWT Auth 2.1
 
 Jakarta EE 9.1 based version is continued on the `Jakarta9.1` branch (https://github.com/atbashEE/runtime/tree/jakarta9.1)
 

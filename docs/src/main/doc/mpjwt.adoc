@@ -35,6 +35,7 @@ Some parameter's interpretation is changed so that the application to be functio
 - The properties `mp.jwt.verify.publickey.location` and `mp.jwt.decrypt.key.location` are interpreted as a List (comma separated values) and keys are loaded from all the specified locations. This is part of the support for the multi-tenancy / multi-source support.
 - The property `mp.jwt.verify.issuer` is also interpreted as a List (comma separated values) and the issuer found in the token must be present in this list. This is part of the support for the multi-tenancy / multi-source support.
 - As encryption algorithm, RSA-OAEP is not supported as it uses the SHA-1 hashing which is indicated as insecure since 2017.  RSA-OAEP might not be affected but as a precaution, only RSA-OAEP-256 is supported (containing the SHA 2 family hashing algorithm)
+- The property `mp.jwt.decrypt.key.algorithm` is also interpreted as a List (comma separated values).  When not specified or empty, all algorithms that are supported by Atbash are allowed. When values are specified, a token with an algorithm indication in the header that isn't in this list, is rejected.
 
 == Tracing
 

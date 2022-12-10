@@ -17,6 +17,7 @@ package be.atbash.runtime.security.jwt;
 
 
 import be.atbash.config.exception.ConfigurationException;
+import be.atbash.ee.security.octopus.nimbus.jwt.jwe.JWEAlgorithm;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
 import be.atbash.ee.security.octopus.util.PeriodUtil;
 import be.atbash.runtime.core.data.util.ResourceReader;
@@ -62,8 +63,12 @@ public class JWTAuthContextInfoProvider {
      * @since 1.2
      */
     @Inject
-    @ConfigProperty(name = "mp.jwt.verify.publickey.algorithm")
+    @ConfigProperty(name = Names.VERIFIER_PUBLIC_KEY_ALGORITHM)
     private Optional<List<JWSAlgorithm>> mpJwtPublicKeyAlgorithms;
+
+    @Inject
+    @ConfigProperty(name = Names.DECRYPTOR_KEY_ALGORITHM)
+    private Optional<List<JWEAlgorithm>> mpJweDecryptorKeyAlgorithms;
 
     /**
      * @since 1.1
@@ -195,6 +200,9 @@ public class JWTAuthContextInfoProvider {
 
         // Force a verification algorithm from the list?
         contextInfo.setSignatureAlgorithms(mpJwtPublicKeyAlgorithms.orElseGet(Collections::emptyList));
+
+        // Force an encryption algorithm from the list?
+        contextInfo.setEncryptionAlgorithms(mpJweDecryptorKeyAlgorithms.orElseGet(Collections::emptyList));
 
         // Audience
         if (mpJwtVerifyAudiences.isPresent()) {
