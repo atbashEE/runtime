@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.security.jwt.principal;
 
+import be.atbash.ee.security.octopus.jwt.JWTValidationConstant;
 import be.atbash.ee.security.octopus.nimbus.jwt.CommonJWTHeader;
 import be.atbash.ee.security.octopus.nimbus.jwt.JWTClaimsSet;
 import be.atbash.ee.security.octopus.nimbus.jwt.jws.JWSAlgorithm;
@@ -24,6 +25,7 @@ import be.atbash.util.TestReflectionUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -347,5 +349,73 @@ class MPBearerTokenVerifierTest {
 
     }
 
+    @Test
+    void verify_tokenAgeNoIAT() {
+        JWTAuthContextInfo authContextInfo = new JWTAuthContextInfo();
+        authContextInfo.setIssuedBy(List.of("JUnit"));
+        authContextInfo.setExpectedAudience(Collections.emptySet());
+        authContextInfo.setRequiredClaims(Collections.emptySet());
+        authContextInfo.setIatTokenAgeSecs(60);
 
+        MPBearerTokenVerifier verifier = new MPBearerTokenVerifier(authContextInfo);
+        JWTClaimsSet claimSet = new JWTClaimsSet.Builder()
+                .issuer("JUnit")
+                .subject("Subject")
+                .expirationTime(Duration.of(10, ChronoUnit.SECONDS))
+                .build();
+        CommonJWTHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                .build();
+
+        boolean valid = verifier.verify(header, claimSet);
+        Assertions.assertThat(valid).isFalse();
+        Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("The token has no iat defined but configuration has specified a max age for the token");
+
+    }
+
+    @Test
+    void verify_tokenAgeExpired() {
+        JWTAuthContextInfo authContextInfo = new JWTAuthContextInfo();
+        authContextInfo.setIssuedBy(List.of("JUnit"));
+        authContextInfo.setExpectedAudience(Collections.emptySet());
+        authContextInfo.setRequiredClaims(Collections.emptySet());
+        authContextInfo.setIatTokenAgeSecs(60);
+
+        MPBearerTokenVerifier verifier = new MPBearerTokenVerifier(authContextInfo);
+        JWTClaimsSet claimSet = new JWTClaimsSet.Builder()
+                .issuer("JUnit")
+                .subject("Subject")
+                .expirationTime(Duration.of(10, ChronoUnit.SECONDS))
+                .issueTime(LocalDateTime.now().minusSeconds(90))
+                .build();
+        CommonJWTHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                .build();
+
+        boolean valid = verifier.verify(header, claimSet);
+        Assertions.assertThat(valid).isFalse();
+        Assertions.assertThat(MDC.get(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON)).isEqualTo("The token is to old, iat + age < now");
+
+    }
+
+    @Test
+    void verify_tokenAgeInLimit() {
+        JWTAuthContextInfo authContextInfo = new JWTAuthContextInfo();
+        authContextInfo.setIssuedBy(List.of("JUnit"));
+        authContextInfo.setExpectedAudience(Collections.emptySet());
+        authContextInfo.setRequiredClaims(Collections.emptySet());
+        authContextInfo.setIatTokenAgeSecs(60);
+
+        MPBearerTokenVerifier verifier = new MPBearerTokenVerifier(authContextInfo);
+        JWTClaimsSet claimSet = new JWTClaimsSet.Builder()
+                .issuer("JUnit")
+                .subject("Subject")
+                .expirationTime(Duration.of(10, ChronoUnit.SECONDS))
+                .issueTime(LocalDateTime.now().minusSeconds(50))
+                .build();
+        CommonJWTHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                .build();
+
+        boolean valid = verifier.verify(header, claimSet);
+        Assertions.assertThat(valid).isTrue();
+
+    }
 }

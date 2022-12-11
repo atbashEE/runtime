@@ -24,6 +24,7 @@ import be.atbash.runtime.core.data.util.SystemPropertyUtil;
 import org.slf4j.MDC;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -66,6 +67,20 @@ public class MPBearerTokenVerifier implements JWTVerifier {
             Date nbf = jwtClaimsSet.getNotBeforeTime();
             if (nbf != null && !DateUtils.isBefore(nbf, now, authContextInfo.getExpGracePeriodSecs())) {
                 result = false;
+            }
+        }
+
+        if (authContextInfo.getIatTokenAgeSecs() != -1) {
+            Date iat = jwtClaimsSet.getIssueTime();
+            if (iat == null) {
+                MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token has no iat defined but configuration has specified a max age for the token");
+                result = false;
+            } else {
+                LocalDateTime maxAllowedIat = DateUtils.asLocalDateTime(iat).plusSeconds(authContextInfo.getIatTokenAgeSecs());
+                if (LocalDateTime.now().isAfter(maxAllowedIat)) {
+                    MDC.put(JWTValidationConstant.JWT_VERIFICATION_FAIL_REASON, "The token is to old, iat + age < now");
+                    result = false;
+                }
             }
         }
 

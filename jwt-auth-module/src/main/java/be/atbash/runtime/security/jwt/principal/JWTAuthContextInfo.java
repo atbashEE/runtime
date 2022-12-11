@@ -30,6 +30,7 @@ public class JWTAuthContextInfo {
 
     private List<String> issuedBy;
     private int expGracePeriodSecs = 60;
+    private int iatTokenAgeSecs = -1; // -1 No check
     private List<String> publicKeyLocation;
     private String publicKeyContent;
     private List<String> decryptionKeyLocation;
@@ -58,6 +59,14 @@ public class JWTAuthContextInfo {
 
     public void setExpGracePeriodSecs(int expGracePeriodSecs) {
         this.expGracePeriodSecs = expGracePeriodSecs;
+    }
+
+    public int getIatTokenAgeSecs() {
+        return iatTokenAgeSecs;
+    }
+
+    public void setIatTokenAgeSecs(int iatTokenAgeSecs) {
+        this.iatTokenAgeSecs = iatTokenAgeSecs;
     }
 
     public List<String> getPublicKeyLocation() {
@@ -165,6 +174,7 @@ public class JWTAuthContextInfo {
         return "JWTAuthContextInfo{" +
                 ", issuedBy='" + issuedBy + '\'' +
                 ", expGracePeriodSecs=" + expGracePeriodSecs +
+                ", iatTokenAge=" + iatTokenAgeSecs +
                 ", publicKeyLocation='" + publicKeyLocation + '\'' +
                 ", publicKeyContent='" + publicKeyContent + '\'' +
                 ", decryptionKeyLocation='" + decryptionKeyLocation + '\'' +

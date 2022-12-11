@@ -114,8 +114,12 @@ public class JWTAuthContextInfoProvider {
     Optional<Set<String>> mpJwtVerifyAudiences;
 
     @Inject
-    @ConfigProperty(name = "mp.jwt.verify.clock.skew", defaultValue = "60")
+    @ConfigProperty(name = Names.CLOCK_SKEW, defaultValue = "60")
     private int mpExpGracePeriodSecs;
+
+    @Inject
+    @ConfigProperty(name = Names.TOKEN_AGE, defaultValue = "-1")
+    private int mpTokenAgeSecs;
 
     // Atbash specific properties
 
@@ -214,6 +218,8 @@ public class JWTAuthContextInfoProvider {
         // Grace period for exp, iat and nbf
         contextInfo.setExpGracePeriodSecs(mpExpGracePeriodSecs);
 
+        // max token age in seconds (-1 no checks)
+        contextInfo.setIatTokenAgeSecs(mpTokenAgeSecs);
 
         // Atbash specific
         contextInfo.setGroupsClaimName(defaultGroupsClaim.orElse(Claims.groups.name()));
