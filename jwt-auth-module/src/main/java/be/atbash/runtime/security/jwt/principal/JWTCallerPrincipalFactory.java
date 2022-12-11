@@ -43,14 +43,13 @@ public class JWTCallerPrincipalFactory {
         if (tck && authContextInfo.isJWERequired() && jwtDecoder.determineEncoding(token) != JWTEncoding.JWE) {
             throw new InvalidJWTException("Token must be a JWE");
         }
-        MPBearerTokenVerifier verifier = new MPBearerTokenVerifier(authContextInfo);
 
         JWTData<JWTClaimsSet> data;
         if (authContextInfo.getPublicKeyContent() != null) {
             // FIXME When inline public key defined, is JWE decryption still supported?
-            data = jwtDecoder.decode(token, JWTClaimsSet.class, new InlineKeySelector(authContextInfo.getPublicKeyContent()), verifier);
+            data = jwtDecoder.decode(token, JWTClaimsSet.class, new InlineKeySelector(authContextInfo.getPublicKeyContent()));
         } else {
-            data = jwtDecoder.decode(token, JWTClaimsSet.class, keySelector, verifier);
+            data = jwtDecoder.decode(token, JWTClaimsSet.class, keySelector);
         }
 
         return new DefaultJWTCallerPrincipal(token, data.getData(), authContextInfo);

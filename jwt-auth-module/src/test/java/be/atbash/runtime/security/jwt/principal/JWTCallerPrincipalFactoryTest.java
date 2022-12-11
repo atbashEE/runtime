@@ -66,7 +66,7 @@ class JWTCallerPrincipalFactoryTest {
                 .claim("claim2", "value2")
                 .build();
         JWTData<Object> jwtData = new JWTData<>(jwtClaimsSet, null);
-        Mockito.when(jwtDecoderMock.decode(Mockito.eq(token), Mockito.any(), Mockito.eq(keySelectorMock), Mockito.any(MPBearerTokenVerifier.class)))
+        Mockito.when(jwtDecoderMock.decode(Mockito.eq(token), Mockito.any(), Mockito.eq(keySelectorMock)))
                 .thenReturn(jwtData);
         JWTCallerPrincipal principal = factory.parse(token, authContextInfo);
         Assertions.assertThat(principal).isNotNull();
@@ -91,7 +91,7 @@ class JWTCallerPrincipalFactoryTest {
                 .claim("claim2", "value2")
                 .build();
         JWTData<Object> jwtData = new JWTData<>(jwtClaimsSet, null);
-        Mockito.when(jwtDecoderMock.decode(Mockito.eq(token), Mockito.any(), Mockito.eq(keySelectorMock), Mockito.any(MPBearerTokenVerifier.class)))
+        Mockito.when(jwtDecoderMock.decode(Mockito.eq(token), Mockito.any(), Mockito.eq(keySelectorMock)))
                 .thenReturn(jwtData);
         JWTCallerPrincipal principal = factory.parse(token, authContextInfo);
         Assertions.assertThat(principal).isNotNull();
@@ -132,7 +132,7 @@ class JWTCallerPrincipalFactoryTest {
                 .claim("claim2", "value2")
                 .build();
         JWTData<Object> jwtData = new JWTData<>(jwtClaimsSet, null);
-        Mockito.when(jwtDecoderMock.decode(Mockito.eq(token), Mockito.any(), Mockito.eq(keySelectorMock), Mockito.any(MPBearerTokenVerifier.class)))
+        Mockito.when(jwtDecoderMock.decode(Mockito.eq(token), Mockito.any(), Mockito.eq(keySelectorMock)))
                 .thenReturn(jwtData);
         JWTCallerPrincipal principal = factory.parse(token, authContextInfo);
         Assertions.assertThat(principal).isNotNull();

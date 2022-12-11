@@ -30,7 +30,8 @@ import java.util.List;
 import java.util.Set;
 
 public class MPBearerTokenVerifier implements JWTVerifier {
-
+    // Within Atbash Runtime, the DefaultJWTClaimsVerifier is nt executed
+    // This is the only JWTVerifier that runs
 
     private final JWTAuthContextInfo authContextInfo;
 
@@ -58,7 +59,8 @@ public class MPBearerTokenVerifier implements JWTVerifier {
             }
         }
 
-        // Fixme already done by DefaultJWTClaimsVerifier but do we use grace period?
+        // Version of checks of DefaultJWTClaimsVerifier but now uses the MP config around grace
+        // periods.
         Date now = new Date();
         Date exp = jwtClaimsSet.getExpirationTime();
         if (exp == null || !DateUtils.isAfter(exp, now, authContextInfo.getExpGracePeriodSecs())) {

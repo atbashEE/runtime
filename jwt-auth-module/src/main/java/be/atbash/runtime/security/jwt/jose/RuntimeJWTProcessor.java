@@ -18,6 +18,7 @@ package be.atbash.runtime.security.jwt.jose;
 import be.atbash.ee.security.octopus.nimbus.jwt.proc.DefaultJWTProcessor;
 import be.atbash.runtime.security.jwt.JWTAuthContextInfoProvider;
 import be.atbash.runtime.security.jwt.principal.JWTAuthContextInfo;
+import be.atbash.runtime.security.jwt.principal.MPBearerTokenVerifier;
 import jakarta.enterprise.inject.spi.CDI;
 
 public class RuntimeJWTProcessor extends DefaultJWTProcessor {
@@ -32,6 +33,7 @@ public class RuntimeJWTProcessor extends DefaultJWTProcessor {
 
         setJWSVerifierFactory(new RuntimeJWSVerifierFactory(authContextInfo));
         setJweDecrypterFactory(new RuntimeJWEDecrypterFactory(authContextInfo));
+        setJWTClaimsSetVerifier(new MPBearerTokenVerifier(authContextInfo));
     }
 
 }
