@@ -16,10 +16,9 @@
 package be.atbash.runtime.security.jwt.principal;
 
 import be.atbash.ee.security.octopus.keys.AtbashKey;
-import be.atbash.ee.security.octopus.keys.generator.KeyGenerator;
-import be.atbash.ee.security.octopus.keys.generator.RSAGenerationParameters;
 import be.atbash.ee.security.octopus.keys.selector.AsymmetricPart;
 import be.atbash.ee.security.octopus.keys.selector.SelectorCriteria;
+import be.atbash.runtime.security.jwt.jose.TestKeys;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -56,11 +55,9 @@ class RuntimeListKeyManagerTest {
     }
 
     private AtbashKey getPublicKey() {
-        RSAGenerationParameters generationParameters = new RSAGenerationParameters.RSAGenerationParametersBuilder()
-                .withKeyId("kid")
+        SelectorCriteria criteria = SelectorCriteria.newBuilder()
+                .withAsymmetricPart(AsymmetricPart.PUBLIC)
                 .build();
-        KeyGenerator generator = new KeyGenerator();
-        List<AtbashKey> keys = generator.generateKeys(generationParameters);
-        return keys.get(0);  // 1 = Private, 0 = public.
+        return TestKeys.generateRSAKeys("kid", criteria).get(0);
     }
 }

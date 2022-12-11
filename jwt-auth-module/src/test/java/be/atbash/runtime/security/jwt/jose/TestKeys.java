@@ -27,7 +27,6 @@ public final class TestKeys {
     private TestKeys() {
     }
 
-    // FIXME use this every where we need Keys
     public static List<AtbashKey> generateRSAKeys(String kid, SelectorCriteria selectorCriteria) {
         return generateRSAKeys(kid, 2048, selectorCriteria);
     }
@@ -47,40 +46,5 @@ public final class TestKeys {
             }
         }
         return result;
-    }
-
-    public static List<AtbashKey> generateECKeys(String kid) {
-        return generateECKeys(kid, "P-256");
-    }
-
-    public static List<AtbashKey> generateECKeys(String kid, String curve) {
-        ECGenerationParameters parameters = new ECGenerationParameters.ECGenerationParametersBuilder()
-                .withKeyId(kid)
-                .withCurveName(curve)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(parameters);
-    }
-
-    public static List<AtbashKey> generateOCTKeys(String kid) {
-        return generateOCTKeys(kid, 256);
-    }
-
-    public static List<AtbashKey> generateOCTKeys(String kid, int length) {
-        OCTGenerationParameters generationParameters = new OCTGenerationParameters.OCTGenerationParametersBuilder()
-                .withKeySize(length)
-                .withKeyId(kid)
-                .build();
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
-    }
-
-    public static List<AtbashKey> generateOKPKeys(String kid) {
-        OKPGenerationParameters generationParameters = new OKPGenerationParameters.OKPGenerationParametersBuilder()
-                .withKeyId(kid)
-                .build();
-
-        KeyGenerator generator = new KeyGenerator();
-        return generator.generateKeys(generationParameters);
     }
 }
