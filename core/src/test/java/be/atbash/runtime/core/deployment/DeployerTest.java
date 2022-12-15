@@ -244,8 +244,9 @@ class DeployerTest {
 
         Assertions.assertThat(testModule.getEvents()).hasSize(2);
         Assertions.assertThat(testModule.getEvents()).containsExactly("PreDeployment", "PostDeployment");
-        Assertions.assertThat(testModule.getRunData().getDeployments()).isEmpty();
+        Assertions.assertThat(testModule.getRunData().getDeployments()).hasSize(1);
         Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.hasDeploymentFailed()).isTrue();
 
     }
 

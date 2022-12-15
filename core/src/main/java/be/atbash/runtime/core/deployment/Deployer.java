@@ -130,11 +130,11 @@ public class Deployer implements ModuleEventListener {
                 .filter(ad -> ad.getDeploymentName().equals(deploymentName))
                 .findAny();
         if (archiveDeployment.isEmpty()) {
-            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, String.format("Unable to fine deployment with name '%s'", deploymentName));
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, String.format("Unable to find deployment with name '%s'", deploymentName));
         }
 
         if (!(archiveDeployment.get() instanceof ArchiveDeployment)) {
-            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, String.format("Unable to fine deployment with name '%s'", deploymentName));
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, String.format("Unable to find deployment with name '%s'", deploymentName));
         }
 
         ArchiveDeployment deployment = (ArchiveDeployment) archiveDeployment.get();
@@ -206,10 +206,10 @@ public class Deployer implements ModuleEventListener {
         eventManager.publishEvent(Events.PRE_DEPLOYMENT, deployment);
 
         deployment.getDeploymentModule().registerDeployment(deployment);
+        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
         if (deployment.getDeploymentException() == null) {
             deployment.setDeployed();
 
-            RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
             runData.deployed(deployment);
 
             applicationMon.registerApplication(deployment);
@@ -219,6 +219,7 @@ public class Deployer implements ModuleEventListener {
                     .addArgument(deployment.getDeploymentName())
                     .addArgument(deployment.getDeploymentException().getMessage())
                     .log("DEPLOY-108");
+            runData.failedDeployment(deployment);
 
         }
         eventManager.publishEvent(Events.POST_DEPLOYMENT, deployment);

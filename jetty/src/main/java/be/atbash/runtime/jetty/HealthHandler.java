@@ -42,23 +42,30 @@ public class HealthHandler extends AbstractHandler {
         response.setContentType("text/html;charset=utf-8");
 
         int status;
+        boolean activeApplications = hasActiveApplications();
         if (runData.isDomainMode()) {
             status = HttpServletResponse.SC_OK;
         } else {
-            status = runData.getDeployments().isEmpty() ? HttpServletResponse.SC_SERVICE_UNAVAILABLE : HttpServletResponse.SC_OK;
+            status = activeApplications ? HttpServletResponse.SC_SERVICE_UNAVAILABLE : HttpServletResponse.SC_OK;
         }
         response.setStatus(status);
 
-        if (!runData.isDomainMode() && runData.getDeployments().isEmpty()) {
+        if (!runData.isDomainMode() && !activeApplications) {
             downWithNoApplications(response);
         } else {
             upWithApplications(response, runData);
         }
     }
 
+    private boolean hasActiveApplications() {
+        return runData.getDeployments().stream()
+                .anyMatch(ad -> !ad.hasDeploymentFailed());
+    }
+
     private void upWithApplications(HttpServletResponse response, RunData runData) throws IOException {
         String names = runData.getDeployments()
                 .stream()
+                .filter(ad -> !ad.hasDeploymentFailed())
                 .map(ad -> "\"" + ad.getDeploymentName() + "\"")
                 .collect(Collectors.joining(","));
         response.getWriter().println("{\n" +

@@ -37,6 +37,7 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("junit");
         Assertions.assertThat(deployment.isVerified()).isTrue();
         Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
     @Test
@@ -57,6 +58,7 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("customName");
         Assertions.assertThat(deployment.isVerified()).isTrue();
         Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
 
@@ -67,7 +69,9 @@ class ArchiveDeploymentTest {
         ArchiveDeployment deployment = new ArchiveDeployment(archive);
         Assertions.assertThat(deployment.isDeployed()).isFalse();
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("junit");
+        // Default contextRoot based on deploymentName
         Assertions.assertThat(deployment.getContextRoot()).isEqualTo("/junit");
+        Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
     @Test
@@ -81,6 +85,7 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("customName");
         Assertions.assertThat(deployment.isVerified()).isFalse();
         Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
     @Test
@@ -98,6 +103,7 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.isVerified()).isTrue();
         Assertions.assertThat(deployment.isPrepared()).isFalse();
         Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
     @Test
@@ -115,6 +121,7 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.isVerified()).isFalse();
         Assertions.assertThat(deployment.isPrepared()).isFalse();
         Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
     @Test
@@ -136,6 +143,7 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.isVerified()).isTrue();
         Assertions.assertThat(deployment.isPrepared()).isTrue();
         Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
     @Test
@@ -159,7 +167,7 @@ class ArchiveDeploymentTest {
         Assertions.assertThat(deployment.isVerified()).isTrue();
         Assertions.assertThat(deployment.isPrepared()).isTrue();
         Assertions.assertThat(deployment.isDeployed()).isFalse();
-
+        Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
     @Test
@@ -202,5 +210,15 @@ class ArchiveDeploymentTest {
 
         Assertions.assertThat(deployment1).isEqualTo(deployment2);
 
+    }
+
+    @Test
+    public void testDeploymentFailed() {
+        String strTmp = System.getProperty("java.io.tmpdir");
+        File archive = new File(strTmp, "junit.war");
+        ArchiveDeployment deployment = new ArchiveDeployment(archive);
+        deployment.setDeploymentException(new RuntimeException());
+
+        Assertions.assertThat(deployment.hasDeploymentFailed()).isTrue();
     }
 }

@@ -57,7 +57,7 @@ class RunDataTest {
         deployment.setContextRoot("/test");
         runData.deployed(deployment);
 
-        Thread.sleep(100L);  // Give some time to execute kn the listener = seperate thread
+        Thread.sleep(100L);  // Give some time to execute of the listener = separate thread
         Assertions.assertThat(listener.getDeploymentDone()).containsExactly("/test");
         CriticalThreadCount.getInstance().waitForCriticalThreadsToFinish();
     }
@@ -76,12 +76,33 @@ class RunDataTest {
         deployment.setContextRoot("/test");
         runData.undeployed(deployment);
 
-        Thread.sleep(100L);  // Give some time to execute kn the listener = seperate thread
+        Thread.sleep(100L);  // Give some time to execute of the listener = separate thread
 
         Assertions.assertThat(listener.getDeploymentRemoved()).containsExactly("/test");
 
         CriticalThreadCount.getInstance().waitForCriticalThreadsToFinish();
 
+    }
+
+    @Test
+    @Timeout(value = 700, unit = TimeUnit.MILLISECONDS)
+        // The testListener has a sleep of 500 ms, so 700 ms should be ok.
+    void failedDeployment() throws InterruptedException {
+        RunData runData = new RunData();
+        Assertions.assertThat(runData.getDeployments()).isEmpty();
+
+        TestListener listener = new TestListener();
+        runData.registerDeploymentListener(listener);
+        ArchiveDeployment deployment = new ArchiveDeployment(new File("./applications/test.war"));
+        deployment.setContextRoot("/test");
+        deployment.setDeploymentException(new RuntimeException());
+        runData.failedDeployment(deployment);
+
+        Thread.sleep(100L);  // Give some time to execute of the listener = separate thread
+        Assertions.assertThat(listener.getDeploymentDone()).isEmpty();
+        CriticalThreadCount.getInstance().waitForCriticalThreadsToFinish();
+
+        Assertions.assertThat(runData.getDeployments()).hasSize(1);
     }
 
     private static class TestListener implements ArchiveDeploymentListener {

@@ -62,5 +62,8 @@ public class AbstractDeployment {
         this.deploymentException = deploymentException;
     }
 
+    public boolean hasDeploymentFailed() {
+        return getDeploymentException() != null;
+    }
 
 }

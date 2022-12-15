@@ -56,6 +56,13 @@ public class RunData {
         }
     }
 
+    public void failedDeployment(AbstractDeployment deployment) {
+        if (deployment.getDeploymentException() == null) {
+            throw new IllegalStateException("We can only have a failed deployment when there is a DeploymentException");
+        }
+        deployments.add(deployment);
+    }
+
     public List<AbstractDeployment> getDeployments() {
         return deployments;
     }
