@@ -41,19 +41,12 @@ public class HealthHandler extends AbstractHandler {
         baseRequest.setHandled(true);
         response.setContentType("text/html;charset=utf-8");
 
-        int status;
         boolean activeApplications = hasActiveApplications();
-        if (runData.isDomainMode()) {
-            status = HttpServletResponse.SC_OK;
-        } else {
-            status = activeApplications ? HttpServletResponse.SC_SERVICE_UNAVAILABLE : HttpServletResponse.SC_OK;
-        }
-        response.setStatus(status);
 
         if (!runData.isDomainMode() && !activeApplications) {
             downWithNoApplications(response);
         } else {
-            upWithApplications(response, runData);
+            withApplications(response, runData);
         }
     }
 
@@ -62,27 +55,67 @@ public class HealthHandler extends AbstractHandler {
                 .anyMatch(ad -> !ad.hasDeploymentFailed());
     }
 
-    private void upWithApplications(HttpServletResponse response, RunData runData) throws IOException {
-        String names = runData.getDeployments()
+    private void withApplications(HttpServletResponse response, RunData runData) throws IOException {
+        String readyNames = runData.getDeployments()
                 .stream()
-                .filter(ad -> !ad.hasDeploymentFailed())
+                .filter(ad -> !ad.hasDeploymentFailed() && ad.isApplicationReady())
                 .map(ad -> "\"" + ad.getDeploymentName() + "\"")
                 .collect(Collectors.joining(","));
-        response.getWriter().println("{\n" +
-                "   \"status\":\"UP\",\n" +
-                "   \"checks\":[\n" +
-                "      {\n" +
-                "         \"name\":\"applications\",\n" +
-                "         \"status\":\"UP\",\n" +
-                "         \"data\":[\n" +
-                "            " + names + "\n" +
-                "         ]\n" +
-                "      }\n" +
-                "   ]\n" +
-                "}");
+        String notReadyNames = runData.getDeployments()
+                .stream()
+                .filter(ad -> !ad.hasDeploymentFailed() && !ad.isApplicationReady())
+                .map(ad -> "\"" + ad.getDeploymentName() + "\"")
+                .collect(Collectors.joining(","));
+        String overallStatus;
+        if (notReadyNames.isEmpty()) {
+            overallStatus = "UP";
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            overallStatus = "DOWN";
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        }
+
+        String responseBody = "{\n" +
+                "   \"status\":\"" + overallStatus + "\",\n" +
+                "   \"checks\":[\n";
+        if (!readyNames.isEmpty()) {
+            responseBody = responseBody +
+                    "      {\n" +
+                    "         \"name\":\"applications\",\n" +
+                    "         \"status\":\"UP\",\n" +
+                    "         \"data\":[\n" +
+                    "            " + readyNames + "\n" +
+                    "         ]\n" +
+                    "      }\n";
+        }
+        if (!notReadyNames.isEmpty()) {
+            responseBody = responseBody +
+                    "      {\n" +
+                    "         \"name\":\"applications\",\n" +
+                    "         \"status\":\"DOWN\",\n" +
+                    "         \"data\":[\n" +
+                    "            " + notReadyNames + "\n" +
+                    "         ]\n" +
+                    "      }\n";
+        }
+        if (runData.getDeployments().isEmpty()) {
+            responseBody = responseBody +
+                    "    {\n" +
+                    "      \"name\":\"applications\",\n" +
+                    "      \"status\":\"UP\",\n" +
+                    "      \"data\":[\n" +
+                    "     ]\n" +
+                    "    }\n";
+
+        }
+        responseBody = responseBody +
+                "     ]\n" +
+                "  }\n";
+        response.getWriter().println(responseBody);
     }
 
     private void downWithNoApplications(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         response.getWriter().println("{\n" +
                 "  \"status\": \"DOWN\",\n" +
                 "  \"checks\": []\n" +

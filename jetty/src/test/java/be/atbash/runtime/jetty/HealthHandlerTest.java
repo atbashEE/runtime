@@ -70,6 +70,7 @@ class HealthHandlerTest {
         deployment.setDeployed();
 
         runData.deployed(deployment);
+        deployment.setApplicationReady();
 
         HealthHandler handler = new HealthHandler(runData);
         handler.handle("/health", baseRequestMock, requestMock, responseMock);

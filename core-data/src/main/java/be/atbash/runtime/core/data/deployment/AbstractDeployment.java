@@ -31,6 +31,8 @@ public class AbstractDeployment {
 
     private Exception deploymentException;
 
+    private boolean applicationReady;
+
     public AbstractDeployment(String deploymentName, Map<String, String> deploymentData) {
         this.deploymentName = deploymentName;
         this.deploymentData = deploymentData;
@@ -81,4 +83,12 @@ public class AbstractDeployment {
         return getDeploymentException() != null;
     }
 
+
+    public boolean isApplicationReady() {
+        return applicationReady;
+    }
+
+    public void setApplicationReady() {
+        applicationReady = true;
+    }
 }

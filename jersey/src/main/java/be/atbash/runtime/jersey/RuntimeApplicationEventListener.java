@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.jersey;
 
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 import be.atbash.runtime.core.data.deployment.CurrentDeployment;
 import jakarta.ws.rs.ext.Provider;
 import org.glassfish.jersey.server.model.Resource;
@@ -43,7 +44,9 @@ public class RuntimeApplicationEventListener implements ApplicationEventListener
     @Override
     public void onEvent(ApplicationEvent event) {
         if (event.getType() == ApplicationEvent.Type.INITIALIZATION_APP_FINISHED) {
-            applicationPath = CurrentDeployment.getInstance().getCurrent().getDeploymentData(JerseyModuleConstant.APPLICATION_PATH);
+            AbstractDeployment currentDeployment = CurrentDeployment.getInstance().getCurrent();
+            currentDeployment.setApplicationReady();
+            applicationPath = currentDeployment.getDeploymentData(JerseyModuleConstant.APPLICATION_PATH);
             ResourceModel resourceModel = event.getResourceModel();
             final ResourceLogDetails logDetails = new ResourceLogDetails();
             resourceModel.getResources().forEach((resource) -> logDetails.addEndpointLogLines(getLinesFromResource(resource)));

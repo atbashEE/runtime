@@ -109,6 +109,7 @@ public class JettyModule implements Module<RuntimeConfiguration> {
         handlers.addHandler(handler);
         try {
             handler.start();
+            deployment.setApplicationReady();  // FIXME Should we have a ApplicationEventListener to set this?
         } catch (Exception e) {
             deployment.setDeploymentException(e);
             return;
