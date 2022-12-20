@@ -34,6 +34,8 @@ public class AtbashContainerConfiguration implements ContainerConfiguration {
 
     private String modules;
 
+    private boolean useOldCDIDiscoveryMode;
+
     @Override
     public void validate() throws ConfigurationException {
         if (profile == null || profile.isBlank()) {
@@ -73,5 +75,13 @@ public class AtbashContainerConfiguration implements ContainerConfiguration {
 
     public void setModules(String modules) {
         this.modules = modules;
+    }
+
+    public boolean isUseOldCDIDiscoveryMode() {
+        return useOldCDIDiscoveryMode;
+    }
+
+    public void setUseOldCDIDiscoveryMode(boolean useOldCDIDiscoveryMode) {
+        this.useOldCDIDiscoveryMode = useOldCDIDiscoveryMode;
     }
 }

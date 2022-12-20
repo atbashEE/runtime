@@ -21,11 +21,8 @@ import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.parameter.WatcherType;
 import be.atbash.runtime.core.data.util.FileUtil;
-import be.atbash.runtime.core.data.util.StringUtil;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.embedded.AtbashEmbedded;
-import jakarta.enterprise.inject.spi.BeanManager;
-import jakarta.enterprise.inject.spi.CDI;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -38,9 +35,6 @@ import org.jboss.arquillian.container.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.container.spi.client.protocol.metadata.HTTPContext;
 import org.jboss.arquillian.container.spi.client.protocol.metadata.ProtocolMetaData;
 import org.jboss.arquillian.container.spi.client.protocol.metadata.Servlet;
-import org.jboss.arquillian.core.api.InstanceProducer;
-import org.jboss.arquillian.core.api.annotation.ApplicationScoped;
-import org.jboss.arquillian.core.api.annotation.Inject;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.descriptor.api.Descriptor;
@@ -60,10 +54,6 @@ public class AtbashDeployableContainer implements DeployableContainer<AtbashCont
 
     private AtbashContainerConfiguration atbashContainerConfiguration;
     private AtbashEmbedded embedded;
-
-    @Inject
-    @ApplicationScoped
-    private InstanceProducer<BeanManager> beanManagerInstance;
 
     @Override
     public Class<AtbashContainerConfiguration> getConfigurationClass() {
@@ -110,19 +100,21 @@ public class AtbashDeployableContainer implements DeployableContainer<AtbashCont
 
     private ProtocolMetaData deployArchive(Archive<?> archive) throws DeploymentException {
         // Write archive to disk
-        File archiveLocation = defineArchiveLocation(archive.getName());
+        String deploymentName = getDeploymentName(archive.getName());
+
+        File archiveLocation = defineArchiveLocation(deploymentName);
         archive.as(ZipExporter.class).exportTo(
                 archiveLocation, true);
 
         // Start deployment by emitting event.
         EventManager eventManager = EventManager.getInstance();
         ArchiveDeployment deployment = new ArchiveDeployment(archiveLocation);
-        eventManager.publishEvent(Events.DEPLOYMENT, deployment);
 
-        // Somehow, we need to set the CDI BeanManager into the Arquillian Manager so that CDI testEnricher finds it
-        // FIXME This will fail if we switch to a real CDI lite implementation that doesn't has BeanManager implemented?
-        beanManagerInstance.set(CDI.current().getBeanManager());
-        // TODO Should we use org.jboss.arquillian.testenricher.cdi.container.BeanManagerProducer?
+        if (atbashContainerConfiguration.isUseOldCDIDiscoveryMode()) {
+            deployment.addDeploymentData(TCKModuleConstant.USE_OLD_CDI_DISCOVERY_MODE, "true");
+        }
+
+        eventManager.publishEvent(Events.DEPLOYMENT, deployment);
 
         // Check if the deployment was successful.
         Exception deploymentException = deployment.getDeploymentException();
@@ -163,8 +155,28 @@ public class AtbashDeployableContainer implements DeployableContainer<AtbashCont
         return result;
     }
 
-    private File defineArchiveLocation(String archiveName) {
-        return new File(FileUtil.getTempDirectory() + "/" + archiveName);
+    private File defineArchiveLocation(String deploymentName) {
+        return new File(FileUtil.getTempDirectory() + "/" + deploymentName + ".war");
+    }
+
+    private String getDeploymentName(String archiveName) {
+        String result = archiveName;
+        if (archiveName.length() > 44) {  // 44 = 40 (SHA-1 message digest) + 4 (.war)
+            // When no archive name specified in the test, the name is TestClassName + SHA-1 digest
+            // But this can be too long in some cases and deployment on Jetty fails. (because we also add UUID)
+
+            // But Arquillian doesn't put the SHA value correctly, some leading 0 might be dropped.
+            // Since Every test Class Name ends with Test, we take that as marker.
+            // No problem for existing name as we overwrite when exporting in archive.as().exportTo()
+
+            int idx = archiveName.lastIndexOf("Test");
+            if (idx > -1) {
+                // Check >-1 for safety when it doesn't end with Test :)
+                result = archiveName.substring(0, idx + 4);
+            }
+
+        }
+        return result;
     }
 
     @Override
@@ -174,10 +186,11 @@ public class AtbashDeployableContainer implements DeployableContainer<AtbashCont
 
     private void undeployArchive(Archive<?> archive) {
         EventManager eventManager = EventManager.getInstance();
-        eventManager.publishEvent(Events.UNDEPLOYMENT, StringUtil.determineDeploymentName(archive.getName()));
+        String deploymentName = getDeploymentName(archive.getName());
+        eventManager.publishEvent(Events.UNDEPLOYMENT, deploymentName);
 
         if (!atbashContainerConfiguration.isKeepArchive()) {
-            File archiveLocation = defineArchiveLocation(archive.getName());
+            File archiveLocation = defineArchiveLocation(deploymentName);
             boolean deleted = archiveLocation.delete();
             if (!deleted) {
                 LOGGER.warn(String.format("Unable to delete the archive from the location '%s'", archiveLocation));
