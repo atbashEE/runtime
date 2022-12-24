@@ -176,6 +176,10 @@ public class AtbashDeployableContainer implements DeployableContainer<AtbashCont
             }
 
         }
+        // strip .war
+        if (result.endsWith(".war")) {
+            result = result.substring(0, result.length()-4);
+        }
         return result;
     }
 
