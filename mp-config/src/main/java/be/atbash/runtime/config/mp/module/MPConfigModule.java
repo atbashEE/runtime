@@ -16,6 +16,7 @@
 package be.atbash.runtime.config.mp.module;
 
 import be.atbash.runtime.config.mp.MPConfigModuleConstant;
+import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.AbstractDeployment;
@@ -23,6 +24,7 @@ import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.module.RuntimeObjectsManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -110,11 +112,15 @@ public class MPConfigModule implements Module<RuntimeConfiguration> {
             return;
         }
 
-        String deploymentData = deployment.getDeploymentData(MPConfigModuleConstant.CONFIG_FILES);
-        if (deploymentData == null || deploymentData.isBlank()) {
-            LOGGER.info(String.format("MPCONFIG-001: MP Config functionality is disabled for application %s", deployment.getDeploymentName()));
-            deployment.addDeploymentData(MPConfigModuleConstant.MPCONFIG_ENABLED, "false");
-            return;
+        RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
+        if (!runData.isRunnerMode()) {
+            // Check only if there is a MP Config property file when not in runner mode.
+            String deploymentData = deployment.getDeploymentData(MPConfigModuleConstant.CONFIG_FILES);
+            if (deploymentData == null || deploymentData.isBlank()) {
+                LOGGER.info(String.format("MPCONFIG-001: MP Config functionality is disabled for application %s", deployment.getDeploymentName()));
+                deployment.addDeploymentData(MPConfigModuleConstant.MPCONFIG_ENABLED, "false");
+                return;
+            }
         }
 
         deployment.addDeploymentData(MPConfigModuleConstant.MPCONFIG_ENABLED, "true");

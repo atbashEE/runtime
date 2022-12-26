@@ -30,6 +30,7 @@ public class RunData {
     private final List<ArchiveDeploymentListener> listeners = new ArrayList<>();
     private boolean domainMode;
     private boolean embeddedMode;
+    private boolean runnerMode;
 
     public List<String> getStartedModules() {
         return startedModules;
@@ -88,6 +89,14 @@ public class RunData {
 
     public void setEmbeddedMode() {
         this.embeddedMode = true;
+    }
+
+    public boolean isRunnerMode() {
+        return runnerMode;
+    }
+
+    public void setRunnerMode() {
+        runnerMode = true;
     }
 
     public void undeployed(ArchiveDeployment deployment) {

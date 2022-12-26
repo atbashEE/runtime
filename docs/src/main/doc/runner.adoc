@@ -1,0 +1,42 @@
+=== Atbash Jakarta Runner mode
+
+The Atbash Runtime can also be used to run your Jakarta EE Core Profile application from the main method.  In this case, you do not create a WAR file, but specify the JAX-RS application or JAX-RS resources to the Runner methods within your Java SE main method.
+
+
+=== Dependency
+
+Add the following Maven dependency to your project
+
+[source,xml]
+----
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>jakarta-executable</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
+            <artifactId>jakarta-executable-impl</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <!-- only needed at runtime, but since jar packaging, you cannot specify its scope. -->
+        </dependency>
+----
+
+=== Define Configuration
+
+There is a Runner Builder available to define the configuration.
+
+[source,java]
+----
+    JakartaSERunnerBuilder.newBuilder(DemoApplication.class)
+        .run();
+----
+
+=== Active Modules
+
+By default, the `jakarta-executable-impl` dependency activates the JAX_RS, CDI, JSON-B, JSON-P and MicroProfile Config functionality.
+
+The general rule for the Runner mode is that when a Atbash Runtime module is on the classpath, it is active. You can deactivate a module, like MP Config, by specifying a certain property. Have a look at the modules on how to do this.
+
+=== Known issues

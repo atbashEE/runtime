@@ -100,6 +100,9 @@ public class CoreModule implements Module<ConfigurationParameters> {
         if (configurationParameters.isEmbeddedMode()) {
             runData.setEmbeddedMode();
         }
+        if (configurationParameters.isJakartaRunner()) {
+            runData.setRunnerMode();
+        }
         watcherService = new WatcherService(configurationParameters.getWatcher());
         if (LoggingUtil.isVerbose()) {
             LOGGER.trace("CORE-1002: Module ready");
