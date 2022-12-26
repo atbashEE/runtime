@@ -28,6 +28,7 @@ public class JakartaApplication {
 
         /*
         // Define the JAX-RS resources.
+        // Does not take into account @ApplicationPath (since you didn't specify it when running)
         JakartaSERunnerBuilder.newBuilder(HelloResource.class, PersonResource.class)
                 .withPort(8888)
                 .run();

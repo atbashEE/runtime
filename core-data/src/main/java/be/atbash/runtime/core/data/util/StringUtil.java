@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,23 @@ public final class StringUtil {
             filename = filename.substring(0, filename.length() - 4);
         }
         return filename;
+    }
+
+    /**
+     * Makes sure the string starts with / and does not end with /.
+     *
+     * @param path
+     * @return
+     */
+    public static String sanitizePath(String path) {
+
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        return path;
     }
 
 }

@@ -21,9 +21,11 @@ import be.atbash.runtime.core.data.deployment.ApplicationExecution;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.data.util.StringUtil;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.util.reflection.ClassUtils;
+import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.SeBootstrap;
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -80,16 +82,17 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
     @Override
     public void executeDeployment(ApplicationExecution applicationExecution) {
         SeBootstrap.Configuration.Builder configBuilder = SeBootstrap.Configuration.builder();
+        ResourceConfig resourceConfig = new ResourceConfig();
+
+        handleResourcesDefinition(resourceConfig, applicationExecution);
+
         configBuilder.property(SeBootstrap.Configuration.PROTOCOL, "HTTP")
                 .property(SeBootstrap.Configuration.HOST, applicationExecution.getHost())
                 .property(SeBootstrap.Configuration.PORT, applicationExecution.getPort())
                 .property(SeBootstrap.Configuration.ROOT_PATH, applicationExecution.getRoot());
 
-        applicationExecution.getDeploymentData().put(JerseySEModuleConstant.APPLICATION_PATH, "/root");
+        applicationExecution.getDeploymentData().put(JerseySEModuleConstant.APPLICATION_PATH, applicationExecution.getRoot());
 
-        ResourceConfig resourceConfig = new ResourceConfig();
-
-        handleResourcesDefinition(resourceConfig, applicationExecution);
         SeBootstrap.start(resourceConfig, configBuilder.build());
 
         LOGGER.atInfo().addArgument(applicationExecution.getDeploymentName()).log("JERSEY-104");
@@ -103,6 +106,7 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
             switch (resourceType) {
 
                 case APPLICATION:
+                    updateContextPathForApplicationPath(someClass, applicationExecution);
                     Application application = ClassUtils.newInstance(someClass);
 
                     Set<Class<?>> resources = application.getClasses();
@@ -125,6 +129,19 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
                     break;
                 default:
                     throw new IllegalArgumentException(String.format("The value %s for enum ResourceType is unexpected.", resourceType));
+            }
+        }
+    }
+
+    private void updateContextPathForApplicationPath(Class<?> someClass, ApplicationExecution applicationExecution) {
+        // @ApplicationPath is not picked up when providing Application as class.
+        ApplicationPath applicationPath = someClass.getAnnotation(ApplicationPath.class);
+        if (applicationPath != null) {
+            String path = StringUtil.sanitizePath(applicationPath.value());
+            if (applicationExecution.getRoot().equals("/")) {
+                applicationExecution.setRoot(path);
+            } else {
+                applicationExecution.setRoot(applicationExecution.getRoot() + path);
             }
         }
     }
