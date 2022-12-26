@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletionStage;
 
 public class JerseySEModule implements Module<RuntimeConfiguration> {
 
@@ -93,7 +94,15 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
 
         applicationExecution.getDeploymentData().put(JerseySEModuleConstant.APPLICATION_PATH, applicationExecution.getRoot());
 
-        SeBootstrap.start(resourceConfig, configBuilder.build());
+        CompletionStage<SeBootstrap.Instance> completionStage = SeBootstrap.start(resourceConfig, configBuilder.build());
+
+        completionStage.exceptionally(ex -> {
+            // handle the exception here
+            LOGGER.error("Exception during startup", ex);
+            // Application can't handle requests, so it is fine to abort JVM.
+            System.exit(-2);
+            return null;
+        });
 
         LOGGER.atInfo().addArgument(applicationExecution.getDeploymentName()).log("JERSEY-104");
     }
