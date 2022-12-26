@@ -24,6 +24,8 @@ public class JakartaRunnerData {
 
     private String host = "localhost";
 
+    private String root = "/";
+
     private Map<String, String> applicationData = new HashMap<>();
     private List<String> commandLineEntries = new ArrayList<>();
 
@@ -49,6 +51,24 @@ public class JakartaRunnerData {
 
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public String getRoot() {
+        return root;
+    }
+
+    public void setRoot(String root) {
+        this.root = Objects.requireNonNull(root);
+        sanitizeRoot();
+    }
+
+    private void sanitizeRoot() {
+        if (!root.startsWith("/")) {
+            root = "/" + root;
+        }
+        if (root.endsWith("/")) {
+            root = root.substring(0, root.length() - 1);
+        }
     }
 
     public Map<String, String> getApplicationData() {

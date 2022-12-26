@@ -20,19 +20,14 @@ import be.atbash.runtime.common.command.AbstractAtbashCommand;
 import be.atbash.runtime.core.data.CriticalThreadCount;
 import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.deployment.ApplicationExecution;
-import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
-import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
-import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.parameter.WatcherType;
-import be.atbash.runtime.core.data.util.SpecificationUtil;
 import be.atbash.runtime.core.data.version.VersionInfo;
 import be.atbash.runtime.core.data.watcher.WatcherBean;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.data.watcher.model.ServerMon;
-import be.atbash.runtime.core.deployment.SnifferManager;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.jakarta.executable.JakartaRunnerData;
 import be.atbash.runtime.jakarta.executable.impl.command.RuntimeCommand;
@@ -41,7 +36,6 @@ import be.atbash.runtime.logging.earlylog.EarlyLogRecords;
 import org.slf4j.Logger;
 import picocli.CommandLine;
 
-import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -195,6 +189,7 @@ public class JakartaRunnerHelper {
         ApplicationExecution execution = new ApplicationExecution(runnerData.getResources());
         execution.setPort(runnerData.getPort());
         execution.setHost(runnerData.getHost());
+        execution.setRoot(runnerData.getRoot());
         eventManager.publishEvent(Events.EXECUTION, execution);
     }
 

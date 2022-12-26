@@ -82,8 +82,10 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
         SeBootstrap.Configuration.Builder configBuilder = SeBootstrap.Configuration.builder();
         configBuilder.property(SeBootstrap.Configuration.PROTOCOL, "HTTP")
                 .property(SeBootstrap.Configuration.HOST, applicationExecution.getHost())
-                .property(SeBootstrap.Configuration.PORT, applicationExecution.getPort());
-        //.property(SeBootstrap.Configuration.ROOT_PATH, "/root/path");
+                .property(SeBootstrap.Configuration.PORT, applicationExecution.getPort())
+                .property(SeBootstrap.Configuration.ROOT_PATH, applicationExecution.getRoot());
+
+        applicationExecution.getDeploymentData().put(JerseySEModuleConstant.APPLICATION_PATH, "/root");
 
         ResourceConfig resourceConfig = new ResourceConfig();
 
@@ -95,6 +97,7 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
 
     private void handleResourcesDefinition(ResourceConfig resourceConfig, ApplicationExecution applicationExecution) {
 
+        resourceConfig.register(RuntimeApplicationEventListener.class);
         for (Class<?> someClass : applicationExecution.getResources()) {
             ResourceType resourceType = ResourceTypeUtil.determineType(someClass);
             switch (resourceType) {

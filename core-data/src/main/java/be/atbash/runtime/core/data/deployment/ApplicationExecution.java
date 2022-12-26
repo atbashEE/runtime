@@ -26,8 +26,10 @@ public class ApplicationExecution extends AbstractDeployment {
 
     private String host;
 
+    private String root;
+
     public ApplicationExecution(List<Class<?>> resources) {
-        super("Jakarta Core profile application", new HashMap<>());
+        super("Jakarta Core Profile application", new HashMap<>());
         this.resources = resources;
     }
 
@@ -49,5 +51,13 @@ public class ApplicationExecution extends AbstractDeployment {
 
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public String getRoot() {
+        return root;
+    }
+
+    public void setRoot(String root) {
+        this.root = root;
     }
 }

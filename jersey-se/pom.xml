@@ -60,12 +60,13 @@
         </dependency>
 
 
-        <!-- This is the simple HTTP server-->
-        <!-- TODO Should we allow for selection of JDK HTTP Server or Grizzly?? -->
+        <!-- This is the JDK HTTP server-->
+        <!-- The Simple Http server doesn't allow setting of Root context path.
+        And Grizzly is much more than just accepting HTTP connections
+        We might have these as option in the future if needed.-->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
-            <!--artifactId>jersey-container-jdk-http</artifactId-->
-            <artifactId>jersey-container-simple-http</artifactId>
+            <artifactId>jersey-container-jdk-http</artifactId>
             <version>${jersey.version}</version>
         </dependency>
 

@@ -53,4 +53,39 @@ class JakartaRunnerDataTest {
         runnerData.setHost("my-server");
         Assertions.assertThat(runnerData.getHost()).isEqualTo("my-server");
     }
+
+    @Test
+    void setRoot_default() {
+        JakartaRunnerData runnerData = new JakartaRunnerData();
+        Assertions.assertThat(runnerData.getRoot()).isEqualTo("/");
+    }
+
+    @Test
+    void setRoot_correct() {
+        JakartaRunnerData runnerData = new JakartaRunnerData();
+        runnerData.setRoot("/root");
+        Assertions.assertThat(runnerData.getRoot()).isEqualTo("/root");
+    }
+
+    @Test
+    void setRoot_missingLeading() {
+        JakartaRunnerData runnerData = new JakartaRunnerData();
+        runnerData.setRoot("root");
+        Assertions.assertThat(runnerData.getRoot()).isEqualTo("/root");
+    }
+
+    @Test
+    void setRoot_extraSlash() {
+        JakartaRunnerData runnerData = new JakartaRunnerData();
+        runnerData.setRoot("/root/");
+        Assertions.assertThat(runnerData.getRoot()).isEqualTo("/root");
+    }
+
+    @Test
+    void setRoot_noNull() {
+        JakartaRunnerData runnerData = new JakartaRunnerData();
+        Assertions.assertThatThrownBy(() -> runnerData.setRoot(null))
+                .isInstanceOf(NullPointerException.class);
+
+    }
 }
