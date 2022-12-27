@@ -190,6 +190,8 @@ public class JakartaRunnerHelper {
         execution.setPort(runnerData.getPort());
         execution.setHost(runnerData.getHost());
         execution.setRoot(runnerData.getRoot());
+        runnerData.getApplicationData().forEach(execution::addDeploymentData);
+
         eventManager.publishEvent(Events.EXECUTION, execution);
     }
 

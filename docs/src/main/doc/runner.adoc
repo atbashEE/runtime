@@ -33,6 +33,28 @@ There is a Runner Builder available to define the configuration.
         .run();
 ----
 
+You can either specify a class that extends the JAX-RS Application class or a list of JAX-RS resource classes.
+
+When using the JAX-RS Application class, either the JAX-RS resources are retrieved from the `getClasses()` method (from that _Application_ class) or the class path is scanned for JAX-RS resources within the package (and subpackages) of that class.
+
+When using the Application class way, the `@ApplicationPath` is honored. If you create a new Jakarta Runner builder by specifying a list of JAX-RS resource classes, this value, if present, is ignored.
+
+The builder has additional methods to configure the runner.
+
+[source,java]
+----
+    .addPort(int)
+----
+
+Specifies the port assignment for the socket listener.
+
+[source,java]
+----
+    .addConfig(String key, String value)
+----
+
+Defines configuration values, for the application Deployer module or for the special `ConfigSource` implementation that these values exposes.  See ???
+
 === Active Modules
 
 By default, the `jakarta-executable-impl` dependency activates the JAX_RS, CDI, JSON-B, JSON-P and MicroProfile Config functionality.

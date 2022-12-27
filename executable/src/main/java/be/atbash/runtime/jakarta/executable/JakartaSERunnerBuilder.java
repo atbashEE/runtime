@@ -41,6 +41,11 @@ public final class JakartaSERunnerBuilder {
         return this;
     }
 
+    public JakartaSERunnerBuilder addConfig(String key, String value) {
+        runnerData.getApplicationData().put(key, value);
+        return this;
+    }
+
     public void run() {
         getRunner().start(runnerData);
     }
