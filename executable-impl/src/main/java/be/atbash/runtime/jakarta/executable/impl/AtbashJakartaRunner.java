@@ -62,10 +62,11 @@ public class AtbashJakartaRunner implements JakartaRunner {
     }
 
     private String[] defineArguments(JakartaRunnerData runnerData) {
-        Set<String> result = new HashSet<>();
+        List<String> result = new ArrayList<>(runnerData.getCommandLineEntries());
 
-        result.addAll(runnerData.getCommandLineEntries());
-        result.add(LOG_TO_CONSOLE_OPTION);
+        if (!result.contains(LOG_TO_CONSOLE_OPTION)) {
+            result.add(LOG_TO_CONSOLE_OPTION);
+        }
 
         return result.toArray(new String[0]);
     }

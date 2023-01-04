@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@ package be.atbash.runtime.jakarta.executable;
 
 import jakarta.ws.rs.core.Application;
 
-import java.util.ServiceLoader;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public final class JakartaSERunnerBuilder {
 
@@ -43,6 +44,23 @@ public final class JakartaSERunnerBuilder {
 
     public JakartaSERunnerBuilder addConfig(String key, String value) {
         runnerData.getApplicationData().put(key, value);
+        return this;
+    }
+
+    public JakartaSERunnerBuilder addConfig(Map<String, String> values) {
+        runnerData.getApplicationData().putAll(values);
+        return this;
+    }
+
+    public JakartaSERunnerBuilder addCommandLineEntry(String value) {
+        List<String> entries = new ArrayList<>();
+        if (value.contains(" ")) {
+            entries = Arrays.stream(value.split(" ")).collect(Collectors.toList());
+        } else {
+            entries.add(value);
+        }
+        runnerData.getCommandLineEntries().addAll(entries);
+
         return this;
     }
 

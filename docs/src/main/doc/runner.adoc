@@ -55,6 +55,28 @@ Specifies the port assignment for the socket listener.
 
 Defines configuration values, for the application Deployer module or for the special `ConfigSource` implementation that these values exposes.  See ???
 
+[source,java]
+----
+    .addCommandLineEntry(String entry)
+----
+
+Defines an option for the configuration of the runner (corresponds with the command line parameters of the class Atbash Runtime). The following options are supported:
+
+*-v|--verbose*: When active, more messages are shown in the log.  This can be enforced 'permanent' by putting `be.atbash.runtime.level=ALL` in the logging configuration.
+
+*-w|--watcher*:  Defines the type of the diagnostics, valid values are  +
+`MINIMAL`: (default) only the events from the Core module are sent to JFR.  +
+`OFF`: JFR and JMX are disabled  +
+`JFR`: Events are send to JFR system and Recording is started which is dump to file at JVM exit.  +
+`JMX`: Some data is available within the JMX system.  +
+`ALL`: Combination of `JFR` and `JMX`
+
+*--logConfiguration <file>*: Define the location of the configuration file and activates the Log to file option.
+
+*--warmup*: When this option is specified, the process exits after the application is deployed. This is typically used in combination with the Class Data Sharing option of the JVM to create archive file.
+
+*--datafile*: Defines the configuration data properties file with key values pairs for the application(s) deployment data. These deployment data can influence the configuration of the modules. For an overview, see ??? ( FIXME create such a section)
+
 === Active Modules
 
 By default, the `jakarta-executable-impl` dependency activates the JAX_RS, CDI, JSON-B, JSON-P and MicroProfile Config functionality.

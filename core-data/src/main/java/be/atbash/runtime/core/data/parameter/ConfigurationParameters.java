@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,9 @@ public class ConfigurationParameters {
 
     @CommandLine.Option(names = {"--no-logToFile"}, description = "Does the Runtime logs to the logging file?", negatable = true)
     private boolean logToFile = true;
+
+    @CommandLine.Option(names = {"--logConfiguration"}, description = "Points to the logging configuration properties file.")
+    private File logConfigurationFile;  // TODO Test this out outside of Jakarta Runner and document
 
     @CommandLine.Option(names = {"--warmup"}, description = "In warmup mode, runtime exists when application(s) are ready.")
     private boolean warmup = false;
@@ -166,6 +169,14 @@ public class ConfigurationParameters {
 
     public void setLogToFile(boolean logToFile) {
         this.logToFile = logToFile;
+    }
+
+    public File getLogConfigurationFile() {
+        return logConfigurationFile;
+    }
+
+    public void setLogConfigurationFile(File logConfigurationFile) {
+        this.logConfigurationFile = logConfigurationFile;
     }
 
     public boolean isWarmup() {

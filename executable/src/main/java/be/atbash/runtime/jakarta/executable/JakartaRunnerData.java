@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ public class JakartaRunnerData {
 
     private String root = "/";
 
-    private Map<String, String> applicationData = new HashMap<>();
-    private List<String> commandLineEntries = new ArrayList<>();
+    private final Map<String, String> applicationData = new HashMap<>();
+    private final List<String> commandLineEntries = new ArrayList<>();
 
     public List<Class<?>> getResources() {
         return resources;
@@ -74,16 +74,7 @@ public class JakartaRunnerData {
     public Map<String, String> getApplicationData() {
         return applicationData;
     }
-
-    public void setApplicationData(Map<String, String> applicationData) {
-        this.applicationData = applicationData;
-    }
-
     public List<String> getCommandLineEntries() {
         return commandLineEntries;
-    }
-
-    public void setCommandLineEntries(List<String> commandLineEntries) {
-        this.commandLineEntries = commandLineEntries;
     }
 }

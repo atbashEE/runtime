@@ -24,38 +24,23 @@ public class ConfigurationRunnerParameters {
     public static final String LOG_TO_CONSOLE_OPTION = "--logToConsole";
     public static final String VERBOSE_OPTION = "--verbose";
     public static final String VERBOSE_OPTION_SHORT = "-v";
-
-    @CommandLine.Option(names = {"-m", "--modules"}, description = "Comma separated list of modules that needs to be started.")
-    private String modules;
-
     @CommandLine.Option(names = {VERBOSE_OPTION_SHORT, VERBOSE_OPTION}, description = "Start with Verbose logging")
     private boolean verbose = false;
 
     @CommandLine.Option(names = {"-w", "--watcher"}, description = "Activate the (internal) monitoring tooling")
     private WatcherType watcher = WatcherType.MINIMAL;
 
-    @CommandLine.Option(names = {"--port"}, description = "Port number assigned to the process running the Atbash runtime.")
-    private int port = 8080;
-
     @CommandLine.Option(names = {LOG_TO_CONSOLE_OPTION}, description = "Does the Jakarta Runner logs to the console?")
     private boolean logToConsole = true;
 
-    @CommandLine.Option(names = {"--no-logToFile"}, description = "Does the Jakarta Runner logs to the logging file?", negatable = true)
-    private boolean logToFile = false;
+    @CommandLine.Option(names = {"--logConfiguration"}, description = "Points to the logging configuration properties file.")
+    private File logConfigurationFile;
 
     @CommandLine.Option(names = {"--warmup"}, description = "In warmup mode, runtime exists when application(s) are ready.")
     private boolean warmup = false;
 
     @CommandLine.Option(names = {"--datafile"}, description = "Configuration properties file that are provided to deployer and application")
     private File configDataFile;
-
-    public String getModules() {
-        return modules;
-    }
-
-    public void setModules(String modules) {
-        this.modules = modules;
-    }
 
     public Boolean getVerbose() {
         return verbose;
@@ -73,14 +58,6 @@ public class ConfigurationRunnerParameters {
         this.watcher = watcher;
     }
 
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
     public boolean isLogToConsole() {
         return logToConsole;
     }
@@ -89,12 +66,12 @@ public class ConfigurationRunnerParameters {
         this.logToConsole = logToConsole;
     }
 
-    public boolean isLogToFile() {
-        return logToFile;
+    public File getLogConfigurationFile() {
+        return logConfigurationFile;
     }
 
-    public void setLogToFile(boolean logToFile) {
-        this.logToFile = logToFile;
+    public void setLogConfigurationFile(File logConfigurationFile) {
+        this.logConfigurationFile = logConfigurationFile;
     }
 
     public boolean isWarmup() {
@@ -116,13 +93,10 @@ public class ConfigurationRunnerParameters {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("ConfigurationParameters{");
-        if (modules != null) {
-            sb.append(", --modules='").append(modules).append('\'');
-        }
         sb.append(", --verbose=").append(verbose);
         sb.append(", --watcher=").append(watcher);
         sb.append(", --logToConsole=").append(logToConsole);
-        sb.append(", --logToFile=").append(logToFile);
+        sb.append(", --logConfigurationFile=").append(logConfigurationFile);
         sb.append(", --warmup=").append(warmup);
         if (configDataFile != null) {
             sb.append(", --datafile=").append(configDataFile);

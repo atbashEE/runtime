@@ -155,6 +155,9 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         } else {
             configInstance = new ConfigInstance(null, null,
                     true, false);
+            // TODO Can we have this also for the normal Atbash Runtime?
+            // Can we add this to the if part?
+            configInstance.setLoggingConfigurationFile(parameters.getLogConfigurationFile().getPath());
         }
 
         config = ConfigUtil.readConfiguration(configInstance);
@@ -164,7 +167,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
 
         RuntimeConfiguration.Builder builder;
         if (parameters.isJakartaRunner()) {
-            builder = new RuntimeConfiguration.Builder(null, null, true);
+            builder = new RuntimeConfiguration.Builder(null, configInstance.getLoggingConfigurationFile(), true);
         } else {
             if (parameters.isStateless()) {
                 if (configInstance.getConfigName() != null) {

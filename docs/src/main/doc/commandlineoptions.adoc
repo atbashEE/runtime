@@ -10,7 +10,7 @@ java -jar atbash-runtime.jar <options>
 
 *-v|--verbose*: When active, more messages are shown in the log.  This can be enforced 'permanent' by putting `be.atbash.runtime.level=ALL` in the logging configuration.
 
-*--watcher*:  Defines the type of the diagnostics, valid values are  +
+*-w|--watcher*:  Defines the type of the diagnostics, valid values are  +
 `MINIMAL`: (default) only the events from the Core module are sent to JFR.  +
 `OFF`: JFR and JMX are disabled  +
 `JFR`: Events are send to JFR system and Recording is started which is dump to file at JVM exit.  +
@@ -39,12 +39,14 @@ The `--modules` option is an expert setting and using it incorrectly can result 
 
 *--no-logToFile*: Does not send logging to the file.  This overrules the value in the logging configuration file (TBC)
 
-zero, one or more WAR files can be added to the command line that needs to be deployed. Also the applications that are already 'deployed' within the configuration are started.
+*--datafile*: Defines the configuration data properties file with key values pairs for the application(s) deployment data. These deployment data can influence the configuration of the modules. For an overview, see ??? ( FIXME create such a section)
 
-*--datafile* Defines the configuration data properties file with key values pairs for the application(s) deployment data. These deployment data can influence the configuration of the modules. For an overview, see ??? ( FIXME create such a section)
-
-*-c|--configfile* Defines the configuration file with commands that needs to be executed. after start up of the runtime but before the applications are deployed.
+*-c|--configfile*: Defines the configuration file with commands that needs to be executed. after start up of the runtime but before the applications are deployed.
 The file can contain comments when the line starts with `#`. Otherwise the line need to contain a valid command as specified in the next section _CLI_
+
+*--warmup*: When this option is specified, the process exits after the application is deployed. This is typically used in combination with the Class Data Sharing option of the JVM to create archive file.
+
+zero, one or more WAR files can be added to the command line that needs to be deployed. Also the applications that are already 'deployed' within the configuration are started.
 
 The exit status of the process is
 

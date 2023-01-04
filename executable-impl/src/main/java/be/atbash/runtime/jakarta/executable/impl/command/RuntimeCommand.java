@@ -21,6 +21,8 @@ import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.module.ModuleManager;
 import picocli.CommandLine;
 
+import java.io.File;
+
 @CommandLine.Command(name = "")
 public class RuntimeCommand extends AbstractAtbashCommand {
 
@@ -57,13 +59,13 @@ public class RuntimeCommand extends AbstractAtbashCommand {
         configurationParameters.setProfile("runner");  // Special profile for Jakarta Runner
         configurationParameters.setStateless(true);  // We don't want to store anything
         configurationParameters.setJakartaRunner();  // Important flag
-        configurationParameters.setPort(configurationRunnerParameters.getPort());
-        configurationParameters.setModules(configurationRunnerParameters.getModules());
         configurationParameters.setVerbose(configurationRunnerParameters.getVerbose());
         configurationParameters.setConfigDataFile(configurationRunnerParameters.getConfigDataFile());
         configurationParameters.setWarmup(configurationRunnerParameters.isWarmup());
         configurationParameters.setWatcher(configurationRunnerParameters.getWatcher());
-        configurationParameters.setLogToFile(configurationRunnerParameters.isLogToFile());
+        File configurationFile = configurationRunnerParameters.getLogConfigurationFile();
+        configurationParameters.setLogToFile(configurationFile != null);
+        configurationParameters.setLogConfigurationFile(configurationFile);
         configurationParameters.setLogToConsole(configurationRunnerParameters.isLogToConsole());
 
 
