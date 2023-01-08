@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ApplicationInfo {
+public final class ApplicationInfo {
 
     private String name;
     private String contextRoot;
@@ -34,7 +34,7 @@ public class ApplicationInfo {
 
     private ApplicationInfo(ArchiveDeployment deployment) {
         name = deployment.getDeploymentName();
-        contextRoot = deployment.getContextRoot();
+        contextRoot = deployment.getContextRoot();  // Can never be null
         specifications = deployment.getSpecifications();
         sniffers = deployment.getSniffers().stream().map(s -> s.getClass().getSimpleName()).collect(Collectors.toList());
     }
@@ -88,6 +88,26 @@ public class ApplicationInfo {
                 , contextRoot
                 , specifications.stream().map(Enum::name).collect(Collectors.joining(", "))
                 , String.join(", ", sniffers));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // contextRoot makes this object unique.
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ApplicationInfo)) {
+            return false;
+        }
+
+        ApplicationInfo that = (ApplicationInfo) o;
+
+        return contextRoot.equals(that.contextRoot);
+    }
+
+    @Override
+    public int hashCode() {
+        return contextRoot.hashCode();
     }
 
     public static ApplicationInfo createFor(AbstractDeployment deployment) {

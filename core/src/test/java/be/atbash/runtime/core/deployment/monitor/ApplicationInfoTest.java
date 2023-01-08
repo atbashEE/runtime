@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.deployment.sniffer.SingleTriggeredSniffer;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -56,4 +57,12 @@ class ApplicationInfoTest {
 
     }
 
+    @Test
+    void equalsContract() {
+        // Equals/HashCode should only be using contextRoot (which is not null)
+        EqualsVerifier.simple().forClass(ApplicationInfo.class)
+                .withNonnullFields("contextRoot")
+                .withIgnoredFields("name", "specifications", "sniffers")
+                .verify();
+    }
 }

@@ -13,7 +13,7 @@ java -jar atbash-runtime.jar <options>
 *-w|--watcher*:  Defines the type of the diagnostics, valid values are  +
 `MINIMAL`: (default) only the events from the Core module are sent to JFR.  +
 `OFF`: JFR and JMX are disabled  +
-`JFR`: Events are send to JFR system and Recording is started which is dump to file at JVM exit.  +
+`JFR`: Events are send to JFR system and Recording is started which is dumped to file at JVM exit.  +
 `JMX`: Some data is available within the JMX system.  +
 `ALL`: Combination of `JFR` and `JMX`
 

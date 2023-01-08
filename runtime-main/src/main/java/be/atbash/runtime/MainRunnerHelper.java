@@ -69,6 +69,7 @@ public class MainRunnerHelper {
         }
         RuntimeCommand command = new RuntimeCommand(null);
         CommandLine commandLine = new CommandLine(command);
+        commandLine.setCaseInsensitiveEnumValuesAllowed(true);
 
         actualCommand = (RuntimeCommand) handleCommandLine(programArguments, commandLine);
         if (actualCommand == null) {

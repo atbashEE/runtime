@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package be.atbash.runtime.core.data.watcher;
 
 public enum WatcherBean {
-    RuntimeWatcherBean("Atbash.Runtime", "Info"),
-    ApplicationWatcherBean("Atbash.Server.Applications", "data");
+    RuntimeWatcherBean("Atbash:type=Runtime", "Info"),
+    ApplicationWatcherBean("Atbash:type=Server.applications", "data");
 
     private final String hierarchyName;
     private final String name;

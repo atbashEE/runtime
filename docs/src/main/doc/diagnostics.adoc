@@ -1,0 +1,26 @@
+== Diagnostics
+
+There are some diagnostics systems and levels supported. These are not activated by default.
+
+- Information within logfile through the _verbose_ option
+- JMX
+- Java Flight Recorder
+- MicroMeter usage to gather statistics about your applications
+
+
+=== JMX
+
+When you activate the JMX option (use `-w|--watcher jmx`  or `all`), the following information is available by default.
+
+* Information about the runtime within the `Atbash.Runtime` bean
+** Runtime version
+** Uptime of the process
+** Active modules
+* Information about the deployed application(s)
+** The context root
+** The Specifications
+
+=== Flight Recorder
+
+=== Logging
+
