@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,10 @@ class ArchiveDeploymentTest {
         String strTmp = System.getProperty("java.io.tmpdir");
         File archive = new File(strTmp, "junit.war");
         ArchiveDeployment deployment = new ArchiveDeployment(archive);
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("junit");
-        Assertions.assertThat(deployment.isVerified()).isTrue();
-        Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isTrue();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isFalse();
         Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
@@ -45,7 +45,7 @@ class ArchiveDeploymentTest {
         String strTmp = System.getProperty("java.io.tmpdir");
         File archive = new File(strTmp, "my.test.application.war");
         ArchiveDeployment deployment = new ArchiveDeployment(archive);
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("my.test.application");
     }
 
@@ -54,10 +54,10 @@ class ArchiveDeploymentTest {
         String strTmp = System.getProperty("java.io.tmpdir");
         File archive = new File(strTmp, "junit.war");
         ArchiveDeployment deployment = new ArchiveDeployment(archive, "customName");
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("customName");
-        Assertions.assertThat(deployment.isVerified()).isTrue();
-        Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isTrue();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isFalse();
         Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
@@ -67,7 +67,7 @@ class ArchiveDeploymentTest {
         String strTmp = System.getProperty("java.io.tmpdir");
         File archive = new File(strTmp, "junit.war");
         ArchiveDeployment deployment = new ArchiveDeployment(archive);
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("junit");
         // Default contextRoot based on deploymentName
         Assertions.assertThat(deployment.getContextRoot()).isEqualTo("/junit");
@@ -81,10 +81,10 @@ class ArchiveDeploymentTest {
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
         Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
         ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit", new HashMap<>());
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("customName");
-        Assertions.assertThat(deployment.isVerified()).isFalse();
-        Assertions.assertThat(deployment.isPrepared()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isFalse();
         Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
@@ -95,14 +95,14 @@ class ArchiveDeploymentTest {
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
         Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
         ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit", new HashMap<>());
-        Assertions.assertThat(deployment.isVerified()).isFalse();
-        Assertions.assertThat(deployment.isPrepared()).isFalse();
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
 
         deployment.setDeploymentLocation(location);
-        Assertions.assertThat(deployment.isVerified()).isTrue();
-        Assertions.assertThat(deployment.isPrepared()).isFalse();
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isTrue();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
         Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
@@ -113,14 +113,14 @@ class ArchiveDeploymentTest {
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
         Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
         ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit", new HashMap<>());
-        Assertions.assertThat(deployment.isVerified()).isFalse();
-        Assertions.assertThat(deployment.isPrepared()).isFalse();
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
 
         deployment.setDeploymentLocation(null);
-        Assertions.assertThat(deployment.isVerified()).isFalse();
-        Assertions.assertThat(deployment.isPrepared()).isFalse();
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
         Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
@@ -130,9 +130,9 @@ class ArchiveDeploymentTest {
         File archive = new File(strTmp, "junit.war");
         ArchiveDeployment deployment = new ArchiveDeployment(archive);
         Assertions.assertThat(deployment.getDeploymentName()).isEqualTo("junit");
-        Assertions.assertThat(deployment.isVerified()).isTrue();
-        Assertions.assertThat(deployment.isPrepared()).isFalse();
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isTrue();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
 
         deployment.setArchiveContent(new ArchiveContent.ArchiveContentBuilder().withClassesFiles(new ArrayList<>()).build());
         deployment.setClassLoader(new WebAppClassLoader(archive, deployment.getArchiveContent().getLibraryFiles(), this.getClass().getClassLoader()));
@@ -140,9 +140,9 @@ class ArchiveDeploymentTest {
         deployment.setSniffers(Collections.singletonList(new SingleTriggeredSniffer()));
         deployment.setDeploymentModule(new Module1());
 
-        Assertions.assertThat(deployment.isVerified()).isTrue();
-        Assertions.assertThat(deployment.isPrepared()).isTrue();
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isTrue();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isTrue();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
         Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 
@@ -153,9 +153,9 @@ class ArchiveDeploymentTest {
         List<Sniffer> sniffers = Collections.singletonList(new SingleTriggeredSniffer());
         Set<Specification> specifications = Collections.singleton(Specification.SERVLET);
         ArchiveDeployment deployment = new ArchiveDeployment(location.getAbsolutePath(), "customName", specifications, sniffers, "/junit", new HashMap<>());
-        Assertions.assertThat(deployment.isPrepared()).isFalse();
-        Assertions.assertThat(deployment.isVerified()).isFalse();
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
 
         // Verification
         deployment.setDeploymentLocation(location);
@@ -164,9 +164,9 @@ class ArchiveDeploymentTest {
         deployment.setClassLoader(new WebAppClassLoader(location, deployment.getArchiveContent().getLibraryFiles(), this.getClass().getClassLoader()));
         deployment.setDeploymentModule(new Module1());
 
-        Assertions.assertThat(deployment.isVerified()).isTrue();
-        Assertions.assertThat(deployment.isPrepared()).isTrue();
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isVerified()).isTrue();
+        Assertions.assertThat(deployment.getDeploymentPhase().isPrepared()).isTrue();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
         Assertions.assertThat(deployment.hasDeploymentFailed()).isFalse();
     }
 

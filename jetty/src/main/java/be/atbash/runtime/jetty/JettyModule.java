@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
+import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.data.watcher.WatcherService;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
@@ -85,6 +86,20 @@ public class JettyModule implements Module<RuntimeConfiguration> {
 
     @Override
     public void onEvent(EventPayload eventPayload) {
+        if (Events.POST_DEPLOYMENT.equals(eventPayload.getEventCode())) {
+
+            Object payload = eventPayload.getPayload();
+            // The Jakarta Runner doesn't use this module since it requires JAX-RS
+            if (payload instanceof ArchiveDeployment) {
+                ArchiveDeployment deployment = (ArchiveDeployment) payload;
+                if (deployment.getDeploymentModule() == this) {
+                    // The module responsible for the deployment was Jetty == this module
+                    deployment.setApplicationReady();
+                    // We don't have any feedback when all the servlets are actually ready
+                    // But we can assume the application is ready as of this moment.
+                }
+            }
+        }
 
     }
 
@@ -108,8 +123,8 @@ public class JettyModule implements Module<RuntimeConfiguration> {
 
         handlers.addHandler(handler);
         try {
+            deployment.setDeployInitiated();
             handler.start();
-            deployment.setApplicationReady();  // FIXME Should we have a ApplicationEventListener to set this?
         } catch (Exception e) {
             deployment.setDeploymentException(e);
             return;

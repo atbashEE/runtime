@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class ApplicationDataConfigSourceTest {
     @Test
     void getPropertyNames() {
 
-        AbstractDeployment deployment = new ApplicationExecution(Collections.emptyList());
+        AbstractDeployment deployment = new ApplicationExecution(Collections.emptyList(), "/");
         deployment.addDeploymentData("mp-config.prop1", "Ignored");
         deployment.addDeploymentData("jersey.prop2", "Ignored");
         deployment.addDeploymentData("foo", "bar");
@@ -41,7 +41,7 @@ class ApplicationDataConfigSourceTest {
     @Test
     void getValue() {
 
-        AbstractDeployment deployment = new ApplicationExecution(Collections.emptyList());
+        AbstractDeployment deployment = new ApplicationExecution(Collections.emptyList(), "/");
         deployment.addDeploymentData("foo", "bar");
         CurrentDeployment.getInstance().setCurrent(deployment);
 
@@ -52,7 +52,7 @@ class ApplicationDataConfigSourceTest {
     @Test
     void getValue_nonExisting() {
 
-        AbstractDeployment deployment = new ApplicationExecution(Collections.emptyList());
+        AbstractDeployment deployment = new ApplicationExecution(Collections.emptyList(), "/");
         deployment.addDeploymentData("foo", "bar");
         CurrentDeployment.getInstance().setCurrent(deployment);
 

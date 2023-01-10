@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,9 +90,9 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
         configBuilder.property(SeBootstrap.Configuration.PROTOCOL, "HTTP")
                 .property(SeBootstrap.Configuration.HOST, applicationExecution.getHost())
                 .property(SeBootstrap.Configuration.PORT, applicationExecution.getPort())
-                .property(SeBootstrap.Configuration.ROOT_PATH, applicationExecution.getRoot());
+                .property(SeBootstrap.Configuration.ROOT_PATH, applicationExecution.getContextRoot());
 
-        applicationExecution.getDeploymentData().put(JerseySEModuleConstant.APPLICATION_PATH, applicationExecution.getRoot());
+        applicationExecution.getDeploymentData().put(JerseySEModuleConstant.APPLICATION_PATH, applicationExecution.getContextRoot());
 
         CompletionStage<SeBootstrap.Instance> completionStage = SeBootstrap.start(resourceConfig, configBuilder.build());
 
@@ -147,10 +147,10 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
         ApplicationPath applicationPath = someClass.getAnnotation(ApplicationPath.class);
         if (applicationPath != null) {
             String path = StringUtil.sanitizePath(applicationPath.value());
-            if (applicationExecution.getRoot().equals("/")) {
-                applicationExecution.setRoot(path);
+            if (applicationExecution.getContextRoot().equals("/")) {
+                applicationExecution.setContextRoot(path);
             } else {
-                applicationExecution.setRoot(applicationExecution.getRoot() + path);
+                applicationExecution.setContextRoot(applicationExecution.getContextRoot() + path);
             }
         }
     }

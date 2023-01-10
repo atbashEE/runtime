@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,7 +157,9 @@ public class ConfigModule implements Module<ConfigurationParameters> {
                     true, false);
             // TODO Can we have this also for the normal Atbash Runtime?
             // Can we add this to the if part?
-            configInstance.setLoggingConfigurationFile(parameters.getLogConfigurationFile().getPath());
+            if (parameters.getLogConfigurationFile() != null) {
+                configInstance.setLoggingConfigurationFile(parameters.getLogConfigurationFile().getPath());
+            }
         }
 
         config = ConfigUtil.readConfiguration(configInstance);

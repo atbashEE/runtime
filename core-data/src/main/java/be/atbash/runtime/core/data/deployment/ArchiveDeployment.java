@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,15 +30,7 @@ public class ArchiveDeployment extends AbstractDeployment {
 
     private File archiveFile;
 
-    // verified means the deploymentLocation points to a valid expanded war
-    // or archiveFile is specified
-    private boolean verified;
-    // There is also isPrepared. Prepared means that ALL preparation is done
-    // Deployed means that the application is responding to user requests.
-    private boolean deployed;
     private File deploymentLocation;
-
-    private String contextRoot;
 
     // This is about preparation.
     private ArchiveContent archiveContent;
@@ -51,43 +43,32 @@ public class ArchiveDeployment extends AbstractDeployment {
     }
 
     public ArchiveDeployment(File archiveFile, String deploymentName) {
-        super(deploymentName, new HashMap<>());
+        super(deploymentName, null, new HashMap<>());
         this.archiveFile = archiveFile;
-        this.verified = true;
+        deploymentPhase = DeploymentPhase.VERIFIED;
     }
 
     public ArchiveDeployment(String deploymentLocation, String deploymentName, Set<Specification> specifications,
                              List<Sniffer> sniffers, String contextRoot, Map<String, String> deploymentData) {
-        super(deploymentName, deploymentData);
+        super(deploymentName, contextRoot, deploymentData);
         this.deploymentLocation = new File(deploymentLocation);
         this.specifications = specifications;
         this.sniffers = sniffers;
-        this.contextRoot = contextRoot;
-        this.verified = false;
     }
 
     public File getArchiveFile() {
         return archiveFile;
     }
 
-    public boolean isDeployed() {
-        return deployed;
-    }
-
-    public void setDeployed() {
-        deployed = true;
-    }
-
-    public boolean isVerified() {
-        return verified;
-    }
-
-    public boolean isPrepared() {
-        return verified && archiveContent != null &&
+    protected void checkIsPrepared() {
+        if (getDeploymentPhase().isVerified() &&
+                archiveContent != null &&
                 classLoader != null &&
                 specifications != null &&
                 getDeploymentModule() != null &&
-                sniffers != null;
+                sniffers != null) {
+            deploymentPhase = DeploymentPhase.PREPARED;
+        }
     }
 
     public File getDeploymentLocation() {
@@ -96,13 +77,16 @@ public class ArchiveDeployment extends AbstractDeployment {
 
     public void setDeploymentLocation(File deploymentLocation) {
         this.deploymentLocation = deploymentLocation;
-        this.verified = deploymentLocation != null;
+        if (deploymentLocation != null) {
+            this.deploymentPhase = DeploymentPhase.VERIFIED;
+        }
         // When setting DeploymentLocation it is assumed that it is a verified
         // it is a valid, expanded WAR
     }
 
     public void setArchiveContent(ArchiveContent archiveContent) {
         this.archiveContent = archiveContent;
+        checkIsPrepared();
     }
 
     public ArchiveContent getArchiveContent() {
@@ -111,6 +95,7 @@ public class ArchiveDeployment extends AbstractDeployment {
 
     public void setClassLoader(WebAppClassLoader classLoader) {
         this.classLoader = classLoader;
+        checkIsPrepared();
     }
 
     public WebAppClassLoader getClassLoader() {
@@ -119,6 +104,7 @@ public class ArchiveDeployment extends AbstractDeployment {
 
     public void setSpecifications(Set<Specification> specifications) {
         this.specifications = specifications;
+        checkIsPrepared();
     }
 
     public Set<Specification> getSpecifications() {
@@ -126,6 +112,7 @@ public class ArchiveDeployment extends AbstractDeployment {
     }
 
     public void setSniffers(List<Sniffer> sniffers) {
+        checkIsPrepared();
         this.sniffers = sniffers;
     }
 
@@ -133,37 +120,4 @@ public class ArchiveDeployment extends AbstractDeployment {
         return sniffers;
     }
 
-    public String getContextRoot() {
-        return contextRoot == null ? "/" + getDeploymentName() : contextRoot;
-    }
-
-    public void setContextRoot(String contextRoot) {
-        this.contextRoot = contextRoot.strip();
-        if (!this.contextRoot.startsWith("/")) {
-            this.contextRoot = "/" + this.contextRoot;
-        }
-        if (this.contextRoot.endsWith("/")) {
-            this.contextRoot = this.contextRoot.substring(0, this.contextRoot.length() - 1);
-        }
-    }
-
-    // archiveDeployments are identified by context root.
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ArchiveDeployment)) {
-            return false;
-        }
-
-        ArchiveDeployment that = (ArchiveDeployment) o;
-
-        return contextRoot.equals(that.contextRoot);
-    }
-
-    @Override
-    public int hashCode() {
-        return contextRoot.hashCode();
-    }
 }

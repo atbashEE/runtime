@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,14 +41,17 @@ public final class StringUtil {
      * @return
      */
     public static String sanitizePath(String path) {
-
-        if (!path.startsWith("/")) {
-            path = "/" + path;
+        if (path == null) {
+            return null;
         }
-        if (path.endsWith("/")) {
-            path = path.substring(0, path.length() - 1);
+        String result = path.strip();
+        if (!result.startsWith("/")) {
+            result = "/" + result;
         }
-        return path;
+        if (result.endsWith("/") && result.length() > 1) {
+            result = result.substring(0, result.length() - 1);
+        }
+        return result;
     }
 
 }

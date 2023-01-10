@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,10 +186,9 @@ public class JakartaRunnerHelper {
 
         EventManager eventManager = EventManager.getInstance();
         // FIXME Need some additional parameters
-        ApplicationExecution execution = new ApplicationExecution(runnerData.getResources());
+        ApplicationExecution execution = new ApplicationExecution(runnerData.getResources(), runnerData.getRoot());
         execution.setPort(runnerData.getPort());
         execution.setHost(runnerData.getHost());
-        execution.setRoot(runnerData.getRoot());
         runnerData.getApplicationData().forEach(execution::addDeploymentData);
 
         eventManager.publishEvent(Events.EXECUTION, execution);

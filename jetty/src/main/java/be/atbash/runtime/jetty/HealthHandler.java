@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,12 +58,12 @@ public class HealthHandler extends AbstractHandler {
     private void withApplications(HttpServletResponse response, RunData runData) throws IOException {
         String readyNames = runData.getDeployments()
                 .stream()
-                .filter(ad -> !ad.hasDeploymentFailed() && ad.isApplicationReady())
+                .filter(ad ->  ad.getDeploymentPhase().isReady())
                 .map(ad -> "\"" + ad.getDeploymentName() + "\"")
                 .collect(Collectors.joining(","));
         String notReadyNames = runData.getDeployments()
                 .stream()
-                .filter(ad -> !ad.hasDeploymentFailed() && !ad.isApplicationReady())
+                .filter(ad -> !ad.getDeploymentPhase().isReady())
                 .map(ad -> "\"" + ad.getDeploymentName() + "\"")
                 .collect(Collectors.joining(","));
         String overallStatus;

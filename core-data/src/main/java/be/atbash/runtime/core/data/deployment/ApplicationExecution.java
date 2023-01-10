@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,10 @@ public class ApplicationExecution extends AbstractDeployment {
 
     private String host;
 
-    private String root;
-
-    public ApplicationExecution(List<Class<?>> resources) {
-        super("Jakarta Core Profile application", new HashMap<>());
+    public ApplicationExecution(List<Class<?>> resources, String root) {
+        super("Jakarta Core Profile application", root, new HashMap<>());
         this.resources = resources;
+        deploymentPhase = DeploymentPhase.VERIFIED;
     }
 
     public List<Class<?>> getResources() {
@@ -53,11 +52,11 @@ public class ApplicationExecution extends AbstractDeployment {
         this.host = host;
     }
 
-    public String getRoot() {
-        return root;
-    }
-
-    public void setRoot(String root) {
-        this.root = root;
+    @Override
+    protected void checkIsPrepared() {
+        if (getDeploymentPhase().isVerified() &&
+                getDeploymentModule() != null) {
+            deploymentPhase = DeploymentPhase.PREPARED;
+        }
     }
 }

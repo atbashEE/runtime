@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ class WatcherServiceTest {
 
         // No JMX entry created
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name = new ObjectName("Atbash.Runtime:name=*");
+        ObjectName name = new ObjectName("Atbash:type=Runtime,name=*");
         Set<ObjectInstance> objectInstances = server.queryMBeans(name, null);
         assertThat(objectInstances).isEmpty();
 
@@ -69,7 +69,7 @@ class WatcherServiceTest {
         service.registerBean(WatcherBean.RuntimeWatcherBean, serverMon);
 
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name = new ObjectName("Atbash.Runtime:name=*");
+        ObjectName name = new ObjectName("Atbash:type=Runtime,name=*");
         Set<ObjectInstance> objectInstances = server.queryMBeans(name, null);
         assertThat(objectInstances.size()).isEqualTo(1);
         assertThat(objectInstances.iterator().next().getClassName()).isEqualTo(ServerMon.class.getName());

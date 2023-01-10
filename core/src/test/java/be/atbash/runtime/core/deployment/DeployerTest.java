@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ class DeployerTest {
         Assertions.assertThat(testModule.getEvents()).hasSize(2);
         Assertions.assertThat(testModule.getEvents()).containsExactly("PreDeployment", "PostDeployment");
         Assertions.assertThat(testModule.getRunData().getDeployments()).hasSize(1);
-        Assertions.assertThat(deployment.isDeployed()).isTrue();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isTrue();
 
     }
 
@@ -199,7 +199,7 @@ class DeployerTest {
 
         Assertions.assertThat(testModule.getEvents()).isEmpty();
         Assertions.assertThat(testModule.getRunData().getDeployments()).isEmpty();
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
 
     }
 
@@ -245,7 +245,7 @@ class DeployerTest {
         Assertions.assertThat(testModule.getEvents()).hasSize(2);
         Assertions.assertThat(testModule.getEvents()).containsExactly("PreDeployment", "PostDeployment");
         Assertions.assertThat(testModule.getRunData().getDeployments()).hasSize(1);
-        Assertions.assertThat(deployment.isDeployed()).isFalse();
+        Assertions.assertThat(deployment.getDeploymentPhase().isDeployed()).isFalse();
         Assertions.assertThat(deployment.hasDeploymentFailed()).isTrue();
 
     }
