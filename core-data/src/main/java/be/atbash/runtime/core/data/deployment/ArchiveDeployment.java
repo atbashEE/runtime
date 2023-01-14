@@ -62,8 +62,6 @@ public class ArchiveDeployment extends AbstractDeployment {
 
     protected void checkIsPrepared() {
         if (getDeploymentPhase().isVerified() &&
-                archiveContent != null &&
-                classLoader != null &&
                 specifications != null &&
                 getDeploymentModule() != null &&
                 sniffers != null) {
@@ -95,7 +93,6 @@ public class ArchiveDeployment extends AbstractDeployment {
 
     public void setClassLoader(WebAppClassLoader classLoader) {
         this.classLoader = classLoader;
-        checkIsPrepared();
     }
 
     public WebAppClassLoader getClassLoader() {
