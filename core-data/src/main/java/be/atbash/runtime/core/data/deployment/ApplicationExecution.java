@@ -52,11 +52,4 @@ public class ApplicationExecution extends AbstractDeployment {
         this.host = host;
     }
 
-    @Override
-    protected void checkIsPrepared() {
-        if (getDeploymentPhase().isVerified() &&
-                getDeploymentModule() != null) {
-            deploymentPhase = DeploymentPhase.PREPARED;
-        }
-    }
 }

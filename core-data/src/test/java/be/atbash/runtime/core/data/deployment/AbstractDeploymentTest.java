@@ -100,8 +100,6 @@ class AbstractDeploymentTest {
     void setDeploymentModule() {
         TestDeployment deployment = new TestDeployment("name", "/root", new HashMap<>());
         deployment.setDeploymentModule(moduleMock);
-        // Make sure the checkIsPrepared() is called.
-        Assertions.assertThat(deployment.checkIsPreparedCalled).isTrue();
     }
 
     @ParameterizedTest
@@ -183,15 +181,8 @@ class AbstractDeploymentTest {
 
     static class TestDeployment extends AbstractDeployment {
 
-        private boolean checkIsPreparedCalled;
-
         public TestDeployment(String deploymentName, String contextRoot, Map<String, String> deploymentData) {
             super(deploymentName, contextRoot, deploymentData);
-        }
-
-        @Override
-        protected void checkIsPrepared() {
-            checkIsPreparedCalled = true;
         }
 
         void forceDeploymentPhase(DeploymentPhase deploymentPhase) {

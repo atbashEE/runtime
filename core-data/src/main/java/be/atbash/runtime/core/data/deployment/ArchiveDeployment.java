@@ -60,15 +60,6 @@ public class ArchiveDeployment extends AbstractDeployment {
         return archiveFile;
     }
 
-    protected void checkIsPrepared() {
-        if (getDeploymentPhase().isVerified() &&
-                specifications != null &&
-                getDeploymentModule() != null &&
-                sniffers != null) {
-            deploymentPhase = DeploymentPhase.PREPARED;
-        }
-    }
-
     public File getDeploymentLocation() {
         return deploymentLocation;
     }
@@ -84,7 +75,6 @@ public class ArchiveDeployment extends AbstractDeployment {
 
     public void setArchiveContent(ArchiveContent archiveContent) {
         this.archiveContent = archiveContent;
-        checkIsPrepared();
     }
 
     public ArchiveContent getArchiveContent() {
@@ -101,7 +91,6 @@ public class ArchiveDeployment extends AbstractDeployment {
 
     public void setSpecifications(Set<Specification> specifications) {
         this.specifications = specifications;
-        checkIsPrepared();
     }
 
     public Set<Specification> getSpecifications() {
@@ -109,7 +98,6 @@ public class ArchiveDeployment extends AbstractDeployment {
     }
 
     public void setSniffers(List<Sniffer> sniffers) {
-        checkIsPrepared();
         this.sniffers = sniffers;
     }
 

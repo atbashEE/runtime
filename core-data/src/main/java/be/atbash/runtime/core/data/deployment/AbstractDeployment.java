@@ -16,7 +16,6 @@
 package be.atbash.runtime.core.data.deployment;
 
 import be.atbash.runtime.core.data.module.Module;
-import be.atbash.runtime.core.data.util.ArchiveDeploymentUtil;
 import be.atbash.runtime.core.data.util.StringUtil;
 import be.atbash.runtime.logging.mapping.BundleMapping;
 import org.slf4j.Logger;
@@ -92,7 +91,12 @@ public abstract class AbstractDeployment {
 
     public void setDeploymentModule(Module<?> deploymentModule) {
         this.deploymentModule = deploymentModule;
-        checkIsPrepared();
+        // Deployment module is the last thing we determine before we can consider the deployment
+        // to be ready.
+        if (getDeploymentPhase().isVerified() && deploymentModule != null) {
+            deploymentPhase = DeploymentPhase.PREPARED;
+        }
+
     }
 
     public Map<String, String> getDeploymentData() {
@@ -149,8 +153,6 @@ public abstract class AbstractDeployment {
             logger.atError().addArgument(() -> deploymentName).log("DEPLOY-111");
         }
     }
-
-    abstract protected void checkIsPrepared();
 
     // archiveDeployments are identified by context root.
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,9 +102,9 @@ public class Deployer implements ModuleEventListener {
         eventManager.publishEvent(Events.PRE_DEPLOYMENT, applicationExecution);
 
         applicationExecution.getDeploymentModule().executeDeployment(applicationExecution);
-        if (applicationExecution.getDeploymentException() == null) {
-
-
+        if (!applicationExecution.getDeploymentPhase().isFailed()) {
+            applicationExecution.setDeployed();
+            
             RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
             runData.deployed(applicationExecution);
 
@@ -207,7 +207,7 @@ public class Deployer implements ModuleEventListener {
 
         deployment.getDeploymentModule().registerDeployment(deployment);
         RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
-        if (deployment.getDeploymentException() == null) {
+        if (!deployment.getDeploymentPhase().isFailed()) {
             deployment.setDeployed();
 
             runData.deployed(deployment);
