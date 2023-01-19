@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,14 +128,15 @@ public final class LoggingUtil {
         String formattedMessage;
         if (msg.contains("{}")) {
             // {} means we have a message using SLF4J style of parameters
-            // Wand we need to format the message here
+            // We need to format the message here
             formattedMessage = MessageFormatter.basicArrayFormat(msg, event.getArgumentArray());
 
         } else {
-            // We se the Formatter used by the java.util.logger to format the message.
+            // We use the Formatter used by the java.util.logger to format the message.
             LogRecord logRecord = new LogRecord(Level.INFO, msg);
             logRecord.setParameters(event.getArgumentArray());
-            logRecord.setResourceBundle(event.getLoggerAdapter().getWrappedLogger().getResourceBundle());
+
+            logRecord.setResourceBundle(event.getResourceBundle());
 
             //SimpleFormatter.formatMessage is thread safe and doesn't use class variables so can be used
             // without creating a new instance.

@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.logging.slf4j;
 
+import be.atbash.runtime.logging.mapping.BundleMapping;
 import be.atbash.runtime.logging.slf4j.jul.JULLoggerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.slf4j.event.LoggingEvent;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * This is not a complete implementation of the {@code LoggingEvent} interface but one that is enough
@@ -33,7 +35,9 @@ import java.util.List;
  */
 public class RuntimeLoggingEvent implements LoggingEvent {
 
-    private final JULLoggerAdapter logger;
+    private final Logger logger;
+
+    private final ResourceBundle resourceBundle;
     private final String message;
 
     private final List<Object> arguments;
@@ -49,13 +53,15 @@ public class RuntimeLoggingEvent implements LoggingEvent {
     }
 
     public RuntimeLoggingEvent(Logger logger, String message, Object... parameters) {
-        if (!(logger instanceof JULLoggerAdapter)) {
-            throw new IllegalArgumentException();  // FIXME
-        }
-
-        this.logger = (JULLoggerAdapter) logger;
         this.message = message;
         this.arguments = Arrays.asList(parameters);
+        this.logger = logger;
+
+        if (logger instanceof JULLoggerAdapter) {
+            resourceBundle = ((JULLoggerAdapter) logger).getWrappedLogger().getResourceBundle();
+        } else {
+            resourceBundle = ResourceBundle.getBundle(BundleMapping.getInstance().defineBundleName(logger.getName()));
+        }
     }
 
     @Override
@@ -76,7 +82,6 @@ public class RuntimeLoggingEvent implements LoggingEvent {
         return arguments.toArray();
     }
 
-
     @Override
     public List<KeyValuePair> getKeyValuePairs() {
         return null;  // null is allowed as return value.
@@ -96,9 +101,10 @@ public class RuntimeLoggingEvent implements LoggingEvent {
         return logger.getName();
     }
 
-    public JULLoggerAdapter getLoggerAdapter() {
-        return logger;
+    public ResourceBundle getResourceBundle() {
+        return resourceBundle;
     }
+
 
     @Override
     public String getMessage() {
