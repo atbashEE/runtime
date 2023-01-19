@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,15 +135,15 @@ class JWTAuthenticationFilterTest {
 
         Assertions.assertThat(TestLogMessages.getLoggingEvents()).hasSize(3);
 
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getMessage()).isEqualTo("JWT-050");
+        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getMessage()).startsWith("JWT-050");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getArguments().get(0)).isEqualTo("Received request on http://localhost:8080/root/endpoint");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getMdc().get(LogTracingHelper.MDC_KEY_REQUEST_ID)).isNotBlank();
 
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getMessage()).isEqualTo("JWT-050");
+        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getMessage()).startsWith("JWT-050");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getArguments().get(0)).isEqualTo("Bearer token 'theJWTToken'");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getMdc().get(LogTracingHelper.MDC_KEY_REQUEST_ID)).isNotBlank();
 
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(2).getMessage()).isEqualTo("JWT-050");
+        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(2).getMessage()).startsWith ("JWT-050");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(2).getArguments().get(0)).isEqualTo("The Token was accepted and has name = 'JUnit' and roles = '[role1, role2]'");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(2).getMdc().get(LogTracingHelper.MDC_KEY_REQUEST_ID)).isNotBlank();
     }
@@ -182,11 +182,11 @@ class JWTAuthenticationFilterTest {
 
         Assertions.assertThat(TestLogMessages.getLoggingEvents()).hasSize(2);
 
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getMessage()).isEqualTo("JWT-050");
+        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getMessage()).startsWith("JWT-050");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getArguments().get(0)).isEqualTo("Received request on http://localhost:8080/root/endpoint");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getMdc().get(LogTracingHelper.MDC_KEY_REQUEST_ID)).isNotBlank();
 
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getMessage()).isEqualTo("JWT-050");
+        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getMessage()).startsWith("JWT-050");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getArguments().get(0)).isEqualTo("Bearer token 'null'");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getMdc().get(LogTracingHelper.MDC_KEY_REQUEST_ID)).isNotBlank();
 

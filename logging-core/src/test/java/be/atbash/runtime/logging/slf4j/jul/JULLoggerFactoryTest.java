@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,8 +60,7 @@ public class JULLoggerFactoryTest {
         List<LoggingEvent> loggingEvents = TestLogMessages.getLoggingEvents();
 
         Assertions.assertThat(loggingEvents).hasSize(1);
-        // Test Log Handler just captures the LogRecord, not expanding the message from resource bundle.
-        Assertions.assertThat(loggingEvents.get(0).getMessage()).isEqualTo("JUNIT-001");
+        Assertions.assertThat(loggingEvents.get(0).getMessage()).isEqualTo("Message from resource bundle with parameter 'Parameter Value' value");
         Assertions.assertThat(loggingEvents.get(0).getArguments()).containsExactly("Parameter Value");
         Assertions.assertThat(loggingEvents.get(0).getResourceBundle().getBaseBundleName()).isEqualTo("msg." + JULLoggerFactoryTest.class.getName());
     }
