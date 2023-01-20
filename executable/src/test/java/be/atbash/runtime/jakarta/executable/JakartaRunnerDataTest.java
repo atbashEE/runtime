@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,33 @@ class JakartaRunnerDataTest {
         runnerData.addResources(String.class, JakartaRunner.class);
 
         Assertions.assertThat(runnerData.getResources()).containsOnly(String.class, JakartaRunner.class);
+    }
+
+    @Test
+    void getResources_nullIsFiltered() {
+        JakartaRunnerData runnerData = new JakartaRunnerData();
+        runnerData.addResources(String.class, null, JakartaRunner.class);
+
+        Assertions.assertThat(runnerData.getResources()).containsOnly(String.class, JakartaRunner.class);
+    }
+
+    @Test
+    void getResources_requiresNotNull() {
+        JakartaRunnerData runnerData = new JakartaRunnerData();
+        Assertions.assertThatThrownBy(
+                        () -> runnerData.addResources(null, null)
+                ).isInstanceOf(ParameterValidationException.class)
+                .hasMessage("You need to provide (at least 1) not null resource class");
+    }
+
+    @Test
+    void getResources_requiresNotNull2() {
+        JakartaRunnerData runnerData = new JakartaRunnerData();
+        Assertions.assertThatThrownBy(
+                        () -> runnerData.addResources(null)
+                ).isInstanceOf(ParameterValidationException.class)
+                .hasMessage("You need to provide (at least 1) not null resource class");
+
     }
 
     @Test

@@ -20,6 +20,7 @@ import be.atbash.runtime.common.command.AbstractAtbashCommand;
 import be.atbash.runtime.core.data.CriticalThreadCount;
 import be.atbash.runtime.core.data.RunData;
 import be.atbash.runtime.core.data.deployment.ApplicationExecution;
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
@@ -36,6 +37,7 @@ import be.atbash.runtime.logging.earlylog.EarlyLogRecords;
 import org.slf4j.Logger;
 import picocli.CommandLine;
 
+import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -64,13 +66,10 @@ public class JakartaRunnerHelper {
 
         actualCommand = (RuntimeCommand) handleCommandLine(programArguments, commandLine);
         if (actualCommand == null) {
-            System.exit(-1);
+            throw new AtbashStartupAbortException(-1);
         }
 
-        if (!validateCommandLine(command)) {
-            logger.atError().log("CLI-111");
-            System.exit(-1);
-        }
+        validateCommandLine(command);
 
         if (LoggingUtil.isVerbose()) {
             logger.atTrace().addArgument(actualCommand).log("CLI-1002");
@@ -78,42 +77,15 @@ public class JakartaRunnerHelper {
 
     }
 
-    private boolean validateCommandLine(RuntimeCommand command) {
+    private void validateCommandLine(RuntimeCommand command) {
 
-        // FIXME
-        /*
-        File configFile = command.getConfigurationParameters().getConfigFile();
-        if (configFile != null) {
-            if (!configFile.exists() || !configFile.canRead()) {
-                // FIXME is status -3 good? what is the logic of the different exit statusses.
-                String msg = LoggingUtil.formatMessage(logger, "CLI-112", configFile);
-                abort(msg, -3);
-            }
-
-        }
-
-        File configDataFile = command.getConfigurationParameters().getConfigDataFile();
+        File configDataFile = command.getConfigurationRunnerParameters().getConfigDataFile();
         if (configDataFile != null) {
             if (!configDataFile.exists() || !configDataFile.canRead()) {
-                // FIXME is status -3 good? what is the logic of the different exit statusses.
                 String msg = LoggingUtil.formatMessage(logger, "CLI-114", configDataFile);
-                abort(msg, -3);
+                abort(msg, -1);
             }
-
         }
-
-        String contextRoot = command.getConfigurationParameters().getContextRoot();
-        if (contextRoot.isBlank()) {
-            // No contextroot value specified, nothing to check.
-            return true;
-        }
-
-        List<File> archivesSpecifiedOnCommandLine = getAllArchivesSpecifiedOnCommandLine(command);
-        String[] parts = contextRoot.split(",");
-        return archivesSpecifiedOnCommandLine.size() == parts.length;
-
-         */
-        return true;
     }
 
     private AbstractAtbashCommand handleCommandLine(String[] args, CommandLine commandLine) {
@@ -217,6 +189,6 @@ public class JakartaRunnerHelper {
 
     private void abort(String message, int status) {
         logger.info(message);
-        System.exit(status);
+        throw new AtbashStartupAbortException(status);
     }
 }

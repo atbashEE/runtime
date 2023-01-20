@@ -16,6 +16,7 @@
 package be.atbash.runtime.jakarta.executable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JakartaRunnerData {
 
@@ -34,7 +35,17 @@ public class JakartaRunnerData {
     }
 
     public void addResources(Class<?>... resources) {
-        this.resources.addAll(Arrays.asList(resources));
+        if (resources == null) {
+            throw new ParameterValidationException("You need to provide (at least 1) not null resource class");
+        }
+
+        List<Class<?>> classes = Arrays.asList(resources).stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if (classes.isEmpty()) {
+            throw new ParameterValidationException("You need to provide (at least 1) not null resource class");
+        }
+        this.resources.addAll(classes);
     }
 
     public int getPort() {

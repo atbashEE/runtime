@@ -13,22 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.core.data.exception;
+package be.atbash.runtime.jakarta.executable;
 
-public class AtbashStartupAbortException extends AtbashRuntimeException {
-
-    private int exitStatus = -1;
-
-    public AtbashStartupAbortException() {
-        super("MODULE-001");
+public class ParameterValidationException extends RuntimeException {
+    public ParameterValidationException(String message) {
+        super(message);
     }
+    // Ideally, should extend from AtbashRuntimeException but that is in data-core
 
-    public AtbashStartupAbortException(int exitStatus) {
-        this();
-        this.exitStatus = exitStatus;
-    }
 
-    public int getExitStatus() {
-        return exitStatus;
-    }
 }

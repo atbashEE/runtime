@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.jakarta.executable.impl;
 
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.watcher.model.ServerMon;
 import be.atbash.runtime.jakarta.executable.JakartaRunner;
 import be.atbash.runtime.jakarta.executable.JakartaRunnerData;
@@ -38,27 +39,31 @@ public class AtbashJakartaRunner implements JakartaRunner {
         initializeEarlyLogging(args);
 
         JakartaRunnerHelper helper = new JakartaRunnerHelper(args);
-        helper.handleCommandlineArguments();
+        try {
+            helper.handleCommandlineArguments();
 
-        helper.temporaryWatcherService(serverMon);
+            helper.temporaryWatcherService(serverMon);
 
-        if (LoggingUtil.isVerbose()) {
-            helper.logEnvironmentInformation();
+            if (LoggingUtil.isVerbose()) {
+                helper.logEnvironmentInformation();
+            }
+
+            helper.performStartup();
+
+            helper.logStartupTime(start);
+
+            // Now that all Modules are initialized, we can use the real WatcherService and the bean will
+            // registered within JMX if the configuration indicates we need to do it.
+            helper.registerRuntimeBean(serverMon);
+
+            helper.runApplication(runnerData);
+
+            helper.handleWarmup();
+
+            preventShutdown();
+        } catch (AtbashStartupAbortException abortException) {
+            System.exit(abortException.getExitStatus());
         }
-
-        helper.performStartup();
-
-        helper.logStartupTime(start);
-
-        // Now that all Modules are initialized, we can use the real WatcherService and the bean will
-        // registered within JMX if the configuration indicates we need to do it.
-        helper.registerRuntimeBean(serverMon);
-
-        helper.runApplication(runnerData);
-
-        helper.handleWarmup();
-
-        preventShutdown();
     }
 
     private String[] defineArguments(JakartaRunnerData runnerData) {

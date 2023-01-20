@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ import be.atbash.runtime.jakarta.executable.testclasses.TestRunner;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 class JakartaSERunnerBuilderTest {
 
     @Test
@@ -31,5 +34,91 @@ class JakartaSERunnerBuilderTest {
         Assertions.assertThat(TestRunner.jakartaRunnerData).isNotNull();
         Assertions.assertThat(TestRunner.jakartaRunnerData.getPort()).isEqualTo(8888);
         Assertions.assertThat(TestRunner.jakartaRunnerData.getResources()).containsOnly(TestApplication.class);
+    }
+
+    @Test
+    void builder_wrongPort() {
+        Assertions.assertThatThrownBy(
+                        () -> JakartaSERunnerBuilder.newBuilder(TestApplication.class)
+                                .withPort(-123))
+                .isInstanceOf(ParameterValidationException.class)
+                .hasMessage("The port value must be between 0 and 65536");
+    }
+
+    @Test
+    void builder_wrongPort2() {
+        Assertions.assertThatThrownBy(
+                        () -> JakartaSERunnerBuilder.newBuilder(TestApplication.class)
+                                .withPort(100_000))
+                .isInstanceOf(ParameterValidationException.class)
+                .hasMessage("The port value must be between 0 and 65536");
+    }
+
+    @Test
+    void builder_wrongHost() {
+        Assertions.assertThatThrownBy(
+                        () -> JakartaSERunnerBuilder.newBuilder(TestApplication.class)
+                                .withHost("hola"))
+                .isInstanceOf(ParameterValidationException.class)
+                .hasMessage("The host does not resolve or address is not a local address.");
+    }
+
+    @Test
+    void builder_wrongHost_notLocal() {
+        // Resolvable address but not local
+        Assertions.assertThatThrownBy(
+                        () -> JakartaSERunnerBuilder.newBuilder(TestApplication.class)
+                                .withHost("atbash.be"))
+                .isInstanceOf(ParameterValidationException.class)
+                .hasMessage("The host does not resolve or address is not a local address.");
+    }
+
+    @Test
+    void builder_correctHost() {
+        // localhost should always resolve
+        Assertions.assertThatCode(() ->
+                JakartaSERunnerBuilder.newBuilder(TestApplication.class)
+                        .withHost("127.0.0.1")
+
+        ).doesNotThrowAnyException();
+
+    }
+
+    @Test
+    void builder_addCommandLineEntry_withOption() {
+        JakartaSERunnerBuilder.newBuilder(TestApplication.class)
+                .addCommandLineEntry("-w JFR").run();
+
+        Assertions.assertThat(TestRunner.jakartaRunnerData).isNotNull();
+        Assertions.assertThat(TestRunner.jakartaRunnerData.getCommandLineEntries()).containsExactly("-w", "JFR");
+    }
+
+    @Test
+    void builder_addCommandLineEntry_single() {
+        JakartaSERunnerBuilder.newBuilder(TestApplication.class)
+                .addCommandLineEntry("-v").run();
+
+        Assertions.assertThat(TestRunner.jakartaRunnerData).isNotNull();
+        Assertions.assertThat(TestRunner.jakartaRunnerData.getCommandLineEntries()).containsExactly("-v");
+    }
+
+    @Test
+    void builder_addConfig_pair() {
+        JakartaSERunnerBuilder.newBuilder(TestApplication.class)
+                .addConfig("foo", "bar").run();
+
+        Assertions.assertThat(TestRunner.jakartaRunnerData).isNotNull();
+        Assertions.assertThat(TestRunner.jakartaRunnerData.getApplicationData()).contains(Assertions.entry("foo", "bar"));
+    }
+
+    @Test
+    void builder_addConfig_map() {
+        Map<String, String> data = new HashMap<>();
+        data.put("key", "value");
+        JakartaSERunnerBuilder.newBuilder(TestApplication.class)
+                .addConfig(data).run();
+
+        Assertions.assertThat(TestRunner.jakartaRunnerData).isNotNull();
+        Assertions.assertThat(TestRunner.jakartaRunnerData.getApplicationData()).contains(Assertions.entry("key", "value"));
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
@@ -73,13 +74,10 @@ public class MainRunnerHelper {
 
         actualCommand = (RuntimeCommand) handleCommandLine(programArguments, commandLine);
         if (actualCommand == null) {
-            System.exit(-1);
+            throw new AtbashStartupAbortException(-1);
         }
 
-        if (!validateCommandLine(command)) {
-            logger.atError().log("CLI-111");
-            System.exit(-1);
-        }
+        validateCommandLine(command);
 
         if (LoggingUtil.isVerbose()) {
             logger.atTrace().addArgument(actualCommand).log("CLI-1002");
@@ -87,14 +85,13 @@ public class MainRunnerHelper {
 
     }
 
-    private boolean validateCommandLine(RuntimeCommand command) {
+    private void validateCommandLine(RuntimeCommand command) {
 
         File configFile = command.getConfigurationParameters().getConfigFile();
         if (configFile != null) {
             if (!configFile.exists() || !configFile.canRead()) {
-                // FIXME is status -3 good? what is the logic of the different exit statusses.
                 String msg = LoggingUtil.formatMessage(logger, "CLI-112", configFile);
-                abort(msg, -3);
+                abort(msg, -1);
             }
 
         }
@@ -102,22 +99,30 @@ public class MainRunnerHelper {
         File configDataFile = command.getConfigurationParameters().getConfigDataFile();
         if (configDataFile != null) {
             if (!configDataFile.exists() || !configDataFile.canRead()) {
-                // FIXME is status -3 good? what is the logic of the different exit statusses.
                 String msg = LoggingUtil.formatMessage(logger, "CLI-114", configDataFile);
-                abort(msg, -3);
+                abort(msg, -1);
             }
 
+        }
+
+        int port = command.getConfigurationParameters().getPort();
+        if (port < 1 || port > 65536) {
+            String msg = LoggingUtil.formatMessage(logger, "CLI-115", port);
+            abort(msg, -1);
         }
 
         String contextRoot = command.getConfigurationParameters().getContextRoot();
         if (contextRoot.isBlank()) {
             // No contextroot value specified, nothing to check.
-            return true;
+            return;
         }
 
         List<File> archivesSpecifiedOnCommandLine = getAllArchivesSpecifiedOnCommandLine(command);
         String[] parts = contextRoot.split(",");
-        return archivesSpecifiedOnCommandLine.size() == parts.length;
+        if (archivesSpecifiedOnCommandLine.size() != parts.length) {
+            logger.atError().log("CLI-111");
+            throw new AtbashStartupAbortException(-1);
+        }
     }
 
     private AbstractAtbashCommand handleCommandLine(String[] args, CommandLine commandLine) {
@@ -211,6 +216,7 @@ public class MainRunnerHelper {
 
         runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
         serverMon.setStartedModules(runData.getStartedModules());
+        serverMon.setMode(runData.getServerMode());
         watcherService.registerBean(WatcherBean.RuntimeWatcherBean, serverMon);
 
     }
@@ -247,7 +253,7 @@ public class MainRunnerHelper {
                     .findAny();
             if (otherDeployment.isPresent()) {
                 logger.atError().addArgument(deployment.getDeploymentName()).log("CLI-109");
-                System.exit(-2);
+                throw new AtbashStartupAbortException(-2);
             }
             eventManager.publishEvent(Events.DEPLOYMENT, deployment);
         }
@@ -327,7 +333,7 @@ public class MainRunnerHelper {
     }
 
     private void abort(String message, int status) {
-        logger.info(message);
-        System.exit(status);
+        logger.error(message);
+        throw new AtbashStartupAbortException(status);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.exception.AtbashRuntimeException;
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
@@ -87,14 +88,18 @@ public class AtbashEmbedded {
 
         RunData runData = RuntimeObjectsManager.getInstance().getExposedObject(RunData.class);
 
-        deployAndRunArchives(runData);
+        try {
+            deployAndRunArchives(runData);
 
-        WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
+            WatcherService watcherService = RuntimeObjectsManager.getInstance().getExposedObject(WatcherService.class);
 
-        serverMon.setStartedModules(runData.getStartedModules());
-        watcherService.registerBean(WatcherBean.RuntimeWatcherBean, serverMon);
+            serverMon.setStartedModules(runData.getStartedModules());
+            watcherService.registerBean(WatcherBean.RuntimeWatcherBean, serverMon);
 
-        logger.info("Atbash Runtime Embedded ready");
+            logger.info("Atbash Runtime Embedded ready");
+        } catch (AtbashStartupAbortException abortException) {
+            System.exit(abortException.getExitStatus());
+        }
     }
 
     private void deployAndRunArchives(RunData runData) {
@@ -126,7 +131,7 @@ public class AtbashEmbedded {
                     .findAny();
             if (otherDeployment.isPresent()) {
                 logger.error(String.format("CLI-109: Deployment %s already active, can't deploy application with same name twice.", deployment.getDeploymentName()));
-                System.exit(-2);
+                throw new AtbashStartupAbortException(-2);
             }
             eventManager.publishEvent(Events.DEPLOYMENT, deployment);
         }

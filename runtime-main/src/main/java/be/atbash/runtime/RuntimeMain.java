@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime;
 
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.watcher.model.ServerMon;
 import be.atbash.runtime.logging.LoggingManager;
 import be.atbash.runtime.logging.LoggingUtil;
@@ -34,29 +35,34 @@ public class RuntimeMain {
         initializeEarlyLogging(args);
 
         MainRunnerHelper helper = new MainRunnerHelper(args);
-        helper.handleCommandlineArguments();
+        try {
+            helper.handleCommandlineArguments();
 
-        helper.temporaryWatcherService(serverMon);
+            helper.temporaryWatcherService(serverMon);
 
-        if (LoggingUtil.isVerbose()) {
-            helper.logEnvironmentInformation();
+            if (LoggingUtil.isVerbose()) {
+                helper.logEnvironmentInformation();
+            }
+
+            helper.performStartup();
+
+            helper.logStartupTime(start);
+
+            helper.performConfiguration();
+
+            // Now that all Modules are initialized, we can use the real WatcherService and the bean will
+            // registered within JMX if the configuration indicates we need to do it.
+            helper.registerRuntimeBean(serverMon);
+
+            helper.deployAndRunArchives();
+
+            helper.stopWhenNoApplications();
+
+            helper.handleWarmup();
+        } catch (AtbashStartupAbortException abortException) {
+            // We need the correct exit status for the process
+            System.exit(abortException.getExitStatus());
         }
-
-        helper.performStartup();
-
-        helper.logStartupTime(start);
-
-        helper.performConfiguration();
-
-        // Now that all Modules are initialized, we can use the real WatcherService and the bean will
-        // registered within JMX if the configuration indicates we need to do it.
-        helper.registerRuntimeBean(serverMon);
-
-        helper.deployAndRunArchives();
-
-        helper.stopWhenNoApplications();
-
-        helper.handleWarmup();
     }
 
 
