@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.slf4j.MDC;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -45,6 +46,38 @@ class SimpleLogFormatterTest {
 
         CustomAssertions.assertThat(message).isSimpleFormat();
         CustomAssertions.assertThat(message).hasMessage("JUnit.test INFO: Just a message\n");
+        CustomAssertions.assertThat(message).hasTimeStamp(zdtStart, zdtEnd);
+    }
+
+    @Test
+    void format_resourceBundle() {
+        SimpleLogFormatter logFormatter = new SimpleLogFormatter();
+        LogRecord record = new LogRecord(Level.INFO, "ABC-123");
+        record.setResourceBundle(new TestResourceBundle("ABC-123", "ABC-123: Message from resourceBundle"));
+        record.setLoggerName("JUnit.test");
+
+        ZonedDateTime zdtStart = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
+        String message = logFormatter.format(record);
+        ZonedDateTime zdtEnd = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
+
+        CustomAssertions.assertThat(message).isSimpleFormat();
+        CustomAssertions.assertThat(message).hasMessage("JUnit.test INFO: ABC-123: Message from resourceBundle\n");
+        CustomAssertions.assertThat(message).hasTimeStamp(zdtStart, zdtEnd);
+    }
+
+    @Test
+    void format_earlyLogRecord() {
+        SimpleLogFormatter logFormatter = new SimpleLogFormatter();
+        LogRecord record = new LogRecord(Level.INFO, "*ABC-123");
+        record.setResourceBundle(new TestResourceBundle("ABC-123", "ABC-123: Message from resourceBundle"));
+        record.setLoggerName("JUnit.test");
+
+        ZonedDateTime zdtStart = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
+        String message = logFormatter.format(record);
+        ZonedDateTime zdtEnd = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
+
+        CustomAssertions.assertThat(message).isSimpleFormat();
+        CustomAssertions.assertThat(message).hasMessage("JUnit.test INFO: *ABC-123: Message from resourceBundle\n");
         CustomAssertions.assertThat(message).hasTimeStamp(zdtStart, zdtEnd);
     }
 
@@ -109,5 +142,25 @@ class SimpleLogFormatterTest {
         CustomAssertions.assertThat(message).isSimpleFormat();
         CustomAssertions.assertThat(message).hasMessage("JUnit.test INFO: [uid=UniqueValue, key=value]Log message contains Context info\n");
 
+    }
+
+    private static class TestResourceBundle extends ResourceBundle {
+
+        private final Map<String, String> content;
+
+        private TestResourceBundle(String key, String message) {
+            content = new HashMap<>();
+            content.put(key, message);
+        }
+
+        @Override
+        protected Object handleGetObject(String key) {
+            return content.get(key);
+        }
+
+        @Override
+        public Enumeration<String> getKeys() {
+            return new Vector<>(content.keySet()).elements();
+        }
     }
 }
