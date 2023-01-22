@@ -25,10 +25,12 @@ import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.deployment.info.DeploymentMetadata;
 import be.atbash.runtime.core.data.deployment.info.PersistedDeployments;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
+import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventManager;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
+import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import be.atbash.runtime.core.data.parameter.WatcherType;
 import be.atbash.runtime.core.data.util.ArchiveDeploymentUtil;
 import be.atbash.runtime.core.data.util.SpecificationUtil;
@@ -44,6 +46,9 @@ import org.slf4j.Logger;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -79,7 +84,7 @@ public class MainRunnerHelper {
 
         validateCommandLine(command);
 
-        if (LoggingUtil.isVerbose()) {
+        if (LoggingUtil.isVerbose() && !command.getConfigurationParameters().isDaemon()) {
             logger.atTrace().addArgument(actualCommand).log("CLI-1002");
         }
 
@@ -335,5 +340,59 @@ public class MainRunnerHelper {
     private void abort(String message, int status) {
         logger.error(message);
         throw new AtbashStartupAbortException(status);
+    }
+
+    public boolean isDaemonRequested() {
+        return actualCommand.getConfigurationParameters().isDaemon();
+    }
+
+    public void startAsDaemon() {
+
+        List<String> command = new ArrayList<>();
+
+        // Find Java program
+        String javaHome = System.getProperty("java.home");
+        String javaCommand = new File(javaHome, "bin/java").getPath();
+        command.add(javaCommand);
+
+        // Get the runtime MX bean
+        RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+
+        // Get the input arguments passed to the JVM
+        command.addAll(runtimeMxBean.getInputArguments());
+
+        // Get the location of the jar file
+        Properties properties = System.getProperties();
+        String commandLine = properties.getProperty("sun.java.command");
+
+        String jarFileName = commandLine.split(" ")[0];
+
+        command.add("-jar");
+        command.add(jarFileName);
+
+        String commandOptions = getRuntimeCommandOptionsForDaemon();
+        command.addAll(Arrays.asList(commandOptions.split(" ")));
+
+        ProcessBuilder builder = new ProcessBuilder(command.toArray(new String[]{}));
+        Process process;
+
+        try {
+            process = builder.start();
+        } catch (IOException e) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+        }
+
+
+        logger.atInfo().addArgument(process.pid()).log("CLI-116");
+    }
+
+    private String getRuntimeCommandOptionsForDaemon() {
+        ConfigurationParameters parameters = actualCommand.getConfigurationParameters();
+
+        parameters.setLogToFile(true);
+        parameters.setLogToConsole(false);
+        parameters.setDaemon(false);
+
+        return parameters.actualCommandLine();
     }
 }

@@ -19,6 +19,7 @@ import picocli.CommandLine;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class ConfigurationParameters {
     public static final String LOG_TO_CONSOLE_OPTION = "--logToConsole";
@@ -245,34 +246,41 @@ public class ConfigurationParameters {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ConfigurationParameters{");
+
+        return actualCommandLine();
+    }
+
+    public String actualCommandLine() {
+        StringBuilder sb = new StringBuilder();
         sb.append("--daemon=").append(daemon);
-        sb.append(", --profile='").append(profile).append('\'');
+        sb.append(" --profile=").append(profile);
         if (modules != null) {
-            sb.append(", --modules='").append(modules).append('\'');
+            sb.append(", --modules=").append(modules);
         }
-        sb.append(", --verbose=").append(verbose);
-        sb.append(", --watcher=").append(watcher);
-        sb.append(", --root='").append(rootDirectory).append('\'');
+        sb.append(" --verbose=").append(verbose);
+        sb.append(" --watcher=").append(watcher);
+        sb.append(" --root=").append(rootDirectory);
         if (deploymentDirectory != null) {
-            sb.append(", --deploymentdirectory=").append(deploymentDirectory);
+            sb.append(" --deploymentdirectory=").append(deploymentDirectory);
         }
-        sb.append(", --configName='").append(configName).append('\'');
-        sb.append(", --logToConsole=").append(logToConsole);
-        sb.append(", --logToFile=").append(logToFile);
-        sb.append(", --warmup=").append(warmup);
-        sb.append(", --stateless=").append(stateless);
-        sb.append(", --contextRoot='").append(contextRoot).append('\'');
+        sb.append(" --configName=").append(configName);
+        sb.append(" --logToConsole=").append(logToConsole);
+        sb.append(" --logToFile=").append(logToFile);
+        sb.append(" --warmup=").append(warmup);
+        sb.append(" --stateless=").append(stateless);
+        if (contextRoot != null && !contextRoot.isBlank()) {
+            sb.append(" --contextRoot=").append(contextRoot);
+        }
         if (configFile != null) {
-            sb.append(", --configfile=").append(configFile);
+            sb.append(" --configfile=").append(configFile);
         }
         if (configDataFile != null) {
-            sb.append(", --datafile=").append(configDataFile);
+            sb.append(" --datafile=").append(configDataFile);
         }
         if (archives != null) {
-            sb.append(", archives=").append(Arrays.toString(archives));
+            sb.append(' ');
+            sb.append(Arrays.stream(archives).map(File::getAbsolutePath).collect(Collectors.joining(" ")));
         }
-        sb.append('}');
         return sb.toString();
     }
 }

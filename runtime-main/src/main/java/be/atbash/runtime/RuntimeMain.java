@@ -37,6 +37,10 @@ public class RuntimeMain {
         MainRunnerHelper helper = new MainRunnerHelper(args);
         try {
             helper.handleCommandlineArguments();
+            if (helper.isDaemonRequested()) {
+                helper.startAsDaemon();
+                return;
+            }
 
             helper.temporaryWatcherService(serverMon);
 

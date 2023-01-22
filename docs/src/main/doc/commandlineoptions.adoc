@@ -46,6 +46,8 @@ The file can contain comments when the line starts with `#`. Otherwise the line 
 
 *--warmup*: When this option is specified, the process exits after the application is deployed. This is typically used in combination with the Class Data Sharing option of the JVM to create archive file.
 
+*-d|--daemon*: Start the Atbash Runtime as a background task.  You can list the running Atbash Runtime processes with the `atbash-cli.jar list-processes` command. And you can stop them with `atbash-cli.jar stop-process`.  When the daemon option is selected, the _logToConsole_ and _logToFile_ options are ignored and only logging to file is active (no console logging)
+
 zero, one or more WAR files can be added to the command line that needs to be deployed. Also the applications that are already 'deployed' within the configuration are started.
 
 The exit status of the process is
@@ -121,7 +123,20 @@ Sets the logging configuration parameters. The parameters must be in the form of
 - set-logging-configuration maxHistoryFiles=
 - set-logging-configuration compressOnRotation=
 
-You can also specify, in addition to the above parameters, a new logging properties file that must be used (in stead of sending individual properties)
+You can also specify, in addition to the above parameters, a new logging properties file that must be used (instead of sending individual properties)
 If you combine a file and parameters, the parameters are applied _after_ the file is used. There
 
 - set-logging-configuration --file <logging.properties.file>
+
+==== list-processes
+
+Shows all the Atbash Runtime processes that are running on this machine. It lists the normally started and the instances that are running as background task. It shows the Program ID (pid value) and the applications that are running. Unless when the process is started in domain mode. Only the applications that are specified on the command line are show.
+
+
+==== stop-process
+
+This command allows you to stop an Atbash Runtime process on the machine.  This can be a normally started process or an instance running in the background.
+
+The command expects a PID of the Atbash Process that needs to be stopped. You can list them with the `list-processes` command. When there is only 1 process running, this PID value can be omitted and it stops the only running instance.
+
+- stop-process 1234
