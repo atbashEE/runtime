@@ -15,10 +15,9 @@
  */
 package be.atbash.runtime.cli.command;
 
+import be.atbash.runtime.common.command.AbstractAtbashCommand;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
 import picocli.CommandLine;
-
-import java.util.concurrent.Callable;
 
 @CommandLine.Command(subcommands =
         {CreateConfigCommand.class,
@@ -31,7 +30,7 @@ import java.util.concurrent.Callable;
                 CLISetCommand.class,
                 CLISetLoggingConfigurationCommand.class}
         , name = "")
-public class RuntimeCommand implements Callable<Integer> {
+public class RuntimeCommand extends AbstractAtbashCommand {
 
     @CommandLine.Mixin
     private ConfigurationParameters configurationParameters;
