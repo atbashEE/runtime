@@ -39,7 +39,7 @@ public class ListApplicationsRemoteCommand implements ServerRemoteCommand {
         try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig())) {
 
             if (runData.getDeployments().isEmpty()) {
-                result.addData(" RC-102 ", "No applications deployed");  // FIXME not really an error/info message but it is helpful I guess
+                result.addData("RC-102", "No applications deployed");
             } else {
                 runData.getDeployments()
                         .forEach(ad -> {

@@ -66,6 +66,14 @@ Create a configuration within the domain.
 
 xx To be documented xx
 
+==== Start runtime in background
+
+When no specific command is specified, the CLI can be used to start the Atbash runtime in the background. It supports all the options that are described in the previous section and the location can be specified using the property `--runtime-jar`.
+
+By default, this option points to the current directory.
+
+Just as with the _daemon_ option, the log to console and log to files flags are ignored.
+
 ==== Options for all remote commands
 
 -h | --host (default - localhost): Host name or IP address of the machine running the Atbash runtime in Domain mode.
