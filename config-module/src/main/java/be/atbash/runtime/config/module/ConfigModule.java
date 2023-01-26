@@ -148,6 +148,7 @@ public class ConfigModule implements Module<ConfigurationParameters> {
             if (!configInstance.isValid()) {
                 throw new AtbashStartupAbortException();
             } else {
+                checkAndSetCustomLoggingFile(configInstance);
                 ConfigInstanceUtil.storeRuntimeConfig(configInstance);
                 ConfigInstanceUtil.storeLoggingConfig(configInstance);
             }
@@ -196,6 +197,20 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         watcherService.logWatcherEvent(Module.CONFIG_MODULE_NAME, msg, false);
 
         configurationManager = new ConfigurationManager(runtimeConfiguration);
+    }
+
+    private void checkAndSetCustomLoggingFile(ConfigInstance configInstance) {
+        if (parameters.getLogConfigurationFile() == null) {
+            // Nothing to do
+            return;
+        }
+        if (!parameters.getLogConfigurationFile().exists()
+                || !parameters.getLogConfigurationFile().isFile()
+                || !parameters.getLogConfigurationFile().canRead()) {
+            LOGGER.atError().addArgument(parameters.getLogConfigurationFile()).log("CONFIG-018");
+            throw new AtbashStartupAbortException();
+        }
+        configInstance.setLoggingConfigurationFile(parameters.getLogConfigurationFile().getAbsolutePath());
     }
 
     private Profile findProfile() {

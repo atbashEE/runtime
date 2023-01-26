@@ -60,7 +60,7 @@ public class ConfigurationParameters {
     private boolean logToFile = true;
 
     @CommandLine.Option(names = {"--logConfiguration"}, description = "Points to the logging configuration properties file.")
-    private File logConfigurationFile;  // TODO Test this out outside of Jakarta Runner and document
+    private File logConfigurationFile;
 
     @CommandLine.Option(names = {"--warmup"}, description = "In warmup mode, runtime exists when application(s) are ready.")
     private boolean warmup = false;

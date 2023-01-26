@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import static be.atbash.runtime.config.RuntimeConfigConstants.CONFIG_FILE;
 import static be.atbash.runtime.config.RuntimeConfigConstants.DEFAULT_CONFIG_FILE;
@@ -105,6 +107,7 @@ public final class ConfigInstanceUtil {
 
     /**
      * Write the Default Configuration if file not already exists.
+     *
      * @param configInstance Information about the configuration this instance.
      */
     public static void storeRuntimeConfig(ConfigInstance configInstance) {
@@ -115,16 +118,32 @@ public final class ConfigInstanceUtil {
 
     /**
      * Write the default Logging configuration if file not already exists.
+     *
      * @param configInstance Information about the configuration this instance.
      */
     public static void storeLoggingConfig(ConfigInstance configInstance) {
         String targetFile;
 
         if (configInstance.isStateless()) {
-            // Get the temporary directory .
-            targetFile = FileUtil.getTempDirectory() + "/logging.properties";
+            if (configInstance.getLoggingConfigurationFile() != null) {
+                targetFile = configInstance.getLoggingConfigurationFile();
+            } else {
+                // Get the temporary directory .
+                targetFile = FileUtil.getTempDirectory() + "/logging.properties";
+            }
         } else {
             targetFile = "/logging.properties";
+
+            if (configInstance.getLoggingConfigurationFile() != null) {
+                // Copy config file defined by user as config file within config
+                try {
+                    Files.copy(Path.of(configInstance.getLoggingConfigurationFile()),
+                            Path.of(configInstance.getConfigDirectory().getAbsolutePath(), targetFile),
+                            StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+                }
+            }
         }
         String loggingConfigFile = writeFile(configInstance, CLASSPATH_PREFIX + "logging.properties", targetFile, configInstance.isStateless());
         configInstance.setLoggingConfigurationFile(loggingConfigFile);
