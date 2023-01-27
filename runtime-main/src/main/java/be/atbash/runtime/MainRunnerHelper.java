@@ -110,7 +110,7 @@ public class MainRunnerHelper {
 
         }
 
-        int port = command.getConfigurationParameters().getPort();
+        int port = command.getConfigurationParameters().getPortWithDefault();
         if (port < 1 || port > 65536) {
             String msg = LoggingUtil.formatMessage(logger, "CLI-115", port);
             abort(msg, -1);

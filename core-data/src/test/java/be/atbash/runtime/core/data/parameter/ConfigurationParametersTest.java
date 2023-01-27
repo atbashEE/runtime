@@ -17,6 +17,8 @@ package be.atbash.runtime.core.data.parameter;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.File;
 
@@ -58,4 +60,14 @@ class ConfigurationParametersTest {
         String commandLine = parameters.actualCommandLine();
         Assertions.assertThat(commandLine).isEqualTo("--daemon=false --profile=default, --modules=JWT --verbose=false --watcher=MINIMAL --root=. --deploymentdirectory=./deploy-dir --configName=default --logToConsole=false --logToFile=true --warmup=false --stateless=false --contextRoot=/app1,/app2 --configfile=./myConfig --datafile=./myData /path/to/app1.war /path/to/app2.war");
     }
+
+    @ParameterizedTest
+    @CsvSource({"8080, 8080", "8888, 8888", "-1, 8080"})
+    void setPort(int input, int expected) {
+        ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setPort(input);
+        Assertions.assertThat(parameters.getPort()).isEqualTo(input);
+        Assertions.assertThat(parameters.getPortWithDefault()).isEqualTo(expected);
+    }
+
 }

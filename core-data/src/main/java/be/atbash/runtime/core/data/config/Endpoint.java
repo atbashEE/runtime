@@ -17,7 +17,7 @@ package be.atbash.runtime.core.data.config;
 
 public class Endpoint {
     private String name;
-    private int port;
+    private int port = 8080;  // Here the default is OK.
 
     public int getPort() {
         return port;

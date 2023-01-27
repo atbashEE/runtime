@@ -51,7 +51,7 @@ public class ConfigurationParameters {
     private String configName = "default";
 
     @CommandLine.Option(names = { "--port"}, description = "Port number assigned to the process running the Atbash runtime.")
-    private int port = 8080;
+    private int port = -1;  // We can't use 8080 as we don't know if the user specified a value 8080 or if it is the default.
 
     @CommandLine.Option(names = {LOG_TO_CONSOLE_OPTION}, description = "Does the Runtime logs to the console?")
     private boolean logToConsole = false;
@@ -108,6 +108,7 @@ public class ConfigurationParameters {
         this.modules = modules;
     }
 
+    // FIXME Review if we don't need this (and just looking at the raw parameters very early on)
     public Boolean getVerbose() {
         return verbose;
     }
@@ -148,8 +149,22 @@ public class ConfigurationParameters {
         this.configName = configName;
     }
 
+    /**
+     * Returns the value specified on command line or -1 when not specified. Can be used to determine if
+     * value is specified.
+     * @return
+     */
     public int getPort() {
         return port;
+    }
+
+    /**
+     * Returns the port as specified on the commandline or the default '8080' when the user didn't
+     * specify a value.
+     * @return
+     */
+    public int getPortWithDefault() {
+        return port == -1 ? 8080 : port;
     }
 
     public void setPort(int port) {
