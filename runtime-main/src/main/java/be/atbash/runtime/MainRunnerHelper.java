@@ -289,7 +289,10 @@ public class MainRunnerHelper {
     }
 
     public void stopWhenNoApplications() {
-        int applications = runData.getDeployments().size();
+        long applications = runData.getDeployments()
+                .stream()
+                .filter(ad -> ad.getDeploymentPhase().isReady())
+                .count();
 
         if (applications > 0) {
             logger.atInfo().addArgument(applications).log("CLI-104");

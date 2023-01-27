@@ -223,9 +223,12 @@ public class Deployer implements ModuleEventListener {
 
         }
         eventManager.publishEvent(Events.POST_DEPLOYMENT, deployment);
-        msg = LoggingUtil.formatMessage(LOGGER, "DEPLOY-102", deployment.getDeploymentName());
+        if (deployment.getDeploymentPhase().isFailed()) {
+            msg = LoggingUtil.formatMessage(LOGGER, "DEPLOY-109", deployment.getDeploymentName());
+        }else {
+            msg = LoggingUtil.formatMessage(LOGGER, "DEPLOY-102", deployment.getDeploymentName());
+        }
         watcherService.logWatcherEvent("Deployer", msg, true);
-
     }
 
     private void addDeploymentData(AbstractDeployment deployment) {
