@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,6 +97,24 @@ public class RunData {
 
     public void setRunnerMode() {
         runnerMode = true;
+    }
+
+    /**
+     * Based on {@code isDomainMode()}, {@code isEmbeddedMode()}, and {@code isRunnerMode()}.
+     * @return Domain, Embedded or Runner
+     */
+    public String getServerMode() {
+        String result = "Runtime";
+        if (isDomainMode()) {
+            result = "Domain";
+        }
+        if (isEmbeddedMode()) {
+            result = "Embedded";
+        }
+        if (isRunnerMode()) {
+            result = "Runner";
+        }
+        return result;
     }
 
     public void undeployed(ArchiveDeployment deployment) {

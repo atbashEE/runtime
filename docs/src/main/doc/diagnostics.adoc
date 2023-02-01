@@ -10,15 +10,36 @@ There are some diagnostics systems and levels supported. These are not activated
 
 === JMX
 
-When you activate the JMX option (use `-w|--watcher jmx`  or `all`), the following information is available by default.
+The JMX usage has 3 levels
+
+- All information: use `-w|--watcher jmx`  or `all`
+- Minimal information : use `-w|--watcher minimal`
+- Off : use `-w|--watcher off`
+
+With level _off_ is chosen, no JMX entries are exposed.
+
+With the minimal level, following information is available:
 
 * Information about the runtime within the `Atbash.Runtime` bean
 ** Runtime version
-** Uptime of the process
+** Uptime of the process (this is an operation)
 ** Active modules
+** The mode of operation (Runtime, Domain, etc ..)
 * Information about the deployed application(s)
 ** The context root
+** Application name
 ** The Specifications
+
+Look for MBeans with the name `Atbash`
+
+When the _all_ level is active, information about the endpoint calls is added.
+
+It is recommended to define the port on which the JMX service is exposed. Otherwise, the port is assigned dynamically and more difficult to find out.  You can use the following System Parameter from Java
+
+[source]
+----
+-Dcom.sun.management.jmxremote.port=8765
+----
 
 === Flight Recorder
 

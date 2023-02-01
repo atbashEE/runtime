@@ -84,11 +84,12 @@ public class WatcherService {
         ObjectName objectName;
         try {
             objectName = constructName(watcherBean);
-            if (jmxActive) {
+            if (minimal || jmxActive) {
                 server.registerMBean(mbean, objectName);
             }
             monitoringBeans.put(objectName, mbean);
-        } catch (MalformedObjectNameException | NotCompliantMBeanException | InstanceAlreadyExistsException | MBeanRegistrationException e) {
+        } catch (MalformedObjectNameException | NotCompliantMBeanException | InstanceAlreadyExistsException |
+                 MBeanRegistrationException e) {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
 

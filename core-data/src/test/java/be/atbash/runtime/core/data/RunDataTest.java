@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,6 +103,33 @@ class RunDataTest {
         CriticalThreadCount.getInstance().waitForCriticalThreadsToFinish();
 
         Assertions.assertThat(runData.getDeployments()).hasSize(1);
+    }
+
+    @Test
+    void getServerMode_default() {
+        RunData runData = new RunData();
+        Assertions.assertThat(runData.getServerMode()).isEqualTo("Runtime");
+    }
+
+    @Test
+    void getServerMode_domain() {
+        RunData runData = new RunData();
+        runData.setDomainMode();
+        Assertions.assertThat(runData.getServerMode()).isEqualTo("Domain");
+    }
+
+    @Test
+    void getServerMode_embedded() {
+        RunData runData = new RunData();
+        runData.setEmbeddedMode();
+        Assertions.assertThat(runData.getServerMode()).isEqualTo("Embedded");
+    }
+
+    @Test
+    void getServerMode_runner() {
+        RunData runData = new RunData();
+        runData.setRunnerMode();
+        Assertions.assertThat(runData.getServerMode()).isEqualTo("Runner");
     }
 
     private static class TestListener implements ArchiveDeploymentListener {

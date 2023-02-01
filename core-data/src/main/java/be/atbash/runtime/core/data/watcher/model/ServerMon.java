@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ public class ServerMon implements ServerMonMBean {
     private String version;
     private final long startOfServer;
     private List<String> startedModules;
+    private String mode;
 
     public ServerMon(long startOfServer) {
         this.startOfServer = startOfServer;
@@ -48,5 +49,14 @@ public class ServerMon implements ServerMonMBean {
     @Override
     public Long uptime() {
         return (System.currentTimeMillis() - startOfServer) / 1000;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    @Override
+    public String getMode() {
+        return mode;
     }
 }

@@ -21,6 +21,7 @@ import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.exception.IncorrectUsageException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
+import be.atbash.runtime.core.data.parameter.WatcherType;
 import be.atbash.runtime.core.module.ModuleManager;
 import be.atbash.runtime.core.modules.ModulesLogger;
 import org.assertj.core.api.Assertions;
@@ -218,6 +219,7 @@ public class ModuleManagerTest {
                 .build();
 
         ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setWatcher(WatcherType.OFF);
         // Since we are not using the real ConfigModule, modules need to be correctly set, including the 'default' modules.
         setModules(parameters, "module1", "module2");
 
@@ -273,6 +275,7 @@ public class ModuleManagerTest {
                 .build();
 
         ConfigurationParameters parameters = new ConfigurationParameters();
+        parameters.setWatcher(WatcherType.OFF);
         // Since we are not using the real ConfigModule, modules need to be correctly set, including the 'default' modules.
         setModules(parameters, "module1", "module2", "module3");
 
