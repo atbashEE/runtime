@@ -18,6 +18,7 @@ package be.atbash.runtime.jersey.se;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.ApplicationExecution;
+import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
@@ -100,8 +101,7 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
             // handle the exception here
             LOGGER.error("Exception during startup", ex);
             // Application can't handle requests, so it is fine to abort JVM.
-            System.exit(-2);
-            return null;
+            throw new AtbashStartupAbortException(-2);
         });
 
         LOGGER.atInfo().addArgument(applicationExecution.getDeploymentName()).log("JERSEY-104");
