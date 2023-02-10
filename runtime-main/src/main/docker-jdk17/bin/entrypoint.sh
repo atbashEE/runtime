@@ -9,7 +9,8 @@ if [ -f "${CONFIG_FILE_LOCATION}" ]
 then
    ATBASH_ARGS="${ATBASH_ARGS} -c ${CONFIG_FILE_LOCATION}"
 fi
-if [[ ${ATBASH_ARGS} != *' -w '* ]] || [[ ${ATBASH_ARGS} != *'--watcher'* ]]
+
+if ! echo "$ATBASH_ARGS" | grep -Eq '(-w|--watcher)';
 then
    ATBASH_ARGS="${ATBASH_ARGS} -w OFF"
 fi
