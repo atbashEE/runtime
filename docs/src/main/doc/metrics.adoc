@@ -1,0 +1,10 @@
+== Metrics
+
+The Metrics module provide information about the execution time of the REST requests that are processed.
+
+When the module is activated (through the commandline option `-m +metrics`) it captures the execution time of each request it processes.
+
+?? TODO ?? Configuration of the collector.
+
+This information is accessible in 2 different ways, as an HTML page (_/metrics/atbash_) or in a Prometheus format as a Summary type (_/metrics_).
+

@@ -99,6 +99,12 @@
 
         <dependency>
             <groupId>be.atbash.runtime</groupId>
+            <artifactId>metrics-module</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>be.atbash.runtime</groupId>
             <artifactId>microstream-module</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

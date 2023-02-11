@@ -42,6 +42,8 @@ include::mpconfig.adoc[]
 
 include::mpjwt.adoc[]
 
+include::metrics.adoc[]
+
 include::microstream.adoc[]
 
 include::bom.adoc[]
