@@ -26,6 +26,12 @@ public class HelloResource {
     @GET
     @Path("/{name}")
     public String sayHello(@PathParam("name") String name) {
+        try {
+            Thread.sleep(5);  // So that metrics does not show 0 ms to process within automated testing
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         return "Hello " + name;
     }
 }
