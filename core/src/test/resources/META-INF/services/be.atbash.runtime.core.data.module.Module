@@ -2,5 +2,7 @@ be.atbash.runtime.core.modules.LoggingModule
 be.atbash.runtime.core.modules.ConfigModule
 be.atbash.runtime.core.CoreModule
 be.atbash.runtime.core.modules.Module1
+be.atbash.runtime.core.modules.Module1Special
 be.atbash.runtime.core.modules.Module2
 be.atbash.runtime.core.modules.Module3
+be.atbash.runtime.core.modules.Module4

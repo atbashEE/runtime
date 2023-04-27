@@ -108,4 +108,24 @@ public class WatcherService {
             throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
         }
     }
+
+    /**
+     * Not really important in production but in testing the same JVM is used for multiple tests
+     * and the same bean is registered multiple times.
+     */
+    public void cleanup() {
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        monitoringBeans.keySet().forEach(on -> {
+            try {
+                server.unregisterMBean(on);
+            } catch (InstanceNotFoundException e) {
+                // Just ignore. TODO We could try to figure out why it is not there (only happens in tests)
+
+            } catch (MBeanRegistrationException e) {
+                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+            }
+        });
+        monitoringBeans.clear();
+
+    }
 }

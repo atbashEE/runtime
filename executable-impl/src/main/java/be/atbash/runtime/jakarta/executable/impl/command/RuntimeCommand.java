@@ -67,8 +67,7 @@ public class RuntimeCommand extends AbstractAtbashCommand {
         configurationParameters.setLogToFile(configurationFile != null);
         configurationParameters.setLogConfigurationFile(configurationFile);
         configurationParameters.setLogToConsole(configurationRunnerParameters.isLogToConsole());
-
-
+        configurationParameters.setModules(configurationRunnerParameters.getAdditionalModules());
     }
 
     public ConfigurationRunnerParameters getConfigurationRunnerParameters() {

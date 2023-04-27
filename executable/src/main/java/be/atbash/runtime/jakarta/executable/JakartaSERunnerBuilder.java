@@ -35,6 +35,8 @@ public final class JakartaSERunnerBuilder {
         runnerData.addResources(resourceClasses);
     }
 
+    private final Set<String> additionalModules = new HashSet<>();
+
     public JakartaSERunnerBuilder withPort(int port) {
         validatePort(port);
         runnerData.setPort(port);
@@ -43,7 +45,7 @@ public final class JakartaSERunnerBuilder {
 
     private void validatePort(int port) {
         if (port < 0 || port > 65536) {
-            throw new ParameterValidationException(String.format("The port value must be between 0 and 65536"));
+            throw new ParameterValidationException("The port value must be between 0 and 65536");
         }
     }
 
@@ -77,6 +79,16 @@ public final class JakartaSERunnerBuilder {
         return this;
     }
 
+    public JakartaSERunnerBuilder additionalModule(String value) {
+        additionalModules.add(value);
+        return this;
+    }
+
+    public JakartaSERunnerBuilder additionalModules(String... values) {
+        additionalModules.addAll(Arrays.asList(values));
+        return this;
+    }
+
     public JakartaSERunnerBuilder addCommandLineEntry(String value) {
         List<String> entries = new ArrayList<>();
         if (value.contains(" ")) {
@@ -90,7 +102,20 @@ public final class JakartaSERunnerBuilder {
     }
 
     public void run() {
+        defineModuleParameter();
         getRunner().start(runnerData);
+    }
+
+    private void defineModuleParameter() {
+        if (additionalModules.isEmpty()) {
+            return;
+        }
+        List<String> entries = new ArrayList<>();
+        entries.add("-m");
+        entries.add(additionalModules.stream()
+                .map(s -> "+" + s)
+                .collect(Collectors.joining(" ")));
+        runnerData.getCommandLineEntries().addAll(entries);
     }
 
     private JakartaRunner getRunner() {

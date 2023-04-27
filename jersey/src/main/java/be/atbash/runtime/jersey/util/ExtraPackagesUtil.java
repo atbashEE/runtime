@@ -15,7 +15,7 @@
  */
 package be.atbash.runtime.jersey.util;
 
-import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 import be.atbash.runtime.jersey.JerseyModuleConstant;
 
 import java.util.Arrays;
@@ -27,7 +27,7 @@ public final class ExtraPackagesUtil {
     private ExtraPackagesUtil() {
     }
 
-    public static void addPackages(ArchiveDeployment deployment, String... packages) {
+    public static void addPackages(AbstractDeployment deployment, String... packages) {
         StringBuilder packageNames = new StringBuilder();
         Optional<String> currentNames = Optional.ofNullable(deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES));
         packageNames.append(currentNames.orElse(""));
@@ -36,7 +36,7 @@ public final class ExtraPackagesUtil {
         deployment.addDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES, packageNames.toString());
 
     }
-    public static void addPackages(ArchiveDeployment deployment, List<String> packages) {
+    public static void addPackages(AbstractDeployment deployment, List<String> packages) {
         StringBuilder packageNames = new StringBuilder();
         Optional<String> currentNames = Optional.ofNullable(deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES));
         packageNames.append(currentNames.orElse(""));

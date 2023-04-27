@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -302,5 +302,43 @@ public class ModuleManagerTest {
         Assertions.assertThat(events.get(12)).isEqualTo("Stop Module3");
         Assertions.assertThat(events.get(13)).isEqualTo("Stop LoggingModule");
         Assertions.assertThat(events.get(14)).isEqualTo("Stop ConfigModule");
+    }
+
+    @Test
+    @Order(10)
+    public void startAndStopModules_specialModuleName() {
+        //System.setProperty("traceModuleStartProcessing", "true");
+        File configDirectory = new File("./target/testDirectory1");
+        configDirectory.mkdirs();
+
+        RuntimeConfiguration runtimeConfiguration = new RuntimeConfiguration.Builder(
+                configDirectory, "JUnitTest")
+                .build();
+
+        ConfigurationParameters parameters = new ConfigurationParameters();
+        // Since we are not using the real ConfigModule, modules need to be correctly set, including the 'default' modules.
+        setModules(parameters, "module1Special", "module4");
+
+        ModuleManager manager = ModuleManager.initModuleManager(parameters);
+        manager.startModules();
+        manager.stopModules();
+
+        List<String> events = ModulesLogger.getEvents();
+
+        Assertions.assertThat(events).hasSize(12);
+
+        Assertions.assertThat(events.get(0)).isEqualTo("Start Config Module");
+        Assertions.assertThat(events.get(1)).isEqualTo("End Config Module");
+        Assertions.assertThat(events.get(2)).isEqualTo("Start Logging Module");
+        Assertions.assertThat(events.get(3)).isEqualTo("End Logging Module");
+        Assertions.assertThat(events.get(4)).isEqualTo("Start Module 1 Special");
+        Assertions.assertThat(events.get(5)).isEqualTo("End Module 1 Special");
+        Assertions.assertThat(events.get(6)).isEqualTo("Start Module 4");
+        Assertions.assertThat(events.get(7)).isEqualTo("End Module 4");
+
+        Assertions.assertThat(events.get(8)).isEqualTo("Stop Module4");
+        Assertions.assertThat(events.get(9)).isEqualTo("Stop Module1Special");
+        Assertions.assertThat(events.get(10)).isEqualTo("Stop LoggingModule");
+        Assertions.assertThat(events.get(11)).isEqualTo("Stop ConfigModule");
     }
 }

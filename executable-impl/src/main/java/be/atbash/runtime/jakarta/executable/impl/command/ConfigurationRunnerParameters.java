@@ -42,6 +42,9 @@ public class ConfigurationRunnerParameters {
     @CommandLine.Option(names = {"--datafile"}, description = "Configuration properties file that are provided to deployer and application")
     private File configDataFile;
 
+    @CommandLine.Option(names = {"-m", "--modules"}, description = "Comma separated list of additional modules that needs to be started.")
+    private String additionalModules;
+
     public Boolean getVerbose() {
         return verbose;
     }
@@ -88,6 +91,14 @@ public class ConfigurationRunnerParameters {
 
     public void setConfigDataFile(File configDataFile) {
         this.configDataFile = configDataFile;
+    }
+
+    public String getAdditionalModules() {
+        return additionalModules;
+    }
+
+    public void setAdditionalModules(String additionalModules) {
+        this.additionalModules = additionalModules;
     }
 
     @Override

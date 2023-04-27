@@ -18,7 +18,7 @@ package be.atbash.runtime.security.jwt.module;
 import be.atbash.runtime.config.mp.module.MPConfigModule;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
-import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.AbstractDeployment;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.Events;
@@ -34,7 +34,8 @@ import static be.atbash.runtime.config.mp.module.MPConfigModule.MP_CONFIG_MODULE
 
 public class JWTAuthModule implements Module<RuntimeConfiguration> {
 
-    private static final String JWT_AUTH_MODULE_NAME = "mp-jwt";
+    // Public so that it can be used in the Jakarta Runner to define additional modules.
+    public static final String JWT_AUTH_MODULE_NAME = "mp-jwt";
 
     private RuntimeConfiguration configuration;
 
@@ -72,21 +73,32 @@ public class JWTAuthModule implements Module<RuntimeConfiguration> {
     public void onEvent(EventPayload eventPayload) {
         if (Events.PRE_DEPLOYMENT.equals(eventPayload.getEventCode())) {
 
-            ArchiveDeployment deployment = eventPayload.getPayload();
+            AbstractDeployment deployment = eventPayload.getPayload();
             checkModuleActive(deployment);
             checkLogTracing(deployment);
         }
+        if (Events.EXECUTION.equals(eventPayload.getEventCode())) {
+            // Events.EXECUTION Only triggered when running within Jakarta Runner
+            // And module is explicitly requested, so it is fine to set it active
+            // Needed since no Sniffers are running and thus @LoginConfig is not detected
+            AbstractDeployment deployment = eventPayload.getPayload();
+            deployment.addDeploymentData(MPJWTModuleConstant.JWTAUTH_ENABLED, "True");
+        }
+
     }
 
-    private void checkLogTracing(ArchiveDeployment deployment) {
+    private void checkLogTracing(AbstractDeployment deployment) {
 
         boolean tracingActive = Boolean.parseBoolean(deployment.getDeploymentData("jwt-auth.tracing.active"));
         LogTracingHelper.getInstance().storeLogTracingActive(deployment.getContextRoot(), tracingActive);
     }
 
-    private void checkModuleActive(ArchiveDeployment deployment) {
+    private void checkModuleActive(AbstractDeployment deployment) {
+        boolean moduleActive = Boolean.parseBoolean(deployment.getDeploymentData(MPJWTModuleConstant.JWTAUTH_ENABLED));
+        if (moduleActive) {
+            return;  // Already active, no need to check
+        }
         String realmName = deployment.getDeploymentData(MPJWTModuleConstant.REALM_NAME);
-        boolean moduleActive = Boolean.FALSE;
         if (realmName != null) {
             moduleActive = true;
 
@@ -95,7 +107,7 @@ public class JWTAuthModule implements Module<RuntimeConfiguration> {
         deployment.addDeploymentData(MPJWTModuleConstant.JWTAUTH_ENABLED, Boolean.toString(moduleActive));
     }
 
-    private void addPackageWithProvider(ArchiveDeployment deployment) {
+    private void addPackageWithProvider(AbstractDeployment deployment) {
         ExtraPackagesUtil.addPackages(deployment, "be.atbash.runtime.security.jwt.jaxrs");
     }
 

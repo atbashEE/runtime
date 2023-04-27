@@ -48,6 +48,25 @@ The builder has additional methods to configure the runner.
 
 Specifies the port assignment for the socket listener.
 
+When your application wants to make use of additional modules, on top of the functionality provided by the Core Profile specifications, you can follow these steps.
+
+. Add the module to your project, for example to have MicroProfile JWT support
+[source,xml]
+----
+<dependency>
+   <groupId>be.atbash.runtime</groupId>
+   <artifactId>jwt-auth-module</artifactId>
+   <version>1.0.0-SNAPSHOT</version>
+</dependency>
+----
+. Add the name as required module to the runner configuration, for example
+[source,java]
+----
+   .additionalModules(JWTAuthModule.JWT_AUTH_MODULE_NAME)
+----
+
+This pattern can be used add any module to the Jakarta Runner.
+
 [source,java]
 ----
     .addConfig(String key, String value)

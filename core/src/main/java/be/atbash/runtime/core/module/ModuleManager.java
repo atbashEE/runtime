@@ -384,11 +384,19 @@ public final class ModuleManager {
 
     private boolean canStart(String moduleName, List<String> startedModules, List<String> currentStarting) {
         // Not already started but all dependencies are started
-        Module module = ModuleUtil.findModule(modules, moduleName);
-        return !startedModules.contains(moduleName)
-                && !currentStarting.contains(moduleName)
+        Module<?> module = ModuleUtil.findModule(modules, moduleName);
+        return !containsModuleName(moduleName, startedModules)
+                && !containsModuleName(moduleName, currentStarting)
                 && Arrays.stream(module.dependencies())
-                .allMatch(startedModules::contains);
+                .allMatch(name -> containsModuleName(name, startedModules));
+    }
+
+    private boolean containsModuleName(String moduleName, List<String> moduleList) {
+        // We don't need to check on exact matches, but startsWith.
+        // mp-jwt depends on Jersey, but we have 'jersey' and 'jersey-se'. So correct startup
+        // must be possible with either 'jersey' modules
+        return moduleList.stream()
+                .anyMatch(s -> s.startsWith(moduleName));
     }
 
     /**
@@ -426,6 +434,8 @@ public final class ModuleManager {
                 });
         eventManager.unregisterListener(deployer);
         eventManager.unregisterListener(coreModule);
+
+        watcherService.cleanup();
 
         modulesStarted = false;
         // don't set moduleStartFailed to false as it doesn't make sense to try again.
