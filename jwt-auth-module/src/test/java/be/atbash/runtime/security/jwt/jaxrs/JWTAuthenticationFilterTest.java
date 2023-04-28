@@ -81,8 +81,7 @@ class JWTAuthenticationFilterTest {
         Mockito.when(authContextInfoProviderMock.getContextInfo()).thenReturn(authContextInfo);
 
         Mockito.when(requestContextMock.getHeaderString("Authorization")).thenReturn("Bearer theJWTToken");
-        UriInfo uriInfo = configureUriInfo("/root");
-        Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfo);
+        configureBaseUri("/root");
 
         // Define JsonWebToken/CallerPrincipal
         JWTCallerPrincipal callerPrincipal = new DefaultJWTCallerPrincipal("theJWTToken", new JWTClaimsSet.Builder().build(), authContextInfo);
@@ -113,13 +112,12 @@ class JWTAuthenticationFilterTest {
         Mockito.when(authContextInfoProviderMock.getContextInfo()).thenReturn(authContextInfo);
 
         Mockito.when(requestContextMock.getHeaderString("Authorization")).thenReturn("Bearer theJWTToken");
-        UriInfo uriInfo = configureUriInfo("/root");
-        Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfo);
+        configureUriInfo("/root");
 
         // Define JsonWebToken/CallerPrincipal
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject("JUnit")
-                .claim("groups", List.of("role1","role2"))
+                .claim("groups", List.of("role1", "role2"))
                 .build();
         JWTCallerPrincipal callerPrincipal = new DefaultJWTCallerPrincipal("theJWTToken", claimsSet, authContextInfo);
         Mockito.when(jwtParserMock.parse("theJWTToken", authContextInfo)).thenReturn(callerPrincipal);
@@ -143,16 +141,25 @@ class JWTAuthenticationFilterTest {
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getArguments().get(0)).isEqualTo("Bearer token 'theJWTToken'");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getMdc().get(LogTracingHelper.MDC_KEY_REQUEST_ID)).isNotBlank();
 
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(2).getMessage()).startsWith ("JWT-050");
+        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(2).getMessage()).startsWith("JWT-050");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(2).getArguments().get(0)).isEqualTo("The Token was accepted and has name = 'JUnit' and roles = '[role1, role2]'");
         Assertions.assertThat(TestLogMessages.getLoggingEvents().get(2).getMdc().get(LogTracingHelper.MDC_KEY_REQUEST_ID)).isNotBlank();
     }
 
-    private UriInfo configureUriInfo(String contextRoot) {
+    private void configureUriInfo(String contextRoot) {
 
-        URI uri = URI.create("http://localhost:8080" + contextRoot + "/endpoint");
-        Mockito.when(uriInfoMock.getRequestUri()).thenReturn(uri);
-        return uriInfoMock;
+        URI baseUri = URI.create("http://localhost:8080" + contextRoot);
+        URI requestUri = URI.create("http://localhost:8080" + contextRoot+"/endpoint");
+        Mockito.when(uriInfoMock.getBaseUri()).thenReturn(baseUri);
+        Mockito.when(uriInfoMock.getRequestUri()).thenReturn(requestUri);
+        Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfoMock);
+    }
+
+    private void configureBaseUri(String contextRoot) {
+
+        URI baseUri = URI.create("http://localhost:8080" + contextRoot);
+        Mockito.when(uriInfoMock.getBaseUri()).thenReturn(baseUri);
+        Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfoMock);
     }
 
     @Test
@@ -168,8 +175,7 @@ class JWTAuthenticationFilterTest {
 
         Mockito.when(requestContextMock.getHeaderString("Authorization")).thenReturn(null);
 
-        UriInfo uriInfo = configureUriInfo("/root");
-        Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfo);
+        configureUriInfo("/root");
 
         // Setup RequestContext
         SecurityContext securityContext = new JWTSecurityContext(null, null);
@@ -203,8 +209,7 @@ class JWTAuthenticationFilterTest {
 
         Mockito.when(jwtParserMock.parse("theJWTToken", authContextInfo)).thenThrow(new InvalidJWTException("Invalid JWT"));
 
-        UriInfo uriInfo = configureUriInfo("/root");
-        Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfo);
+        configureBaseUri("/root");
 
         // Setup RequestContext
         SecurityContext securityContext = new JWTSecurityContext(null, null);
@@ -229,8 +234,7 @@ class JWTAuthenticationFilterTest {
 
         Mockito.when(jwtParserMock.parse("theJWTToken", authContextInfo)).thenThrow(new JOSEException("Invalid JWT"));
 
-        UriInfo uriInfo = configureUriInfo("/root");
-        Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfo);
+        configureUriInfo("/root");
 
         // Setup RequestContext
         SecurityContext securityContext = new JWTSecurityContext(null, null);
@@ -255,8 +259,7 @@ class JWTAuthenticationFilterTest {
 
         Mockito.when(jwtParserMock.parse("theJWTToken", authContextInfo)).thenThrow(new IllegalArgumentException("Unknown JWT Type"));
 
-        UriInfo uriInfo = configureUriInfo("/root");
-        Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfo);
+        configureBaseUri("/root");
         // Setup RequestContext
         SecurityContext securityContext = new JWTSecurityContext(null, null);
         Mockito.when(requestContextMock.getSecurityContext()).thenReturn(securityContext);
@@ -278,8 +281,7 @@ class JWTAuthenticationFilterTest {
 
         Mockito.when(requestContextMock.getHeaderString("Authorization")).thenReturn("Bearer theJWTToken");
 
-        UriInfo uriInfo = configureUriInfo("/root");
-        Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfo);
+        configureBaseUri("/root");
 
         Mockito.when(jwtParserMock.parse("theJWTToken", authContextInfo)).thenThrow(new NullPointerException());
 
@@ -302,8 +304,7 @@ class JWTAuthenticationFilterTest {
         // We set a SecurityContext with a JsonWebToken as principal -> nothing to do.
         Mockito.when(requestContextMock.getSecurityContext()).thenReturn(securityContext);
 
-        UriInfo uriInfo = configureUriInfo("/root");
-        Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfo);
+        configureBaseUri("/root");
 
         filter.filter(requestContextMock);
 

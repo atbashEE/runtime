@@ -159,8 +159,8 @@ class RolesAllowedFilterTest {
     private void activateTracing() {
         LogTracingHelper.getInstance().storeLogTracingActive("/root", true);
 
-        URI uri = URI.create("http://localhost:8080/root/endpoint");
-        Mockito.when(uriInfoMock.getRequestUri()).thenReturn(uri);
+        URI uri = URI.create("http://localhost:8080/root");
+        Mockito.when(uriInfoMock.getBaseUri()).thenReturn(uri);
 
         Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfoMock);
 
@@ -170,8 +170,8 @@ class RolesAllowedFilterTest {
     private void noTracing() {
         LogTracingHelper.getInstance().storeLogTracingActive("/root", false);
 
-        URI uri = URI.create("http://localhost:8080/root/endpoint");
-        Mockito.when(uriInfoMock.getRequestUri()).thenReturn(uri);
+        URI uri = URI.create("http://localhost:8080/root");
+        Mockito.when(uriInfoMock.getBaseUri()).thenReturn(uri);
 
         Mockito.when(requestContextMock.getUriInfo()).thenReturn(uriInfoMock);
 

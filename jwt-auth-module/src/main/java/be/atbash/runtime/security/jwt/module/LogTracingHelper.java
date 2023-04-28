@@ -44,7 +44,7 @@ public final class LogTracingHelper {
     }
 
     public void startTracing(ContainerRequestContext context) {
-        String contextRoot = getContextRoot(context.getUriInfo().getRequestUri().getPath());
+        String contextRoot = getContextRoot(context);
         MDC.put(MDC_KEY_REQUEST_ID, UUID.randomUUID().toString());
         logTracingActive.set(contextRootTracingActive.getOrDefault(contextRoot, Boolean.FALSE));
     }
@@ -61,6 +61,7 @@ public final class LogTracingHelper {
     /**
      * Log information about request and log message parameters are passed directly. Use the
      * variant with a Supplier if the retrieval of the log parameters is more costly.
+     *
      * @param message
      * @param parameters
      */
@@ -74,6 +75,7 @@ public final class LogTracingHelper {
 
     /**
      * Log information about request but log message parameters are retrieved lazily.
+     *
      * @param message
      * @param parameters
      */
@@ -86,9 +88,12 @@ public final class LogTracingHelper {
     }
 
 
-    private String getContextRoot(String path) {
-        int idx = path.indexOf('/', 1);
-        return path.substring(0, idx);
+    private String getContextRoot(ContainerRequestContext context) {
+        String path = context.getUriInfo().getBaseUri().getPath();
+        if (path.length() > 1 && path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        return path;
     }
 
     public static LogTracingHelper getInstance() {
