@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.jersey;
+package be.atbash.runtime.core.data.deployment;
 
-public final class JerseyModuleConstant {
+public final class DeploymentDataConstants {
 
-    // The comma separated list of package names detected by the RestSniffer.
-    public static final String PACKAGE_NAMES = "jersey.package.names";
 
-    // The comma separated list of class names detected by the RestSniffer.
-    public static final String CLASS_NAMES = "jersey.class.names";
-    public static final String PROVIDER_NAMES = "jersey.provider.names";
-    public static final String APPLICATION_PATH = "jersey.application.path";
+    // The comma separated list of packages that contain providers added by some modules.
+    public static final String EXTRA_PACKAGE_NAMES = "jersey.extra.package.names";
 
-    private JerseyModuleConstant() {
+    private DeploymentDataConstants() {
     }
 }

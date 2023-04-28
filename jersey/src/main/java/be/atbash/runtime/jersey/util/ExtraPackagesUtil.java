@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package be.atbash.runtime.jersey.util;
 
 import be.atbash.runtime.core.data.deployment.AbstractDeployment;
-import be.atbash.runtime.jersey.JerseyModuleConstant;
+import be.atbash.runtime.core.data.deployment.DeploymentDataConstants;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,20 +29,21 @@ public final class ExtraPackagesUtil {
 
     public static void addPackages(AbstractDeployment deployment, String... packages) {
         StringBuilder packageNames = new StringBuilder();
-        Optional<String> currentNames = Optional.ofNullable(deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES));
+        Optional<String> currentNames = Optional.ofNullable(deployment.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES));
         packageNames.append(currentNames.orElse(""));
 
         Arrays.stream(packages).forEach(name -> addName(packageNames, name));
-        deployment.addDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES, packageNames.toString());
+        deployment.addDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES, packageNames.toString());
 
     }
+
     public static void addPackages(AbstractDeployment deployment, List<String> packages) {
         StringBuilder packageNames = new StringBuilder();
-        Optional<String> currentNames = Optional.ofNullable(deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES));
+        Optional<String> currentNames = Optional.ofNullable(deployment.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES));
         packageNames.append(currentNames.orElse(""));
 
         packages.forEach(name -> addName(packageNames, name));
-        deployment.addDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES, packageNames.toString());
+        deployment.addDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES, packageNames.toString());
 
     }
 

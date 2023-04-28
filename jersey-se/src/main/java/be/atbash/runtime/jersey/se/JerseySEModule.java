@@ -18,6 +18,7 @@ package be.atbash.runtime.jersey.se;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.ApplicationExecution;
+import be.atbash.runtime.core.data.deployment.DeploymentDataConstants;
 import be.atbash.runtime.core.data.exception.AtbashStartupAbortException;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
@@ -33,6 +34,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +46,7 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JerseySEModule.class);
 
-    private RuntimeConfiguration configuration;
+    private RuntimeConfiguration configuration;  // FIXME Not needed? Can be removed??
 
     @Override
     public String name() {
@@ -87,6 +89,7 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
         ResourceConfig resourceConfig = new ResourceConfig();
 
         handleResourcesDefinition(resourceConfig, applicationExecution);
+        handleAdditionalProviders(resourceConfig, applicationExecution);
 
         configBuilder.property(SeBootstrap.Configuration.PROTOCOL, "HTTP")
                 .property(SeBootstrap.Configuration.HOST, applicationExecution.getHost())
@@ -105,6 +108,17 @@ public class JerseySEModule implements Module<RuntimeConfiguration> {
         });
 
         LOGGER.atInfo().addArgument(applicationExecution.getDeploymentName()).log("JERSEY-104");
+    }
+
+    private void handleAdditionalProviders(ResourceConfig resourceConfig, ApplicationExecution applicationExecution) {
+
+        String extraPackageNames = applicationExecution.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES);
+        if (extraPackageNames != null) {
+
+            Arrays.stream(extraPackageNames.split(";")).forEach(resourceConfig::packages);
+
+        }
+
     }
 
     private void handleResourcesDefinition(ResourceConfig resourceConfig, ApplicationExecution applicationExecution) {

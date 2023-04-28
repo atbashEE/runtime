@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package be.atbash.runtime.jersey.util;
 
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
-import be.atbash.runtime.jersey.JerseyModuleConstant;
+import be.atbash.runtime.core.data.deployment.DeploymentDataConstants;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ class ExtraPackagesUtilTest {
 
         ExtraPackagesUtil.addPackages(deployment, "be.atbash");
 
-        String names = deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES);
+        String names = deployment.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES);
         Assertions.assertThat(names).isEqualTo("be.atbash");
     }
 
@@ -43,7 +43,7 @@ class ExtraPackagesUtilTest {
 
         ExtraPackagesUtil.addPackages(deployment, "be.atbash.runtime.cdi", "be.atbash.runtime.jaxrs");
 
-        String names = deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES);
+        String names = deployment.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES);
         Assertions.assertThat(names).isEqualTo("be.atbash.runtime.cdi;be.atbash.runtime.jaxrs");
     }
 
@@ -51,10 +51,10 @@ class ExtraPackagesUtilTest {
     void addPackages_add() {
 
         ArchiveDeployment deployment = createArchiveDeployment();
-        deployment.addDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES, "be.atbash.runtime.cdi");
+        deployment.addDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES, "be.atbash.runtime.cdi");
         ExtraPackagesUtil.addPackages(deployment, "be.atbash.runtime.jaxrs");
 
-        String names = deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES);
+        String names = deployment.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES);
         Assertions.assertThat(names).isEqualTo("be.atbash.runtime.cdi;be.atbash.runtime.jaxrs");
     }
 
@@ -65,7 +65,7 @@ class ExtraPackagesUtilTest {
 
         ExtraPackagesUtil.addPackages(deployment, List.of("be.atbash.runtime.jaxrs"));
 
-        String names = deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES);
+        String names = deployment.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES);
         Assertions.assertThat(names).isEqualTo("be.atbash.runtime.jaxrs");
     }
 
@@ -73,10 +73,10 @@ class ExtraPackagesUtilTest {
     void addPackages_list_add() {
 
         ArchiveDeployment deployment = createArchiveDeployment();
-        deployment.addDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES, "be.atbash.runtime.cdi");
+        deployment.addDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES, "be.atbash.runtime.cdi");
         ExtraPackagesUtil.addPackages(deployment, List.of("be.atbash.runtime.jaxrs"));
 
-        String names = deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES);
+        String names = deployment.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES);
         Assertions.assertThat(names).isEqualTo("be.atbash.runtime.cdi;be.atbash.runtime.jaxrs");
     }
 

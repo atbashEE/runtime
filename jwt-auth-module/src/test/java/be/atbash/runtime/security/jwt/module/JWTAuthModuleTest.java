@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.config.Config;
 import be.atbash.runtime.core.data.config.Modules;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
+import be.atbash.runtime.core.data.deployment.DeploymentDataConstants;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.Events;
 import be.atbash.runtime.security.jwt.MPJWTModuleConstant;
@@ -27,8 +28,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Map;
-
-import static be.atbash.runtime.jersey.JerseyModuleConstant.EXTRA_PACKAGE_NAMES;
 
 class JWTAuthModuleTest {
 
@@ -60,14 +59,14 @@ class JWTAuthModuleTest {
         ArchiveDeployment deployment = new ArchiveDeployment(new File("./applications/test.war"));
 
         deployment.addDeploymentData(MPJWTModuleConstant.REALM_NAME, "JWTRealm");
-        deployment.addDeploymentData(EXTRA_PACKAGE_NAMES, "some.package");
+        deployment.addDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES, "some.package");
         EventPayload eventPayload = new EventPayload(Events.PRE_DEPLOYMENT, deployment);
         module.onEvent(eventPayload);
 
         String enabled = deployment.getDeploymentData(MPJWTModuleConstant.JWTAUTH_ENABLED);
         Assertions.assertThat(enabled).isEqualTo("true");
 
-        String packages = deployment.getDeploymentData(EXTRA_PACKAGE_NAMES);
+        String packages = deployment.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES);
         Assertions.assertThat(packages).isEqualTo("some.package;be.atbash.runtime.security.jwt.jaxrs");
     }
 
@@ -82,7 +81,7 @@ class JWTAuthModuleTest {
         String enabled = deployment.getDeploymentData(MPJWTModuleConstant.JWTAUTH_ENABLED);
         Assertions.assertThat(enabled).isEqualTo("false");
 
-        String packages = deployment.getDeploymentData(EXTRA_PACKAGE_NAMES);
+        String packages = deployment.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES);
         Assertions.assertThat(packages).isNull();
     }
 }

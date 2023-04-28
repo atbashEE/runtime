@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,6 +96,7 @@ public class JWTAuthModule implements Module<RuntimeConfiguration> {
     private void checkModuleActive(AbstractDeployment deployment) {
         boolean moduleActive = Boolean.parseBoolean(deployment.getDeploymentData(MPJWTModuleConstant.JWTAUTH_ENABLED));
         if (moduleActive) {
+            addPackageWithProvider(deployment);
             return;  // Already active, no need to check
         }
         String realmName = deployment.getDeploymentData(MPJWTModuleConstant.REALM_NAME);

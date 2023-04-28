@@ -18,7 +18,7 @@ package be.atbash.runtime.jersey;
 import be.atbash.runtime.core.data.RuntimeConfiguration;
 import be.atbash.runtime.core.data.Specification;
 import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
-import be.atbash.runtime.core.data.exception.UnexpectedException;
+import be.atbash.runtime.core.data.deployment.DeploymentDataConstants;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.sniffer.Sniffer;
@@ -41,7 +41,7 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JerseyModule.class);
 
-    private RuntimeConfiguration configuration;
+    private RuntimeConfiguration configuration; // FIXME NOt used? can be removed.
     private HandlerCollection handlers;
 
     @Override
@@ -132,7 +132,7 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
         List<String> resourcePackages = new ArrayList<>(Arrays.asList(deployment.getDeploymentData(JerseyModuleConstant.PACKAGE_NAMES).split(",")));
         resourcePackages.add("be.atbash.runtime.jersey");
 
-        String extraPackageNames = deployment.getDeploymentData(JerseyModuleConstant.EXTRA_PACKAGE_NAMES);
+        String extraPackageNames = deployment.getDeploymentData(DeploymentDataConstants.EXTRA_PACKAGE_NAMES);
         if (extraPackageNames != null) {
 
             resourcePackages.addAll(Arrays.asList(extraPackageNames.split(";")));
@@ -152,7 +152,11 @@ public class JerseyModule implements Module<RuntimeConfiguration> {
                 webAppContextHandler.stop();
                 handlers.removeHandler(webAppContextHandler);
             } catch (Exception e) {
-                throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
+                // FIXME jetty 11 uses Servlet 5 and EL Expression 4
+                // Since EL Expression 5 is now on classpath, org.eclipse.jetty.servlet.listener.ELContextCleaner.contextDestroyed fails
+                // So log message until we have Jetty 12
+                LOGGER.warn("Problem undeploying application from Jersey due to older Jetty 11");
+                //throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, e);
             }
         }
         LOGGER.info("JERSEY-105: Unregistration of WebApp " + deployment.getDeploymentName() + " done");
