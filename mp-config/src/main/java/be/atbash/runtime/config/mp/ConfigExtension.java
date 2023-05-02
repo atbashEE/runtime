@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,8 +66,17 @@ public class ConfigExtension implements Extension {
         if (configDisabled) {
             return;
         }
-        AnnotatedType<ConfigProducer> configBean = bm.createAnnotatedType(ConfigProducer.class);
-        event.addAnnotatedType(configBean, ConfigProducer.class.getName());
+
+        boolean originalJarPackaging = getClass().getClassLoader().getResource("META-INF/OriginalJarPackaging") != null;
+
+        if (originalJarPackaging) {
+            // NO beans.xml in the mp-config; so register manually.
+            // If using Shade plugin or Runtime maven plugin, the uber jar contains a beans.xml
+            // and thus this manual registration should not be done as otherwise we have 2 beans for same Injection point
+            // and an Exception
+            AnnotatedType<ConfigProducer> configBean = bm.createAnnotatedType(ConfigProducer.class);
+            event.addAnnotatedType(configBean, ConfigProducer.class.getName());
+        }
     }
 
     protected <T> void storeConfigPropertiesType(@Observes @WithAnnotations(ConfigProperties.class) ProcessAnnotatedType<T> event) {

@@ -103,3 +103,7 @@ By default, the `jakarta-executable-impl` dependency activates the JAX_RS, CDI, 
 The general rule for the Runner mode is that when a Atbash Runtime module is on the classpath, it is active. You can deactivate a module, like MP Config, by specifying a certain property. Have a look at the modules on how to do this.
 
 === Known issues
+
+=== Creating executable JAR
+
+Creating an executable Jar for your project when it is using this Jakarta Runner, can be done using the Maven plugin: https://github.com/atbashEE/runtime-ecosystem/blob/main/docs/src/main/doc/maven-plugin.adoc
