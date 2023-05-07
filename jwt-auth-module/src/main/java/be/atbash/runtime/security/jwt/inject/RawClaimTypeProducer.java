@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import java.util.Set;
 /**
  * Based on the SmallRye code.
  */
+@Dependent
 public class RawClaimTypeProducer {
     @Inject
     private JsonWebToken currentToken;
@@ -181,7 +182,6 @@ public class RawClaimTypeProducer {
     @Produces
     @Claim
     @Dependent
-    @SuppressWarnings("rawtypes")
     public <T> Optional<T> getOptionalValue(InjectionPoint ip) {
         if (currentToken == null) {
             return Optional.empty();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package be.atbash.runtime.security.jwt.inject;
 
+import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Produces;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import jakarta.inject.Inject;
@@ -28,6 +29,7 @@ import java.util.Optional;
  * <p>
  * Based on the SmallRye code.
  */
+@Dependent
 public class JsonValueProducer {
     @Inject
     private CommonJwtProducer util;
