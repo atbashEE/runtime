@@ -180,21 +180,17 @@ class JWTAuthenticationFilterTest {
         // Setup RequestContext
         SecurityContext securityContext = new JWTSecurityContext(null, null);
         Mockito.when(requestContextMock.getSecurityContext()).thenReturn(securityContext);
-        filter.filter(requestContextMock);
+
+        // No token is not authorized
+        Assertions.assertThatThrownBy(() ->
+                        filter.filter(requestContextMock))
+                .isInstanceOf(NotAuthorizedException.class);
+
 
         Mockito.verify(requestContextMock, Mockito.never()).abortWith(Mockito.any(Response.class));
         Mockito.verify(requestContextMock, Mockito.never()).setSecurityContext(Mockito.any(SecurityContext.class));
-        Mockito.verify(producerMock, Mockito.never()).setJsonWebToken(Mockito.any(JsonWebToken.class));
+        Mockito.verify(producerMock, Mockito.never()).setJsonWebToken(Mockito.any(JWTCallerPrincipal.class));
 
-        Assertions.assertThat(TestLogMessages.getLoggingEvents()).hasSize(2);
-
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getMessage()).startsWith("JWT-050");
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getArguments().get(0)).isEqualTo("Received request on http://localhost:8080/root/endpoint");
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(0).getMdc().get(LogTracingHelper.MDC_KEY_REQUEST_ID)).isNotBlank();
-
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getMessage()).startsWith("JWT-050");
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getArguments().get(0)).isEqualTo("Bearer token 'null'");
-        Assertions.assertThat(TestLogMessages.getLoggingEvents().get(1).getMdc().get(LogTracingHelper.MDC_KEY_REQUEST_ID)).isNotBlank();
 
     }
 

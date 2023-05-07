@@ -46,4 +46,8 @@ It also assigns a unique id to dach request and places that in the MDC context o
 == Additional functionality
 
 - The Claims that specify a date value (like _exp_, _iat_, etc) but also custom claims that are transmitted as a number but actually represent the number of seconds since 1 Jan 1970, can be injected as a Date.
-- In contrast to JWT Auth Specification, a JAX-RS resource method that is not annotated with a permission annotation (@RolesAllowed or @permitAll), will receive the @DenyAll annotation as this is probably an oversight of the developer. These occurrences are reported in the log the first time they are called.
+- In contrast to JWT Auth Specification, a JAX-RS resource method that is not annotated with a permission annotation (@RolesAllowed or @PermitAll), will receive the @DenyAll annotation as this is probably an oversight of the developer. These occurrences are reported in the log the first time they are called.
+
+== PermitAll
+
+`@PermitAll` implementation, had an issue before version 1.0.0 as it allowed an unauthenticated call to the endpoint (no headers values where checked)  But the annotation is about authorization so authentication must be done. It is not enforcing any roles within the token.
