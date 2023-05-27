@@ -29,11 +29,11 @@ import java.util.logging.SimpleFormatter;
 public class TestingLoggingEvent extends LoggingEvent {
 
     private static final SimpleFormatter formatter = new SimpleFormatter();
-    private final LogRecord record;
+    private final LogRecord logRecord;
 
-    public TestingLoggingEvent(LogRecord record) {
-        super(record);
-        this.record = record;
+    public TestingLoggingEvent(LogRecord logRecord) {
+        super(logRecord);
+        this.logRecord = logRecord;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class TestingLoggingEvent extends LoggingEvent {
 
             //SimpleFormatter.formatMessage is thread safe and doesn't use class variables so can be used
             // without creating a new instance.
-            formattedMessage = formatter.formatMessage(record);
+            formattedMessage = formatter.formatMessage(logRecord);
         }
         return formattedMessage;
     }

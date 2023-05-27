@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,29 +63,29 @@ class ConfigInstanceUtilTest {
     }
 
     @Test
-    public void testExistingConfigName() {
+    void testExistingConfigName() {
 
         ConfigInstance configInstance = new ConfigInstance(TEST_DIRECTORY.getAbsolutePath(), "testconfig", false, true);
         ConfigInstanceUtil.processConfigInstance(configInstance);
 
-        Assertions.assertThat(outCapture.toString()).isEqualTo("CONFIG-017\n");
+        Assertions.assertThat(outCapture).hasToString("CONFIG-017\n");
         Assertions.assertThat(configInstance.isValid()).isTrue();
         Assertions.assertThat(configInstance.isExistingConfigDirectory()).isTrue();  // This can be used to abort the command create-config
         Assertions.assertThat(configInstance.getConfigName()).isEqualTo("testconfig");
     }
 
     @Test
-    public void testNonExistingDirectory() {
+    void testNonExistingDirectory() {
 
         ConfigInstance configInstance = new ConfigInstance(NONEXISTING_DIRECTORY.getAbsolutePath(), "testconfig", false, true);
         ConfigInstanceUtil.processConfigInstance(configInstance);
 
-        Assertions.assertThat(outCapture.toString()).isEqualTo("CONFIG-014\n");
+        Assertions.assertThat(outCapture).hasToString("CONFIG-014\n");
         Assertions.assertThat(configInstance.isValid()).isFalse();
     }
 
     @Test
-    public void testWithFile() {
+    void testWithFile() {
 
         ConfigInstance configInstance = new ConfigInstance(new File(TEST_DIRECTORY, "pom.xml").getAbsolutePath(), "testconfig", false, true);
         ConfigInstanceUtil.processConfigInstance(configInstance);
@@ -96,7 +96,7 @@ class ConfigInstanceUtilTest {
     }
 
     @Test
-    public void test_ProcessConfigInstance_HappyCase() {
+    void test_ProcessConfigInstance_HappyCase() {
 
         ConfigInstance configInstance = new ConfigInstance(new File(TEST_DIRECTORY, "target/").getAbsolutePath(), "testconfig", false, true);
         ConfigInstanceUtil.processConfigInstance(configInstance);
@@ -108,7 +108,7 @@ class ConfigInstanceUtilTest {
     }
 
     @Test
-    public void testExistingConfigName_UseConfig() {
+    void testExistingConfigName_UseConfig() {
 
         ConfigInstance configInstance = new ConfigInstance(TEST_DIRECTORY.getAbsolutePath(), "testconfig", false, false);
         ConfigInstanceUtil.processConfigInstance(configInstance);
@@ -120,7 +120,7 @@ class ConfigInstanceUtilTest {
     }
 
     @Test
-    public void testNonExistingDirectory_stateless_invalidRoot() {
+    void testNonExistingDirectory_stateless_invalidRoot() {
 
         ConfigInstance configInstance = new ConfigInstance(NONEXISTING_DIRECTORY.getAbsolutePath(), "testconfig", true, false);
         ConfigInstanceUtil.processConfigInstance(configInstance);
@@ -133,7 +133,7 @@ class ConfigInstanceUtilTest {
     }
 
     @Test
-    public void testNonExistingDirectory_stateless_invalidConfig() {
+    void testNonExistingDirectory_stateless_invalidConfig() {
 
         ConfigInstance configInstance = new ConfigInstance(TEST_DIRECTORY.getAbsolutePath(), "something", true, false);
         ConfigInstanceUtil.processConfigInstance(configInstance);
@@ -146,7 +146,7 @@ class ConfigInstanceUtilTest {
     }
 
     @Test
-    public void testNonExistingDirectory_stateless_validDirectories() {
+    void testNonExistingDirectory_stateless_validDirectories() {
 
         ConfigInstance configInstance = new ConfigInstance(TEST_DIRECTORY.getAbsolutePath(), "testconfig", true, false);
         ConfigInstanceUtil.processConfigInstance(configInstance);
@@ -159,7 +159,7 @@ class ConfigInstanceUtilTest {
     }
 
     @Test
-    public void test_storeConfig_HappyCase() {
+    void test_storeConfig_HappyCase() {
         // This test fails when you run it a second time without clearing the target directory.
         File testDirectory = new File(TEST_DIRECTORY, "target/");
         ConfigInstance configInstance = new ConfigInstance(testDirectory.getAbsolutePath(), "test", false, true);

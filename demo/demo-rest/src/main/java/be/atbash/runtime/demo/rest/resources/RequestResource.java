@@ -28,6 +28,7 @@ public class RequestResource {
         try {
             Thread.sleep(5);  // So that metrics does not show 0 ms to process within automated testing
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
         return "RequestScoped resource response " ;

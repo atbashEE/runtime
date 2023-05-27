@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +68,7 @@ public class RestSniffer implements Sniffer {
     public Map<String, String> deploymentData() {
         Map<String, String> result = new HashMap<>();
         result.put(JerseyModuleConstant.CLASS_NAMES, String.join(",", resourceClassNames()));
+        result.put(JerseyModuleConstant.PROVIDER_NAMES, String.join(",", providerClassNames()));
         result.put(JerseyModuleConstant.PACKAGE_NAMES, String.join(",", determinePackages()));
         result.put(JerseyModuleConstant.APPLICATION_PATH, findApplicationPath());
 
@@ -87,6 +88,13 @@ public class RestSniffer implements Sniffer {
 
     private List<String> resourceClassNames() {
         return resourceClasses
+                .stream()
+                .map(Class::getName)
+                .collect(Collectors.toList());
+    }
+
+    private List<String> providerClassNames() {
+        return providerClasses
                 .stream()
                 .map(Class::getName)
                 .collect(Collectors.toList());

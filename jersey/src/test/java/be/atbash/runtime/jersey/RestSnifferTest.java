@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,12 +42,13 @@ class RestSnifferTest {
 
         Map<String, String> data = sniffer.deploymentData();
 
-        assertThat(data).hasSize(3);
-        assertThat(data.keySet()).contains(JerseyModuleConstant.APPLICATION_PATH, JerseyModuleConstant.PACKAGE_NAMES, JerseyModuleConstant.CLASS_NAMES);
+        assertThat(data).hasSize(4);
+        assertThat(data.keySet()).contains(JerseyModuleConstant.APPLICATION_PATH, JerseyModuleConstant.PACKAGE_NAMES, JerseyModuleConstant.CLASS_NAMES, JerseyModuleConstant.PROVIDER_NAMES);
         assertThat(data.get(JerseyModuleConstant.APPLICATION_PATH)).isEqualTo("/rest");
         assertThat(data.get(JerseyModuleConstant.PACKAGE_NAMES)).isEqualTo("be.atbash.runtime.demo.rest.resources,be.atbash.runtime.demo.rest.provider");
         assertThat(data.get(JerseyModuleConstant.CLASS_NAMES)).contains("be.atbash.runtime.demo.rest.resources.HelloResource");
         assertThat(data.get(JerseyModuleConstant.CLASS_NAMES)).contains("be.atbash.runtime.demo.rest.resources.RequestResource");
+        assertThat(data.get(JerseyModuleConstant.PROVIDER_NAMES)).contains("be.atbash.runtime.demo.rest.provider.DemoContainerRequestFilter");
         /// FIXME we need a 3th JAX-RS resource in another package so that we can test the concatenation.
     }
 }

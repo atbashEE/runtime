@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ class ConfigurationManagerTest {
 
         ConfigurationManager manager = new ConfigurationManager(runtimeConfiguration);
         List<String> result = manager.setCommand(new String[]{"module.key.parts=value"});
-        Assertions.assertThat(result.isEmpty()).isTrue();
+        Assertions.assertThat(result).isEmpty();
 
         File configFile = new File(configDirectory, CONFIG_FILE);
         Assertions.assertThat(configFile).exists();
@@ -65,12 +65,12 @@ class ConfigurationManagerTest {
 
         ConfigurationManager manager = new ConfigurationManager(runtimeConfiguration);
         List<String> result = manager.setCommand(new String[]{"module.key.parts=value", "mpconfig.validation.disable=true"});
-        Assertions.assertThat(result.isEmpty()).isTrue();
+        Assertions.assertThat(result).isEmpty();
 
         File configFile = new File(configDirectory, CONFIG_FILE);
-        Assertions.assertThat(configFile).exists();
-
-        Assertions.assertThat(configFile).hasContent("{\"modules\":{\"configuration\":{\"module\":{\"key.parts\":\"value\"},\"mpconfig\":{\"validation.disable\":\"true\"}}}}");
+        Assertions.assertThat(configFile)
+                .exists()
+                .hasContent("{\"modules\":{\"configuration\":{\"module\":{\"key.parts\":\"value\"},\"mpconfig\":{\"validation.disable\":\"true\"}}}}");
 
     }
 
@@ -88,9 +88,9 @@ class ConfigurationManagerTest {
 
         ConfigurationManager manager = new ConfigurationManager(runtimeConfiguration);
         List<String> result = manager.setCommand(new String[]{"module.key.parts"});
-        Assertions.assertThat(result.isEmpty()).isFalse();
-        Assertions.assertThat(result).containsExactly("CONFIG-101: Option must be 2 parts separated by =, received 'module.key.parts'");
-
+        Assertions.assertThat(result)
+                .isNotEmpty()
+                .containsExactly("CONFIG-101: Option must be 2 parts separated by =, received 'module.key.parts'");
 
         File configFile = new File(configDirectory, CONFIG_FILE);
         Assertions.assertThat(configFile).doesNotExist();

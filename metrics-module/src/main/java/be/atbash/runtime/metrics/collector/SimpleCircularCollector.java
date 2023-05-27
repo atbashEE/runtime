@@ -17,8 +17,8 @@ package be.atbash.runtime.metrics.collector;
 
 public class SimpleCircularCollector implements MetricsCollector {
 
-    private long[] reservoir;
-    private int size;
+    private final long[] reservoir;
+    private final int size;
 
     private int idx;
 

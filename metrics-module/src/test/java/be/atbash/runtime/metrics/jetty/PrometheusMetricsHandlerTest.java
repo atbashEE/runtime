@@ -36,8 +36,8 @@ import java.util.regex.Pattern;
 @ExtendWith(MockitoExtension.class)
 class PrometheusMetricsHandlerTest {
 
-    private static Pattern REGEX_COUNT = Pattern.compile("application_response_time_seconds_count\\{application=\"([^-\\s]+)\",endpoint=\"([^-\\s]+)\"} ([0-9]+)");
-    private static Pattern REGEX_QUANTILE = Pattern.compile("application_response_time_seconds\\{application=\"([^-\\s]+)\",endpoint=\"([^-\\s]+)\",quantile=\"([.0-9]+)\"} ([0-9]+)");
+    private static final Pattern REGEX_COUNT = Pattern.compile("application_response_time_seconds_count\\{application=\"([^-\\s]+)\",endpoint=\"([^-\\s]+)\"} ([0-9]+)");
+    private static final Pattern REGEX_QUANTILE = Pattern.compile("application_response_time_seconds\\{application=\"([^-\\s]+)\",endpoint=\"([^-\\s]+)\",quantile=\"([.0-9]+)\"} ([0-9]+)");
 
     @Mock
     private Request baseRequestMock;

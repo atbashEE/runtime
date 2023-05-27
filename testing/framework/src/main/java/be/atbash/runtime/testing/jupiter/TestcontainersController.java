@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package be.atbash.runtime.testing.jupiter;
 
 import be.atbash.runtime.testing.AtbashContainer;
 import be.atbash.runtime.testing.DockerImageContainer;
+import be.atbash.runtime.testing.exception.ContainersNotReadyException;
 import be.atbash.runtime.testing.model.ServerAdapterMetaData;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.extension.ExtensionConfigurationException;
@@ -182,8 +183,11 @@ public class TestcontainersController {
                 }, 200, TimeUnit.MILLISECONDS);
 
 
-                shutdownTimeout.await(waitTimeout.getSeconds(), TimeUnit.SECONDS);
-                // FIXME What should we do if we don't get container up and running within the time frame?
+                boolean notStarted = shutdownTimeout.await(waitTimeout.getSeconds(), TimeUnit.SECONDS);
+
+                if (!notStarted) {
+                    throw new ContainersNotReadyException("Atbash Container not ready " );
+                }
             } catch (InterruptedException e) {
                 // re-interrupt for proper clean up
                 Thread.currentThread().interrupt();

@@ -156,8 +156,6 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         } else {
             configInstance = new ConfigInstance(null, null,
                     true, false);
-            // TODO Can we have this also for the normal Atbash Runtime?
-            // Can we add this to the if part?
             if (parameters.getLogConfigurationFile() != null) {
                 configInstance.setLoggingConfigurationFile(parameters.getLogConfigurationFile().getPath());
             }
@@ -238,8 +236,14 @@ public class ConfigModule implements Module<ConfigurationParameters> {
         if (parameters.getWatcher() == WatcherType.JMX || parameters.getWatcher() == WatcherType.ALL) {
             config.getMonitoring().setJmx(true);
         }
+        if (parameters.getWatcher() == WatcherType.OFF) {
+            // Does not disable the JMX service on some OpenJDK ones. But no harm.
+            System.setProperty("com.sun.management.jmxremote", "false");
+        }
 
         Endpoint httpEndpoint = ConfigHelper.getHttpEndpoint(config);
-        httpEndpoint.setPort(parameters.getPort());
+        if (parameters.getPort() != -1) {
+            httpEndpoint.setPort(parameters.getPortWithDefault());
+        }
     }
 }

@@ -80,11 +80,9 @@ public class JakartaRunnerHelper {
     private void validateCommandLine(RuntimeCommand command) {
 
         File configDataFile = command.getConfigurationRunnerParameters().getConfigDataFile();
-        if (configDataFile != null) {
-            if (!configDataFile.exists() || !configDataFile.canRead()) {
-                String msg = LoggingUtil.formatMessage(logger, "CLI-114", configDataFile);
-                abort(msg, -1);
-            }
+        if (configDataFile != null && (!configDataFile.exists() || !configDataFile.canRead())) {
+            String msg = LoggingUtil.formatMessage(logger, "CLI-114", configDataFile);
+            abort(msg, -1);
         }
     }
 
@@ -97,10 +95,10 @@ public class JakartaRunnerHelper {
             result = commandLines.get(commandLines.size() - 1).getCommand();
 
         } catch (CommandLine.ParameterException e) {
-            Logger logger = LoggingUtil.getMainLogger(AtbashJakartaRunner.class);
-            logger.error(e.getMessage());
+            Logger exceptionLogger = LoggingUtil.getMainLogger(AtbashJakartaRunner.class);
+            exceptionLogger.error(e.getMessage());
             String usageMessage = commandLine.getUsageMessage(CommandLine.Help.Ansi.AUTO);
-            logger.info(usageMessage);
+            exceptionLogger.info(usageMessage);
         }
         return result;
     }

@@ -13,26 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.atbash.runtime.demo.rest.resources;
+package be.atbash.runtime.testing.exception;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-
-
-@Path("/hello")
-public class HelloResource {
-
-    @GET
-    @Path("/{name}")
-    public String sayHello(@PathParam("name") String name) {
-        try {
-            Thread.sleep(5);  // So that metrics does not show 0 ms to process within automated testing
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        }
-
-        return "Hello " + name;
+public class ContainersNotReadyException extends AtbashTestingException{
+    public ContainersNotReadyException(String message) {
+        super(message);
     }
 }

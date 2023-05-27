@@ -44,7 +44,7 @@ class RequestMetricsPumpTest {
     @Mock
     private UriInfo uriInfoMock;
 
-    private RequestMetricsPump metricsPump = new RequestMetricsPump();
+    private final RequestMetricsPump metricsPump = new RequestMetricsPump();
 
     @AfterEach
     void cleanup() {
@@ -147,7 +147,7 @@ class RequestMetricsPumpTest {
         Mockito.when(uriInfoMock.getPathParameters()).thenReturn(map);
 
         List<PathSegment> segments = Arrays.stream(path.substring(1).split("/"))
-                .map(p -> new SimplePathSegment(p))
+                .map(SimplePathSegment::new)
                 .collect(Collectors.toList());
 
         Mockito.when(uriInfoMock.getPathSegments()).thenReturn(segments);
@@ -159,7 +159,7 @@ class RequestMetricsPumpTest {
         return metricsData;
     }
 
-    public class TestDeployment extends AbstractDeployment {
+    public static class TestDeployment extends AbstractDeployment {
 
         public TestDeployment(String deploymentName, String contextRoot) {
             super(deploymentName, contextRoot, new HashMap<>());

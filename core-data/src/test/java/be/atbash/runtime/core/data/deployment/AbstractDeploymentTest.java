@@ -100,6 +100,7 @@ class AbstractDeploymentTest {
     void setDeploymentModule() {
         TestDeployment deployment = new TestDeployment("name", "/root", new HashMap<>());
         deployment.setDeploymentModule(moduleMock);
+        Assertions.assertThat(deployment.getDeploymentPhase()).isEqualTo(DeploymentPhase.NOT_STARTED);
     }
 
     @ParameterizedTest

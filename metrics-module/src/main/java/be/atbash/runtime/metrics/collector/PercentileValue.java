@@ -18,7 +18,7 @@ package be.atbash.runtime.metrics.collector;
 public enum PercentileValue {
     P0_01(1), P0_05(5),P0_10(10),P0_25(25),P0_50(50),P0_75(75),P0_90(90),P0_95(95),P0_99(99);
 
-    private int value;
+    private final int value;
 
     PercentileValue(int value) {
         this.value = value;

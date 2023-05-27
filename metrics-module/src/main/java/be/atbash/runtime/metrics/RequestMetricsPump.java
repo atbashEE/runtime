@@ -16,7 +16,6 @@
 package be.atbash.runtime.metrics;
 
 import be.atbash.runtime.core.data.deployment.AbstractDeployment;
-import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.exception.UnexpectedException;
 import be.atbash.runtime.core.data.util.Synchronizer;
 import be.atbash.runtime.metrics.collector.MetricsCollector;
@@ -81,11 +80,11 @@ public class RequestMetricsPump implements MetricsDataProvider {
             synchronized (LOCK) {
                 String application = findApplication(metricsData.getFullPath());
                 EndpointKey key = new EndpointKey(application, metricsData.getMethodAndPath());
-                MetricsCollector collector = collectorsPerEndpoint.computeIfAbsent(key, k -> determineCollector(k));
+                MetricsCollector collector = collectorsPerEndpoint.computeIfAbsent(key, this::determineCollector);
                 collector.handle(metricsData.getDuration());
 
                 key = new EndpointKey(application, "/*");
-                collector = collectorsPerEndpoint.computeIfAbsent(key, k -> determineCollector(k));
+                collector = collectorsPerEndpoint.computeIfAbsent(key, this::determineCollector);
                 collector.handle(metricsData.getDuration());
 
             }
@@ -110,7 +109,9 @@ public class RequestMetricsPump implements MetricsDataProvider {
     }
 
     public void offer(RequestMetricsData metricsData) {
-        pendingMetrics.offer(metricsData);
+        if (!pendingMetrics.offer(metricsData)) {
+            throw new UnexpectedException(UnexpectedException.UnexpectedExceptionCode.UE001, "Queue full");
+        }
     }
 
     public void registerApplication(AbstractDeployment deployment) {
@@ -140,7 +141,7 @@ public class RequestMetricsPump implements MetricsDataProvider {
             return collectorsPerEndpoint.keySet()
                     .stream()
                     .filter(k -> deploymentName.equals(k.getDeploymentName()))
-                    .map(k -> k.getPath())
+                    .map(EndpointKey::getPath)
                     .collect(Collectors.toList());
         }
     }

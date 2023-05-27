@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,9 @@ class ValidateJWTConfigurationTest {
         contextInfo.setIssuedBy(List.of("Issuer"));
         contextInfo.setPublicKeyLocation(List.of("file:key.pem"));
         Mockito.when(providerMock.getContextInfo()).thenReturn(contextInfo);
-        validateJWTConfiguration.onApplicationDeployment(null);
-
-        // No exception thrown
+        Assertions.assertThatCode(() -> {
+            validateJWTConfiguration.onApplicationDeployment(null);
+        }).doesNotThrowAnyException();
     }
 
     @Test
@@ -56,9 +56,11 @@ class ValidateJWTConfigurationTest {
         contextInfo.setPublicKeyLocation(Collections.emptyList());
         contextInfo.setPublicKeyContent("SomethingThatWillBeInterpretedAsAKey");
         Mockito.when(providerMock.getContextInfo()).thenReturn(contextInfo);
-        validateJWTConfiguration.onApplicationDeployment(null);
 
-        // No exception thrown
+        Assertions.assertThatCode(() -> {
+            validateJWTConfiguration.onApplicationDeployment(null);
+        }).doesNotThrowAnyException();
+
     }
 
     @Test

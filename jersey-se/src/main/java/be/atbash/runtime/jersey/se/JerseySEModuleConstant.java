@@ -17,5 +17,8 @@ package be.atbash.runtime.jersey.se;
 
 public final class JerseySEModuleConstant {
 
+    private JerseySEModuleConstant() {
+    }
+
     public static final String APPLICATION_PATH = "jersey.application.path";
 }

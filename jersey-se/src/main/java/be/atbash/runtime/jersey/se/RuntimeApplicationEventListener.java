@@ -68,11 +68,6 @@ public class RuntimeApplicationEventListener implements ApplicationEventListener
         return logLines;
     }
 
-    private void populate(String basePath, Class<?> klass, boolean isLocator,
-                          Set<EndpointLogLine> endpointLogLines) {
-        populate(basePath, isLocator, Resource.from(klass), endpointLogLines);
-    }
-
     private void populate(String basePath, boolean isLocator, Resource resource,
                           Set<EndpointLogLine> endpointLogLines) {
         if (!isLocator) {

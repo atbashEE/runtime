@@ -25,7 +25,6 @@ import be.atbash.runtime.core.data.module.sniffer.Sniffer;
 import be.atbash.runtime.core.module.RuntimeObjectsManager;
 import be.atbash.runtime.jersey.JerseyModule;
 import be.atbash.runtime.jersey.util.ExtraPackagesUtil;
-import be.atbash.runtime.jetty.HealthHandler;
 import be.atbash.runtime.metrics.jetty.AtbashMetricsHandler;
 import be.atbash.runtime.metrics.jetty.PrometheusMetricsHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;

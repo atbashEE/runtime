@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 Rudy De Busscher (https://www.atbash.be)
+ * Copyright 2021-2023 Rudy De Busscher (https://www.atbash.be)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class JWTAuthorizationFilterRegistrar implements DynamicFeature {
             if (SystemPropertyUtil.getInstance().isTck("jwt")) {
                 if (hasSecurityAnnotations(resourceInfo)) {
                     // DenyAll when this method has no annotation but other methods in the Resource have annotations.
-                    // (and we have the TCK flag -> allow the method which is against the spirit of the spec and the security best practives
+                    // (and we have the TCK flag -> allow the method which is against the spirit of the spec and the security best practices
                     configureDenyAll(context);
                 }
             } else {

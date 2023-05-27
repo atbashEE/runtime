@@ -21,13 +21,9 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.PathSegment;
 import jakarta.ws.rs.ext.Provider;
-import org.glassfish.jersey.server.internal.routing.UriRoutingContext;
 
 import java.io.IOException;
-import java.util.List;
 
 @Provider
 public class RestMetricsFilter implements ContainerRequestFilter, ContainerResponseFilter {

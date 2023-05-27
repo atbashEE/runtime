@@ -19,20 +19,11 @@ import be.atbash.runtime.core.data.deployment.ArchiveDeployment;
 import be.atbash.runtime.core.data.module.Module;
 import be.atbash.runtime.core.data.module.event.EventPayload;
 import be.atbash.runtime.core.data.module.event.Events;
-import be.atbash.runtime.core.data.parameter.ConfigurationParameters;
-import be.atbash.runtime.core.data.parameter.WatcherType;
-import be.atbash.runtime.core.data.watcher.WatcherService;
-import be.atbash.runtime.core.deployment.Deployer;
-import be.atbash.runtime.core.module.ModuleManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.io.File;
-import java.util.Collections;
 
 
 @ExtendWith(MockitoExtension.class)

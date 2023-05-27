@@ -17,8 +17,8 @@ package be.atbash.runtime.metrics;
 
 public class EndpointKey {
 
-    private String deploymentName;
-    private String path;
+    private final String deploymentName;
+    private final String path;
 
     public EndpointKey(String deploymentName, String path) {
         this.deploymentName = deploymentName;

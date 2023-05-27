@@ -39,7 +39,7 @@ public class JakartaRunnerData {
             throw new ParameterValidationException("You need to provide (at least 1) not null resource class");
         }
 
-        List<Class<?>> classes = Arrays.asList(resources).stream()
+        List<Class<?>> classes = Arrays.stream(resources)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         if (classes.isEmpty()) {
